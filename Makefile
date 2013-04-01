@@ -14,6 +14,16 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   STRIP_OPTIONS=-S -x
+  RDYNAMIC=-rdynamic
+else ifeq ($(UNAME), Linux)	# linux
+  PLATFORM_ARCH = linux x86_64
+  PLATFORM_LIBS = linux
+  PLATFORM_GENERAL_INCLUDES = -I$(JAVA_HOME)/include
+  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
+  PLATFORM_CONSOLE_OPTION = 
+  EXE_EXT=
+  STRIP_OPTIONS=--strip-all
+  RDYNAMIC=-rdynamic
 else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_ARCH = windows i386
   PLATFORM_LIBS = win32
@@ -22,6 +32,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_CONSOLE_OPTION = -mconsole
   EXE_EXT=.exe
   STRIP_OPTIONS=--strip-all
+  RDYNAMIC=
 endif
 
 JAVA_CLASSES = $(BIN)/java/crossbase/Application.class
@@ -57,7 +68,7 @@ $(BIN)/crossbase: $(JAVA_CLASSES) $(NATIVE_OBJECTS)
 
 	# Making an object file from the java class library
 	tools/$(PLATFORM_LIBS)/binaryToObject $(BIN)/boot.jar $(OBJ)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(OBJ)/libavian/*.o $(NATIVE_OBJECTS) $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(OBJ)/libavian/*.o $(NATIVE_OBJECTS) $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip $(STRIP_OPTIONS) $@$(EXE_EXT)
 
 clean:

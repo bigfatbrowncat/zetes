@@ -12,7 +12,7 @@ The example is tested under:
 * OS X 10.8 Mountain Lion (x86_64 build using the provided OS X JDK)
 * Ubuntu 12.10 (a Debian-based linux, OpenJDK, x86_64 build)
 
-Hopefully it should work under any Linux, Windows or Mac platform with JDK compatible to Oracle JDK 6 or 7 installed.
+Hopefully it should work under any Intel-based Linux, Windows or Mac platform with JDK compatible to Oracle JDK 6 or 7 installed.
 
 ## Building
 

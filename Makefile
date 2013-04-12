@@ -4,6 +4,10 @@ SRC = src
 BIN = bin
 OBJ = obj
 
+JAVA_SOURCE = $(SRC)/java
+JAVA_CLASSPATH = $(BIN)/java
+
+
 DEBUG_OPTIMIZE = -O3 #-O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
@@ -25,8 +29,8 @@ else ifeq ($(UNAME), Linux)	# linux
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
 else ifeq ($(OS), Windows_NT)	# Windows
-  PLATFORM_ARCH = windows i386
-  PLATFORM_LIBS = win32
+  PLATFORM_ARCH = windows x86_64
+  PLATFORM_LIBS = win
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   PLATFORM_GENERAL_LINKER_OPTIONS = -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole
@@ -35,14 +39,16 @@ else ifeq ($(OS), Windows_NT)	# Windows
   RDYNAMIC=
 endif
 
-JAVA_CLASSES = $(BIN)/java/crossbase/Application.class
+JAVA_FILES = $(shell cd $(JAVA_SOURCE); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
+JAVA_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+
 NATIVE_OBJECTS = $(OBJ)/main.o
 
 all: $(BIN)/crossbase
 
-$(BIN)/java/%.class: $(SRC)/java/%.java
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE)/%.java
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SRC)/java" -classpath "$(BIN)/java" -d $(BIN)/java $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJ)/%.o: $(SRC)/cpp/%.cpp
 	mkdir -p $(OBJ)
@@ -68,8 +74,9 @@ $(BIN)/crossbase: $(JAVA_CLASSES) $(NATIVE_OBJECTS)
 
 	# Making an object file from the java class library
 	tools/$(PLATFORM_LIBS)/binaryToObject $(BIN)/boot.jar $(OBJ)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(NATIVE_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	g++ -static $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(NATIVE_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz $(PLATFORM_LIBS_SWT) -o $@
 	strip $(STRIP_OPTIONS) $@$(EXE_EXT)
+
 
 clean:
 	rm -rf $(OBJ)

@@ -4,8 +4,10 @@ SRC = src
 BIN = bin
 OBJ = obj
 
-JAVA_SOURCE = $(SRC)/java
+JAVA_SOURCE_PATH = $(SRC)/java
 JAVA_CLASSPATH = $(BIN)/java
+CPP_SOURCE_PATH = $(SRC)/cpp
+OBJECTS = $(OBJ)
 
 
 DEBUG_OPTIMIZE = -O3 #-O0 -g
@@ -39,22 +41,23 @@ else ifeq ($(OS), Windows_NT)	# Windows
   RDYNAMIC=
 endif
 
-JAVA_FILES = $(shell cd $(JAVA_SOURCE); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
-JAVA_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
+JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
 
-NATIVE_OBJECTS = $(OBJ)/main.o
+CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
+CPP_OBJECTS := $(addprefix $(OBJECTS)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
 all: $(BIN)/crossbase
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE)/%.java
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJ)/%.o: $(SRC)/cpp/%.cpp
 	mkdir -p $(OBJ)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BIN)/crossbase: $(JAVA_CLASSES) $(NATIVE_OBJECTS)
+$(BIN)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS)
 	mkdir -p $(BIN);
 
 	# Extracting libavian objects
@@ -74,7 +77,7 @@ $(BIN)/crossbase: $(JAVA_CLASSES) $(NATIVE_OBJECTS)
 
 	# Making an object file from the java class library
 	tools/$(PLATFORM_LIBS)/binaryToObject $(BIN)/boot.jar $(OBJ)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ -static $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(NATIVE_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz $(PLATFORM_LIBS_SWT) -o $@
+	g++ -static $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz $(PLATFORM_LIBS_SWT) -o $@
 	strip $(STRIP_OPTIONS) $@$(EXE_EXT)
 
 

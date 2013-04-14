@@ -15,16 +15,25 @@ DEBUG_OPTIMIZE = -O3 #-O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
-  PLATFORM_LIBS = osx
+  PLATFORM_LIBS = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
-else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on raspberry pi
+else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
+  PLATFORM_ARCH = linux x86_64
+  PLATFORM_LIBS = linux-x86_64
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
+  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
+  PLATFORM_CONSOLE_OPTION = 
+  EXE_EXT=
+  STRIP_OPTIONS=--strip-all
+  RDYNAMIC=-rdynamic
+else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
-  PLATFORM_LIBS = linux-arm
+  PLATFORM_LIBS = linux-armv6l
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
   PLATFORM_CONSOLE_OPTION = 
@@ -33,7 +42,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on raspberry pi
   RDYNAMIC=-rdynamic
 else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_ARCH = windows x86_64
-  PLATFORM_LIBS = win
+  PLATFORM_LIBS = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole

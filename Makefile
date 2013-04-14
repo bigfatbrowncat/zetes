@@ -1,4 +1,5 @@
 UNAME := $(shell uname)
+ARCH := $(shell uname -m)
 
 SRC = src
 BIN = bin
@@ -21,9 +22,9 @@ ifeq ($(UNAME), Darwin)	# OS X
   EXE_EXT=
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
-else ifeq ($(UNAME), Linux)	# linux
-  PLATFORM_ARCH = linux x86_64
-  PLATFORM_LIBS = linux
+else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on raspberry pi
+  PLATFORM_ARCH = linux arm
+  PLATFORM_LIBS = linux-arm
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
   PLATFORM_CONSOLE_OPTION = 
@@ -50,15 +51,18 @@ CPP_OBJECTS := $(addprefix $(OBJECTS)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 all: $(BIN)/crossbase
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java
+	@echo $(PLATFORM_GENERAL_INCLUDES)
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJ)/%.o: $(SRC)/cpp/%.cpp
+	@echo $(PLATFORM_GENERAL_INCLUDES)
 	mkdir -p $(OBJ)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
 $(BIN)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS)
 	mkdir -p $(BIN);
+	@echo $(PLATFORM_GENERAL_INCLUDES)
 
 	# Extracting libavian objects
 	( \

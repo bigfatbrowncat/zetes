@@ -34,7 +34,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_ARCH = windows x86_64
   PLATFORM_LIBS = win
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole
   EXE_EXT=.exe
   STRIP_OPTIONS=--strip-all
@@ -77,7 +77,7 @@ $(BIN)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS)
 
 	# Making an object file from the java class library
 	tools/$(PLATFORM_LIBS)/binaryToObject $(BIN)/boot.jar $(OBJ)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ -static $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz $(PLATFORM_LIBS_SWT) -o $@
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_LIBS) $(OBJ)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip $(STRIP_OPTIONS) $@$(EXE_EXT)
 
 

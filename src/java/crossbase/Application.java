@@ -1,13 +1,30 @@
 package crossbase;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+
 public class Application
 {
 	public static void main(String... args)
 	{
-		System.out.println("This is a crossplatform monolith application with Java code inside. Freedom to Java apps!");
-		for (int i = 0; i < args.length; i++)
+		Display display = new Display ();
+		Shell shell = new Shell(display);
+	 
+		Text helloWorldTest = new Text(shell, SWT.NONE);
+		helloWorldTest.setText("Hello World SWT");
+		helloWorldTest.pack();
+	 
+		shell.pack();
+		shell.open ();
+		
+		while (!shell.isDisposed ())
 		{
-			System.out.println("args[" + i + "] = " + args[i]);
+			if (!display.readAndDispatch ()) display.sleep ();
 		}
+		display.dispose ();
+		
+		
 	}
 }

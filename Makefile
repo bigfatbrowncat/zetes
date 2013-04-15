@@ -14,6 +14,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  LIB_EXT=.so
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
@@ -23,6 +24,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  LIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
@@ -32,6 +34,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  LIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
 else ifeq ($(OS), Windows_NT)	# Windows
@@ -41,6 +44,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole
   EXE_EXT=.exe
+  LIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
 endif
@@ -57,19 +61,21 @@ JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(J
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
+SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
+SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(LIB_EXT)))
+
 all: $(BINARY_PATH)/crossbase
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(BIN)/java/boot.jar
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH);$(BIN)/java/boot.jar" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS)
+$(BINARY_PATH)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS) $(BIN)/java/boot.jar
 	mkdir -p $(BINARY_PATH);
-	@echo $(PLATFORM_GENERAL_INCLUDES)
 
 	# Extracting libavian objects
 	( \
@@ -81,6 +87,14 @@ $(BINARY_PATH)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS)
 
 	mkdir -p $(BIN)/java
 
+	# Making an object file from the java class library
+	tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+
+$(BIN)/java/boot.jar: lib/java/classpath.jar swt
+	mkdir -p $(BINARY_PATH);
+
 	# Making the java class library
 	cp lib/java/classpath.jar $(BIN)/java/boot.jar; \
 	( \
@@ -88,14 +102,25 @@ $(BINARY_PATH)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS)
 	    "$(JAVA_HOME)/bin/jar" u0f boot.jar -C ../java/classes .; \
 	)
 
-	# Making an object file from the java class library
-	tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+swt-extract:
+	mkdir -p $(BINARY_PATH);
+	mkdir -p $(BIN)/java/swt;
+	mkdir -p $(BIN)/java/classes;
+	# Extracting swt
+	( \
+	    cd $(BIN)/java/swt; \
+	    "$(JAVA_HOME)/bin/jar" xf ../../../lib/$(PLATFORM_TAG)/swt.jar; \
+	    mv -f org ../classes/; \
+	    mv -f *$(LIB_EXT) ../../$(PLATFORM_TAG)/; \
+	)
 
+$(SWT_CLASSES): %: swt-extract
+$(SWT_LIBS): %: swt-extract
+
+swt: $(SWT_CLASSES) $(SWT_LIBS)
 
 clean:
 	rm -rf $(OBJ)
 	rm -rf $(BIN)
 
-.PHONY: all
+.PHONY: all swt

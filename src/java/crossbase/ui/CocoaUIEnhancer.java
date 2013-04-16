@@ -75,7 +75,7 @@ public class CocoaUIEnhancer {
         //
         Object target = new Object() {
             @SuppressWarnings( "unused" )
-            int actionProc( int id, int sel, int arg0 ) {
+            long actionProc( long id, long sel, long arg0 ) {
                 if ( sel == sel_aboutMenuItemSelected_ ) {
                     aboutAction.run();
                 } else if ( sel == sel_preferencesMenuItemSelected_ ) {

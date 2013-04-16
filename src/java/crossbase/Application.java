@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class Application
 {
-	public static final String APP_NAME = "CrossBase SWT Application";
+	public static final String APP_NAME = "SWT Application";
 	
 	private static MainWindow mainWindow = null;
 	

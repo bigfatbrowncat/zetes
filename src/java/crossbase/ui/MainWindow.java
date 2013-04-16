@@ -3,6 +3,9 @@ package crossbase.ui;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -13,6 +16,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -32,8 +36,10 @@ public class MainWindow
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	
-	private boolean aboutInHelpMenu;
+	private boolean isNotCocoa;
 	private MenuItem helpMenuItem;
+	
+	private AboutBox aboutBox;
 
 	protected static Image loadImage(InputStream stream) throws IOException {
 		try {
@@ -55,16 +61,24 @@ public class MainWindow
 	
 	public MainWindow(boolean aboutInHelpMenu)
 	{
-		this.aboutInHelpMenu = aboutInHelpMenu;
+		this.isNotCocoa = aboutInHelpMenu;
 	}
 	
 	/**
 	 * Open the window.
+	 * @throws IllegalAccessException 
+	 * @throws NoSuchFieldException 
+	 * @throws ClassNotFoundException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
 	 */
-	public void open()
+	public void open() throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException
 	{
 		Display display = Display.getDefault();
 		createContents();
+		
+		setCocoaFullscreenButton(true);
+		
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed())
@@ -76,6 +90,32 @@ public class MainWindow
 		}
 	}
 
+	private void setCocoaFullscreenButton(boolean on)
+	{
+		try
+		{
+			Field field = Control.class.getDeclaredField("view");
+			Object /*NSView*/ view = field.get(shell);
+	
+			if (view != null)
+			{
+			    Class<?> c = Class.forName("org.eclipse.swt.internal.cocoa.NSView");
+			    Object /*NSWindow*/ window = c.getDeclaredMethod("window").invoke(view);
+	
+			    c = Class.forName("org.eclipse.swt.internal.cocoa.NSWindow");
+			    Method setCollectionBehavior = c.getDeclaredMethod(
+			        "setCollectionBehavior", long.class);
+			    setCollectionBehavior.invoke(window, on ? (1 << 7) : 0);
+			}
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
 	/**
 	 * Create contents of the window.
 	 * 
@@ -87,6 +127,8 @@ public class MainWindow
 		shell.setMinimumSize(new Point(150, 200));
 		shell.setImage(SWTResourceManager.getImage(MainWindow.class,
 				"/crossbase/icon.png"));
+		
+		aboutBox = new AboutBox(shell);
 
 		shell.setSize(450, 450);
 		shell.setText("SWT Application");
@@ -101,6 +143,7 @@ public class MainWindow
 		Menu menu_1 = new Menu(mntmFile_1);
 		mntmFile_1.setMenu(menu_1);
 
+		// "Open" menu item
 		MenuItem mainMenuItemOpen = new MenuItem(menu_1, SWT.NONE);
 		mainMenuItemOpen.addSelectionListener(new SelectionAdapter()
 		{
@@ -121,7 +164,7 @@ public class MainWindow
 						imageLabel.setSize(imageLabel.getImage().getImageData().width, imageLabel.getImage().getImageData().height);
 						scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 						if (oldImage != null) oldImage.dispose();
-					} 
+					}
 					catch (IOException e)
 					{
 						MessageBox cantOpenFileMessageBox = new MessageBox(shell);
@@ -130,28 +173,33 @@ public class MainWindow
 				}
 			}
 		});
-		mainMenuItemOpen.setText("Open...");
+		HotKey openHotKey = new HotKey(!isNotCocoa, HotKey.MOD1, 'O');
+		mainMenuItemOpen.setText("Open...\t" + openHotKey.toString());
+		mainMenuItemOpen.setAccelerator(openHotKey.toAccelerator());
 
-		MenuItem mainMenuItemExit = new MenuItem(menu_1, SWT.NONE);
-		mainMenuItemExit.addSelectionListener(new SelectionAdapter()
+		if (isNotCocoa)
 		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0)
+			// "Exit" menu item
+			MenuItem mainMenuItemExit = new MenuItem(menu_1, SWT.NONE);
+			mainMenuItemExit.addSelectionListener(new SelectionAdapter()
 			{
-				userClose();
-			}
-		});
+				@Override
+				public void widgetSelected(SelectionEvent arg0)
+				{
+					userClose();
+				}
+			});
 
-		mainMenuItemExit.setText("Exit");
-		
-		if (aboutInHelpMenu)
-		{
+			mainMenuItemExit.setText("Exit");
+			
+			// "Help" menu item
 			helpMenuItem = new MenuItem(menu, SWT.CASCADE);
 			helpMenuItem.setText("Help");
 			
 			Menu menu_2 = new Menu(helpMenuItem);
 			helpMenuItem.setMenu(menu_2);
 			
+			// "About" menu item
 			MenuItem mntmAbout = new MenuItem(menu_2, SWT.NONE);
 			mntmAbout.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -181,12 +229,10 @@ public class MainWindow
 	public void userClose()
 	{
 		shell.close();
-		
 	}
 
 	public void userAbout()
 	{
-		AboutBox aboutBox = new AboutBox(shell);
 		aboutBox.open();		
 	}
 	

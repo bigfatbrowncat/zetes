@@ -1,31 +1,31 @@
 package crossbase;
 
+import crossbase.ui.MainWindow;
+//import crossbase.ui.extensions.cocoa.CocoaUIEnhancer;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+
 
 public class Application
 {
-
+	public static final String APP_NAME = "CrossBase SWT Application";
+	
 	public static void main(String... args)
 	{
-		Display display = new Display ();
-		Shell shell = new Shell(display);
-	 
-		Text helloWorldTest = new Text(shell, SWT.NONE);
-		helloWorldTest.setText("Hello World SWT");
-		helloWorldTest.pack();
-	 
-		shell.pack();
-		shell.open ();
-		
-		while (!shell.isDisposed ())
+		Display.setAppName(APP_NAME);
+	
+		boolean aboutBoxInHelpMenu = true;
+		if (SWT.getPlatform().equals("cocoa"))
 		{
-			if (!display.readAndDispatch ()) display.sleep ();
+			//new CocoaUIEnhancer().earlyStartup();
+
+			// In Cocoa we don't add "About..." item the the help menu 
+			// cause it should appear in the system menu
+			aboutBoxInHelpMenu = false;
 		}
-		display.dispose ();
-		
-		
+
+		MainWindow mainWindow = new MainWindow(aboutBoxInHelpMenu);
+		mainWindow.open();
 	}
 }

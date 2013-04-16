@@ -101,10 +101,11 @@ $(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
 	mkdir -p $(BINARY_PATH);
 
 	# Making the java class library
-	cp lib/java/classpath.jar $(BIN)/java/boot.jar; \
+	cp -f lib/java/classpath.jar $(BIN)/java/boot.jar; \
 	( \
 	    cd $(BIN)/java; \
 	    "$(JAVA_HOME)/bin/jar" u0f boot.jar -C ../java/classes .; \
+	    "$(JAVA_HOME)/bin/jar" u0f boot.jar -C ../../src/res .; \
 	)
 
 $(SWT_CLASSES) $(SWT_LIBS): %:
@@ -126,4 +127,4 @@ clean:
 	rm -rf $(BIN)
 
 .PHONY: all
-.SILENT:
+#.SILENT:

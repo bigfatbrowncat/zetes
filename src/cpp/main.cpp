@@ -7,6 +7,8 @@
 
 #include <jni.h>
 
+#include "WinLinMacApi.h"
+
 #if (defined __MINGW32__)
 #  define EXPORT __declspec(dllexport)
 #else
@@ -46,16 +48,23 @@ int main(int argc, const char** argv)
 	int wac = argc;
 	const char** wav = argv;
 #endif
+	WinLinMacApi winLinMacApi;
 
 	JavaVMInitArgs vmArgs;
 	vmArgs.version = JNI_VERSION_1_2;
-	vmArgs.nOptions = 1;
+	vmArgs.nOptions = 2;
 	vmArgs.ignoreUnrecognized = JNI_TRUE;
 
 	JavaVMOption options[vmArgs.nOptions];
 	vmArgs.options = options;
 
 	options[0].optionString = const_cast<char*>("-Xbootclasspath:[bootJar]");
+
+	string execPath = winLinMacApi.locateExecutable();
+	execPath = "-Dswt.library.path=" + execPath;
+	printf("%s\n", execPath.c_str());
+
+	options[1].optionString = const_cast<char*>(execPath.c_str());
 
 	JavaVM* vm;
 	void* env;

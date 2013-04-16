@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class Application
 {
+
 	public static void main(String... args)
 	{
 		Display display = new Display ();

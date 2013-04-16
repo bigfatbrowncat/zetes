@@ -14,9 +14,10 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
-  LIB_EXT=.so
+  JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
+  CLASSPATH_DELIM=:
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
   PLATFORM_TAG = linux-x86_64
@@ -24,9 +25,10 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
-  LIB_EXT=.so
+  JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
+  CLASSPATH_DELIM=:
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
   PLATFORM_TAG = linux-armv6l
@@ -34,9 +36,10 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
-  LIB_EXT=.so
+  JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
+  CLASSPATH_DELIM=:
 else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_ARCH = windows x86_64
   PLATFORM_TAG = win-x86_64
@@ -44,9 +47,10 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole
   EXE_EXT=.exe
-  LIB_EXT=.dll
+  JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
+  CLASSPATH_DELIM=;
 endif
 
 JAVA_SOURCE_PATH = $(SRC)/java
@@ -62,19 +66,19 @@ CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -name \*.cpp | awk '{ sub(/.\/
 CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
 SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
-SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(LIB_EXT)))
+SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
 all: $(BINARY_PATH)/crossbase
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(BIN)/java/boot.jar
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH);$(BIN)/java/boot.jar" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS) $(BIN)/java/boot.jar
+$(BINARY_PATH)/crossbase: $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libavian objects
@@ -92,7 +96,7 @@ $(BINARY_PATH)/crossbase: $(JAVA_CLASSES) $(CPP_OBJECTS) $(BIN)/java/boot.jar
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
-$(BIN)/java/boot.jar: lib/java/classpath.jar swt
+$(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
 	mkdir -p $(BINARY_PATH);
 
 	# Making the java class library
@@ -110,14 +114,13 @@ swt-extract:
 	( \
 	    cd $(BIN)/java/swt; \
 	    "$(JAVA_HOME)/bin/jar" xf ../../../lib/$(PLATFORM_TAG)/swt.jar; \
+	    rm -rf ../classes/org; \
 	    mv -f org ../classes/; \
-	    mv -f *$(LIB_EXT) ../../$(PLATFORM_TAG)/; \
+	    mv -f *$(JNILIB_EXT) ../../$(PLATFORM_TAG)/; \
 	)
 
 $(SWT_CLASSES): %: swt-extract
 $(SWT_LIBS): %: swt-extract
-
-swt: $(SWT_CLASSES) $(SWT_LIBS)
 
 clean:
 	rm -rf $(OBJ)

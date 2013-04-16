@@ -68,14 +68,17 @@ SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$
 all: $(BINARY_PATH)/crossbase
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
+	@echo Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
+	@echo Compiling $<...
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
 $(BINARY_PATH)/crossbase: $(BIN)/java/boot.jar $(CPP_OBJECTS)
+	@echo Linking $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libavian objects
@@ -94,6 +97,7 @@ $(BINARY_PATH)/crossbase: $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
+	@echo Constructing $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Making the java class library
@@ -104,6 +108,7 @@ $(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
 	)
 
 $(SWT_CLASSES) $(SWT_LIBS): %:
+	@echo Extracting SWT library...
 	mkdir -p $(BINARY_PATH);
 	mkdir -p $(BIN)/java/swt;
 	mkdir -p $(BIN)/java/classes;
@@ -116,7 +121,9 @@ $(SWT_CLASSES) $(SWT_LIBS): %:
 	)
 
 clean:
+	@echo Cleaning all...
 	rm -rf $(OBJ)
 	rm -rf $(BIN)
 
-.PHONY: all swt
+.PHONY: all
+.SILENT:

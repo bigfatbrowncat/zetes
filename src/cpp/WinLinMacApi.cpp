@@ -102,36 +102,12 @@ string WinLinMacApi::locateExecutable()
 	}
 	return res;
 }
-/*char *GetExecutableLocation()
-{
-	CFBundleRef bundle = CFBundleGetMainBundle();
-	CFURLRef executableURL = CFBundleCopyExecutableURL(bundle);
-	CFStringRef executablePath = CFURLCopyFileSystemPath(executableURL, kCFURLPOSIXPathStyle);
-	CFIndex maxLength = CFStringGetMaximumSizeOfFileSystemRepresentation(executablePath);
-	char *result = malloc(maxLength);
-
-	if (result)
-	{
-		if(!CFStringGetFileSystemRepresentation(executablePath, result, maxLength))
-		{
-			free(result);
-			result = NULL;
-		}
-	}
-
-	CFRelease(executablePath);
-	CFRelease(executableURL);
-
-	return result;
-}*/
-
 
 #elif __WIN32__
 
 // Win32 includes/methods
 #include <windows.h>
 #include <direct.h>
-#define GetCurrentDir _getcwd
 
 BOOL FileExists(string szPath)
 {

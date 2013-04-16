@@ -8,7 +8,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -36,7 +43,6 @@ public class MainWindow
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	
-	private boolean isNotCocoa;
 	private MenuItem helpMenuItem;
 	
 	private AboutBox aboutBox;
@@ -59,25 +65,19 @@ public class MainWindow
 		return loadImage(new FileInputStream(fileName));
 	}
 	
-	public MainWindow(boolean aboutInHelpMenu)
-	{
-		this.isNotCocoa = aboutInHelpMenu;
-	}
 	
 	/**
 	 * Open the window.
-	 * @throws IllegalAccessException 
-	 * @throws NoSuchFieldException 
-	 * @throws ClassNotFoundException 
-	 * @throws NoSuchMethodException 
-	 * @throws InvocationTargetException 
 	 */
-	public void open() throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException
+	public void open(boolean fullscreenEnabled)
 	{
 		Display display = Display.getDefault();
 		createContents();
 		
-		setCocoaFullscreenButton(true);
+		if (SWT.getPlatform().equals("cocoa"))
+		{
+			setCocoaFullscreenButton(fullscreenEnabled);
+		}
 		
 		shell.open();
 		shell.layout();
@@ -116,6 +116,20 @@ public class MainWindow
 
 	}
 	
+	private DropTargetAdapter fileDropTargetAdapter = new DropTargetAdapter() {
+		public void drop(DropTargetEvent event) {
+			String fileList[] = null;
+			FileTransfer ft = FileTransfer.getInstance();
+			if (ft.isSupportedType(event.currentDataType)) {
+				fileList = (String[]) event.data;
+				if (fileList.length > 0)
+				{
+					openImageFile(fileList[0]);
+				}
+			}
+		}
+	};
+	
 	/**
 	 * Create contents of the window.
 	 * 
@@ -124,13 +138,14 @@ public class MainWindow
 	protected void createContents()
 	{
 		shell = new Shell();
+		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		shell.setMinimumSize(new Point(150, 200));
 		shell.setImage(SWTResourceManager.getImage(MainWindow.class,
 				"/crossbase/icon.png"));
 		
 		aboutBox = new AboutBox(shell);
 
-		shell.setSize(450, 450);
+		shell.setSize(480, 360);
 		shell.setText("SWT Application");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
@@ -157,27 +172,16 @@ public class MainWindow
 				String fileName = fileDialog.open();
 				if (fileName != null)
 				{
-					try
-					{
-						Image oldImage = imageLabel.getImage();
-						imageLabel.setImage(loadImage(fileName));
-						imageLabel.setSize(imageLabel.getImage().getImageData().width, imageLabel.getImage().getImageData().height);
-						scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-						if (oldImage != null) oldImage.dispose();
-					}
-					catch (IOException e)
-					{
-						MessageBox cantOpenFileMessageBox = new MessageBox(shell);
-						cantOpenFileMessageBox.setMessage("Can't open the specified file: " + fileName);
-					}
+					openImageFile(fileName);
 				}
 			}
 		});
-		HotKey openHotKey = new HotKey(!isNotCocoa, HotKey.MOD1, 'O');
+		
+		HotKey openHotKey = new HotKey(HotKey.MOD1, 'O');
 		mainMenuItemOpen.setText("Open...\t" + openHotKey.toString());
 		mainMenuItemOpen.setAccelerator(openHotKey.toAccelerator());
 
-		if (isNotCocoa)
+		if (!SWT.getPlatform().equals("cocoa"))
 		{
 			// "Exit" menu item
 			MenuItem mainMenuItemExit = new MenuItem(menu_1, SWT.NONE);
@@ -215,15 +219,50 @@ public class MainWindow
 		scrolledComposite.setExpandVertical(true);
 		
 		imageContainerComposite = new Composite(scrolledComposite, SWT.NONE);
+		imageContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		imageContainerComposite.setLayout(null);
+		DropTarget imageContainerDropTarget = new DropTarget(imageContainerComposite, DND.DROP_DEFAULT	| DND.DROP_MOVE);
+		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		imageContainerDropTarget.addDropListener(fileDropTargetAdapter);
+		
 		
 		imageLabel = new Label(imageContainerComposite, SWT.NONE);
 		imageLabel.setImage(null);
 		imageLabel.setAlignment(SWT.CENTER);
-		imageLabel.setBounds(0, 0, 49, 45);
+		imageLabel.setBounds(0, 0, 50, 50);
+		DropTarget imageLabelDropTarget = new DropTarget(imageLabel, DND.DROP_DEFAULT	| DND.DROP_MOVE);
+		imageLabelDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		imageLabelDropTarget.addDropListener(fileDropTargetAdapter);
+
+		
 		scrolledComposite.setContent(imageContainerComposite);
 		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
 
+	protected void openImageFile(String fileName)
+	{
+		try
+		{
+			Image oldImage = imageLabel.getImage();
+			imageLabel.setImage(loadImage(fileName));
+			imageLabel.setSize(imageLabel.getImage().getImageData().width, imageLabel.getImage().getImageData().height);
+			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			if (oldImage != null) oldImage.dispose();
+		}
+		catch (IOException e)
+		{
+			MessageBox cantOpenFileMessageBox = new MessageBox(shell, SWT.ICON_ERROR);
+			cantOpenFileMessageBox.setMessage("Can't open file: " + fileName);
+			cantOpenFileMessageBox.setText("Error");
+			cantOpenFileMessageBox.open();
+		}
+		catch (SWTException e)
+		{
+			MessageBox cantOpenFileMessageBox = new MessageBox(shell, SWT.ICON_ERROR);
+			cantOpenFileMessageBox.setMessage("Incorrect image format: " + fileName);
+			cantOpenFileMessageBox.setText("Error");
+			cantOpenFileMessageBox.open();			
+		}
 	}
 
 	public void userClose()
@@ -238,6 +277,6 @@ public class MainWindow
 	
 	public void userPreferences()
 	{
-		// TODO Implemnt preferences window
+		// TODO Implement preferences window
 	}
 }

@@ -11,13 +11,11 @@ public class HotKey
 	
 	private int modifiers;
 	private char code;
-	private boolean isOSX;
 	
-	public HotKey(boolean isOSX, int modifiers, char code)
+	public HotKey(int modifiers, char code)
 	{
 		this.modifiers = modifiers;
 		this.code = code;
-		this.isOSX = isOSX;
 	}
 	
 	public int toAccelerator()
@@ -34,6 +32,7 @@ public class HotKey
 	@Override
 	public String toString() 
 	{
+		boolean isOSX = SWT.getPlatform().equals("cocoa");
 		String res = "";
 		
 		if ((modifiers & MOD1) != 0 && !isOSX)

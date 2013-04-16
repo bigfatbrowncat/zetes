@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <string.h>
+#include <string>
 
 #ifdef __MINGW32__
 #include <windows.h>

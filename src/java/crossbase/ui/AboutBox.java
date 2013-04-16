@@ -85,9 +85,7 @@ public class AboutBox extends Dialog
 		shlAboutSwtApplication.setLayout(new FormLayout());
 		
 
-        
-        
-		Label iconLabel = new Label(shlAboutSwtApplication, SWT.NONE);
+ 		Label iconLabel = new Label(shlAboutSwtApplication, SWT.NONE);
 		iconLabel.setAlignment(SWT.CENTER);
 		iconLabel.setImage(SWTResourceManager.getImage(AboutBox.class, "/crossbase/icon.png"));
 		FormData fd_iconLabel = new FormData();

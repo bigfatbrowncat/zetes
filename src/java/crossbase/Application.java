@@ -57,19 +57,14 @@ public class Application
 	{
 		Display.setAppName(APP_NAME);
 	
-		boolean aboutBoxInHelpMenu = true;
 		if (SWT.getPlatform().equals("cocoa"))
 		{
 			// In Cocoa we use a special hook class to handle the default
 			// About, Quit and Preferences items from the system menu.
 			new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getDefault(), quitListener, aboutAction, preferencesAction);
-
-			// In Cocoa we don't add "About..." item the the help menu 
-			// cause it should appear in the system menu
-			aboutBoxInHelpMenu = false;
 		}
 
-		mainWindow = new MainWindow(aboutBoxInHelpMenu);
-		mainWindow.open();
+		mainWindow = new MainWindow();
+		mainWindow.open(true);
 	}
 }

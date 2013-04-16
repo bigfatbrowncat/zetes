@@ -17,7 +17,6 @@ ifeq ($(UNAME), Darwin)	# OS X
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
-  CLASSPATH_DELIM=:
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
   PLATFORM_TAG = linux-x86_64
@@ -28,7 +27,6 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
-  CLASSPATH_DELIM=:
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
   PLATFORM_TAG = linux-armv6l
@@ -45,12 +43,11 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_TAG = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
-  PLATFORM_CONSOLE_OPTION = -mconsole
+  PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
-  CLASSPATH_DELIM=;
 endif
 
 JAVA_SOURCE_PATH = $(SRC)/java
@@ -106,7 +103,7 @@ $(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
 	    "$(JAVA_HOME)/bin/jar" u0f boot.jar -C ../java/classes .; \
 	)
 
-swt-extract:
+$(SWT_CLASSES) $(SWT_LIBS): %:
 	mkdir -p $(BINARY_PATH);
 	mkdir -p $(BIN)/java/swt;
 	mkdir -p $(BIN)/java/classes;
@@ -114,13 +111,9 @@ swt-extract:
 	( \
 	    cd $(BIN)/java/swt; \
 	    "$(JAVA_HOME)/bin/jar" xf ../../../lib/$(PLATFORM_TAG)/swt.jar; \
-	    rm -rf ../classes/org; \
-	    mv -f org ../classes/; \
-	    mv -f *$(JNILIB_EXT) ../../$(PLATFORM_TAG)/; \
+	    cp -rf org ../classes/; \
+	    cp -rf *$(JNILIB_EXT) ../../$(PLATFORM_TAG)/; \
 	)
-
-$(SWT_CLASSES): %: swt-extract
-$(SWT_LIBS): %: swt-extract
 
 clean:
 	rm -rf $(OBJ)

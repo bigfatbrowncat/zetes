@@ -60,10 +60,9 @@ int main(int argc, const char** argv)
 
 	options[0].optionString = const_cast<char*>("-Xbootclasspath:[bootJar]");
 
+	// Setting SWT libraries path
 	string execPath = winLinMacApi.locateExecutable();
 	execPath = "-Dswt.library.path=" + execPath;
-	printf("%s\n", execPath.c_str());
-
 	options[1].optionString = const_cast<char*>(execPath.c_str());
 
 	JavaVM* vm;

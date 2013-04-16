@@ -138,7 +138,7 @@ public class MainWindow
 			@Override
 			public void widgetSelected(SelectionEvent arg0)
 			{
-				shell.close();
+				userClose();
 			}
 		});
 
@@ -156,8 +156,7 @@ public class MainWindow
 			mntmAbout.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent arg0) {
-					AboutBox aboutBox = new AboutBox(shell);
-					aboutBox.open();
+					userAbout();
 				}
 			});
 			mntmAbout.setText("About...");
@@ -177,5 +176,22 @@ public class MainWindow
 		scrolledComposite.setContent(imageContainerComposite);
 		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
+	}
+
+	public void userClose()
+	{
+		shell.close();
+		
+	}
+
+	public void userAbout()
+	{
+		AboutBox aboutBox = new AboutBox(shell);
+		aboutBox.open();		
+	}
+	
+	public void userPreferences()
+	{
+		// TODO Implemnt preferences window
 	}
 }

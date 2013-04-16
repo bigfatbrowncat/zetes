@@ -51,7 +51,7 @@ public class HotKey
 		if ((modifiers & ALT) != 0)
 		{
 			if (isOSX)
-				res += "⌥";
+				res += "\u2325";
 			else
 				res += "Alt+";
 		}
@@ -59,14 +59,14 @@ public class HotKey
 		if ((modifiers & SHIFT) != 0)
 		{
 			if (isOSX)
-				res += "⇧";
+				res += "\u21e7";
 			else
 				res += "Shift+";
 		}
 		
 		if ((modifiers & MOD1) != 0 && isOSX)
 		{
-			res += "⌘";
+			res += "\u2318";
 		}
 
 		res += Character.toString(code);

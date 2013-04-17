@@ -151,4 +151,42 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 	return ss.str();
 }
 
+#else
+// Linux includes/methods
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+#include <linux/limits.h>
+
+string WinLinMacApi::locateExecutable()
+{
+	char arg[20];
+	char exepath[PATH_MAX + 1];
+	exepath[0] = 0;
+
+	sprintf(arg, "/proc/%d/exe", getpid());
+	readlink(arg, exepath, PATH_MAX);
+
+	for (int i = strlen(exepath) - 1; i >= 0; i--)
+	{
+		if (exepath[i] == '/')
+		{
+			exepath[i] = 0;
+			break;
+		}
+	}
+
+	return exepath;
+}
+
+string WinLinMacApi::locateResource(const string& path, const string& filename)
+{
+	string appDirectory = locateExecutable();
+
+	stringstream ss;
+	ss << appDirectory << "/" << path << "/" << filename;
+
+	return ss.str();
+}
+
 #endif

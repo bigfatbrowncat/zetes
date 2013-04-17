@@ -1,5 +1,8 @@
 #include <stdint.h>
+#include <string.h>
+
 #include <string>
+using namespace std;
 
 #ifdef __MINGW32__
 #include <windows.h>

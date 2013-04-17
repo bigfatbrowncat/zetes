@@ -55,18 +55,20 @@ int main(int argc, const char** argv)
 
 	JavaVMInitArgs vmArgs;
 	vmArgs.version = JNI_VERSION_1_2;
-	vmArgs.nOptions = 2;
+	vmArgs.nOptions = 3;
 	vmArgs.ignoreUnrecognized = JNI_TRUE;
 
 	JavaVMOption options[vmArgs.nOptions];
 	vmArgs.options = options;
 
 	options[0].optionString = const_cast<char*>("-Xbootclasspath:[bootJar]");
+	options[1].optionString = const_cast<char*>("-Xmx16000m");	// 16GB should be enough
 
 	// Setting SWT libraries path
 	string execPath = winLinMacApi.locateExecutable();
 	execPath = "-Dswt.library.path=" + execPath;
-	options[1].optionString = const_cast<char*>(execPath.c_str());
+	options[2].optionString = const_cast<char*>(execPath.c_str());
+
 
 	JavaVM* vm;
 	void* env;

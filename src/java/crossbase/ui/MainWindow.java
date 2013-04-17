@@ -145,7 +145,8 @@ public class MainWindow
 		
 		aboutBox = new AboutBox(shell);
 
-		shell.setSize(480, 360);
+		//shell.setSize(480, 360);
+		
 		shell.setText("SWT Application");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
@@ -230,6 +231,7 @@ public class MainWindow
 		imageLabel.setImage(null);
 		imageLabel.setAlignment(SWT.CENTER);
 		imageLabel.setBounds(0, 0, 50, 50);
+		imageLabel.setVisible(false);
 		DropTarget imageLabelDropTarget = new DropTarget(imageLabel, DND.DROP_DEFAULT	| DND.DROP_MOVE);
 		imageLabelDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
 		imageLabelDropTarget.addDropListener(fileDropTargetAdapter);
@@ -246,6 +248,7 @@ public class MainWindow
 			Image oldImage = imageLabel.getImage();
 			imageLabel.setImage(loadImage(fileName));
 			imageLabel.setSize(imageLabel.getImage().getImageData().width, imageLabel.getImage().getImageData().height);
+			imageLabel.setVisible(true);
 			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			if (oldImage != null) oldImage.dispose();
 		}

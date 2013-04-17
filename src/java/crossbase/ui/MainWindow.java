@@ -154,7 +154,7 @@ public class MainWindow
 		shell.setMenuBar(menu);
 
 		MenuItem mntmFile_1 = new MenuItem(menu, SWT.CASCADE);
-		mntmFile_1.setText("File");
+		mntmFile_1.setText("&File");
 
 		Menu menu_1 = new Menu(mntmFile_1);
 		mntmFile_1.setMenu(menu_1);
@@ -179,11 +179,13 @@ public class MainWindow
 		});
 		
 		HotKey openHotKey = new HotKey(HotKey.MOD1, 'O');
-		mainMenuItemOpen.setText("Open...\t" + openHotKey.toString());
+		mainMenuItemOpen.setText("&Open...\t" + openHotKey.toString());
 		mainMenuItemOpen.setAccelerator(openHotKey.toAccelerator());
-
+		
 		if (!SWT.getPlatform().equals("cocoa"))
 		{
+			new MenuItem(menu_1, SWT.SEPARATOR);
+
 			// "Exit" menu item
 			MenuItem mainMenuItemExit = new MenuItem(menu_1, SWT.NONE);
 			mainMenuItemExit.addSelectionListener(new SelectionAdapter()
@@ -195,11 +197,11 @@ public class MainWindow
 				}
 			});
 
-			mainMenuItemExit.setText("Exit");
+			mainMenuItemExit.setText("E&xit");
 			
 			// "Help" menu item
 			helpMenuItem = new MenuItem(menu, SWT.CASCADE);
-			helpMenuItem.setText("Help");
+			helpMenuItem.setText("&Help");
 			
 			Menu menu_2 = new Menu(helpMenuItem);
 			helpMenuItem.setMenu(menu_2);
@@ -212,7 +214,7 @@ public class MainWindow
 					userAbout();
 				}
 			});
-			mntmAbout.setText("About...");
+			mntmAbout.setText("&About...");
 		}
 		
 		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL);

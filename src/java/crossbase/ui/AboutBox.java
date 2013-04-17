@@ -152,8 +152,8 @@ public class AboutBox extends Dialog
 		fd_descriptionLabel.bottom = new FormAttachment(copyrightLabel, -6);
 		copyrightLabel.setText("Copyright Ilya Mizus, 2013");
 		FormData fd_copyrightLabel = new FormData();
+		fd_copyrightLabel.left = new FormAttachment(iconLabel, 10);
 		fd_copyrightLabel.bottom = new FormAttachment(okButton, -6);
-		fd_copyrightLabel.left = new FormAttachment(0, 44);
 		fd_copyrightLabel.right = new FormAttachment(100, -10);
 		copyrightLabel.setLayoutData(fd_copyrightLabel);
 		

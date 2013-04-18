@@ -243,10 +243,11 @@ public class MainWindow
 		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
-	protected void openImageFile(String fileName)
+	public void openImageFile(String fileName)
 	{
 		try
 		{
+			System.out.println("Opening " + fileName);
 			Image oldImage = imageLabel.getImage();
 			imageLabel.setImage(loadImage(fileName));
 			imageLabel.setSize(imageLabel.getImage().getImageData().width, imageLabel.getImage().getImageData().height);

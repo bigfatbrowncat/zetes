@@ -65,6 +65,17 @@ public class Application
 		}
 
 		mainWindow = new MainWindow();
+		
+		Display.getCurrent().addListener(SWT.OpenDocument, new Listener() {
+			
+			@Override
+			public void handleEvent(Event arg0) {
+				String fileName = arg0.text;
+				mainWindow.openImageFile(fileName);
+				
+			}
+		});
+		
 		mainWindow.open(true);
 	}
 }

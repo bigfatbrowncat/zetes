@@ -17,6 +17,9 @@ class WinLinMacApi
 public:
 	string locateResource(const string& path, const string& filename);
 	string locateExecutable();
+
+	static string readFromPipe(const char* name);
+	static bool writeToPipe(string name, string textToWrite);
 };
 
 #endif /* RESOURCELOCATOR_H_ */

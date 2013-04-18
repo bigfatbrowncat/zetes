@@ -103,6 +103,11 @@ string WinLinMacApi::locateExecutable()
 	return res;
 }
 
+bool runSecondExecutable(string arguments)
+{
+	// Don't try to run the second GUI app on OS X
+}
+
 #elif __WIN32__
 
 // Win32 includes/methods
@@ -149,6 +154,106 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 	}
 
 	return ss.str();
+}
+
+#define BUFFER_SIZE		10
+
+string WinLinMacApi::readFromPipe(const char* name)
+{
+	string res = "";
+
+	HANDLE hPipe = CreateNamedPipe(name,             // pipe name
+			PIPE_ACCESS_DUPLEX,       // read/write access
+			PIPE_TYPE_MESSAGE |       // message type pipe
+					PIPE_READMODE_MESSAGE |   // message-read mode
+					PIPE_WAIT,                // blocking mode
+			PIPE_UNLIMITED_INSTANCES, // max. instances
+			BUFFER_SIZE,               // output buffer size
+			BUFFER_SIZE,                  // input buffer size
+			1000,                        // client time-out
+			NULL);
+
+	if (hPipe == INVALID_HANDLE_VALUE)
+	{
+		printf("We have a problem while creating an inbound pipe: %d\n", GetLastError());
+		return res;
+	}
+
+	bool fConnected = ConnectNamedPipe(hPipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
+
+	if (fConnected)
+	{
+		char bufferToReceive[BUFFER_SIZE + 1] = { 0 };
+		bufferToReceive[BUFFER_SIZE] = 0;
+		unsigned long bytesRead = 0;
+
+		bool fSuccess = true;
+		do
+		{
+			bufferToReceive[bytesRead] = 0;
+			res += bufferToReceive;
+
+			fSuccess = ReadFile(hPipe,        		// handle to pipe
+					bufferToReceive,   			// buffer to receive data
+					BUFFER_SIZE * sizeof(char),	// size of buffer
+					&bytesRead,					// number of bytes read
+					NULL);						// not overlapped I/O
+
+		}
+		while (bytesRead > 0);
+
+		FlushFileBuffers(hPipe);
+		DisconnectNamedPipe(hPipe);
+	}
+	else
+	{
+		printf("Can't connect the pipe\n");
+	}
+
+	CloseHandle(hPipe);
+
+	return res;
+}
+
+bool WinLinMacApi::writeToPipe(string name, string textToWrite)
+{
+	bool res = true;
+
+	if (!WaitNamedPipe(name.c_str(), 1000))
+	{
+		return false;
+	}
+
+	HANDLE hPipe = CreateFile(
+		name.c_str(),
+		GENERIC_WRITE, // only need read access
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL
+	);
+
+    if (hPipe == INVALID_HANDLE_VALUE)
+    {
+        printf("We have a problem while creating an outbound pipe: %d\n", GetLastError());
+        return false;
+    }
+
+	unsigned long written = 0;
+
+	char toWrite[textToWrite.length() + 2];
+	strcpy(toWrite, textToWrite.c_str());
+	int fSuccess = WriteFile(hPipe, toWrite, textToWrite.length(), &written, NULL);
+
+	if (!fSuccess || textToWrite.length() != written)
+	{
+		printf("We can't write\n");
+		res = false;
+	}
+
+	CloseHandle(hPipe);
+	return res;
 }
 
 #else

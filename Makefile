@@ -5,7 +5,7 @@ SRC = src
 BIN = bin
 OBJ = obj
 
-DEBUG_OPTIMIZE = -O3 #-O0 -g
+DEBUG_OPTIMIZE = -O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
@@ -43,10 +43,10 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_TAG = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
-  PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
+  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   JNILIB_EXT=.dll
-  STRIP_OPTIONS=--strip-all
+  #STRIP_OPTIONS=--strip-all
   RDYNAMIC=
 endif
 
@@ -94,7 +94,7 @@ $(BINARY_PATH)/crossbase: $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	# Making an object file from the java class library
 	tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+	#strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
 	@echo Constructing $@...

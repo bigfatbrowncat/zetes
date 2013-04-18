@@ -69,14 +69,14 @@ public class MainWindow
 	/**
 	 * Open the window.
 	 */
-	public void open(boolean fullscreenEnabled)
+	public void open()
 	{
 		Display display = Display.getDefault();
 		createContents();
 		
 		if (SWT.getPlatform().equals("cocoa"))
 		{
-			setCocoaFullscreenButton(fullscreenEnabled);
+			setCocoaFullscreenButton(true);
 		}
 		
 		shell.open();

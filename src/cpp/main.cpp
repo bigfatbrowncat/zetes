@@ -25,6 +25,7 @@ using namespace std;
 #  define SYMBOL(x) _binary_boot_jar_##x
 #endif
 
+
 extern "C"
 {
 
@@ -39,6 +40,10 @@ extern "C"
 
 } // extern "C"
 
+
+static WinLinMacApi winLinMacApi;
+
+
 int main(int argc, const char** argv)
 {
 #ifdef __MINGW32__
@@ -51,7 +56,6 @@ int main(int argc, const char** argv)
 	int wac = argc;
 	const char** wav = argv;
 #endif
-	WinLinMacApi winLinMacApi;
 
 	JavaVMInitArgs vmArgs;
 	vmArgs.version = JNI_VERSION_1_2;

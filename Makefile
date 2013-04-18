@@ -5,7 +5,7 @@ SRC = src
 BIN = bin
 OBJ = obj
 
-DEBUG_OPTIMIZE = -O0 -g
+DEBUG_OPTIMIZE = -O3 #-O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
@@ -65,7 +65,21 @@ CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILE
 SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
 SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
+ifeq ($(UNAME), Darwin)	# OS X
+all: $(BINARY_PATH)/SWT\ Application.app
+
+$(BINARY_PATH)/SWT\ Application.app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/crossbase $(SWT_LIBS)
+	@echo Building OS X bundle...
+	mkdir -p $(BINARY_PATH)/SWT\ Application/SWT\ Application.app/Contents/MacOS
+	cp -r osx-bundle/* $(BINARY_PATH)/SWT\ Application/SWT\ Application.app
+	cp $(BINARY_PATH)/crossbase $(BINARY_PATH)/SWT\ Application/SWT\ Application.app/Contents/MacOS
+	cp $(SWT_LIBS) $(BINARY_PATH)/SWT\ Application/SWT\ Application.app/Contents/MacOS
+	@echo Creating DMG image...
+	hdiutil create $(BINARY_PATH)/crossbase-darwin-universal.dmg -srcfolder $(BINARY_PATH)/SWT\ Application -ov
+
+else
 all: $(BINARY_PATH)/crossbase
+endif
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
 	@echo Compiling $<...
@@ -94,7 +108,7 @@ $(BINARY_PATH)/crossbase: $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	# Making an object file from the java class library
 	tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libavian/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	#strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BIN)/java/boot.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
 	@echo Constructing $@...
@@ -127,4 +141,4 @@ clean:
 	rm -rf $(BIN)
 
 .PHONY: all
-#.SILENT:
+.SILENT:

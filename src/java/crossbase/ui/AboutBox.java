@@ -110,7 +110,7 @@ public class AboutBox extends Dialog
 	private void createContents()
 	{
 		aboutBoxShell = new Shell(getParent(), getStyle());
-		aboutBoxShell.setSize(360, 147);
+		aboutBoxShell.setSize(368, 150);
 		aboutBoxShell.setText("About SWT Application");
 		aboutBoxShell.setLayout(new FormLayout());
 		
@@ -119,8 +119,8 @@ public class AboutBox extends Dialog
 		iconLabel.setAlignment(SWT.CENTER);
 		iconLabel.setImage(SWTResourceManager.getImage(AboutBox.class, "/crossbase/icon.png"));
 		FormData fd_iconLabel = new FormData();
-		fd_iconLabel.top = new FormAttachment(0, 10);
-		fd_iconLabel.left = new FormAttachment(0, 10);
+		fd_iconLabel.top = new FormAttachment(0, 15);
+		fd_iconLabel.left = new FormAttachment(0, 15);
 		iconLabel.setLayoutData(fd_iconLabel);
 		iconLabel.setSize(64, 64);
 		
@@ -143,8 +143,8 @@ public class AboutBox extends Dialog
 		
 		Label descriptionLabel = new Label(aboutBoxShell, SWT.NONE);
 		FormData fd_descriptionLabel = new FormData();
-		fd_descriptionLabel.left = new FormAttachment(iconLabel, 10);
-		fd_descriptionLabel.right = new FormAttachment(100, -10);
+		fd_descriptionLabel.left = new FormAttachment(iconLabel, 15);
+		fd_descriptionLabel.right = new FormAttachment(100, -15);
 		descriptionLabel.setLayoutData(fd_descriptionLabel);
 		descriptionLabel.setText("This app demonstrates Avian + SWT power");
 		
@@ -152,9 +152,9 @@ public class AboutBox extends Dialog
 		fd_descriptionLabel.bottom = new FormAttachment(copyrightLabel, -6);
 		copyrightLabel.setText("Copyright Ilya Mizus, 2013");
 		FormData fd_copyrightLabel = new FormData();
-		fd_copyrightLabel.left = new FormAttachment(iconLabel, 10);
+		fd_copyrightLabel.left = new FormAttachment(iconLabel, 15);
 		fd_copyrightLabel.bottom = new FormAttachment(okButton, -6);
-		fd_copyrightLabel.right = new FormAttachment(100, -10);
+		fd_copyrightLabel.right = new FormAttachment(100, -15);
 		copyrightLabel.setLayoutData(fd_copyrightLabel);
 		
 		Label titleLabel = new Label(aboutBoxShell, SWT.NONE);
@@ -163,9 +163,9 @@ public class AboutBox extends Dialog
 		updateTitleFont(titleLabel);
 		titleLabel.setText("CrossBase SWT Application");
 		FormData fd_titleLabel = new FormData();
-		fd_titleLabel.left = new FormAttachment(iconLabel, 10);
-		fd_titleLabel.right = new FormAttachment(100, -10);
-		fd_titleLabel.top = new FormAttachment(0, 10);
+		fd_titleLabel.left = new FormAttachment(iconLabel, 15);
+		fd_titleLabel.right = new FormAttachment(100, -15);
+		fd_titleLabel.top = new FormAttachment(0, 15);
 		titleLabel.setLayoutData(fd_titleLabel);
 
 		if (SWT.getPlatform().equals("gtk"))

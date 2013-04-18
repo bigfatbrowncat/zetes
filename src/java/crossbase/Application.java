@@ -14,7 +14,6 @@ public class Application
 	public static final String APP_NAME = "SWT Application";
 	
 	private static MainWindow mainWindow = null;
-	private static Display mainDisplay = null;
 
 	private static Listener quitListener = new Listener()
 	{
@@ -78,7 +77,6 @@ public class Application
 		if (shouldIOpenWindow)
 		{
 			Display.setAppName(APP_NAME);
-			mainDisplay = Display.getDefault();
 	
 			mainWindow = new MainWindow();
 	

@@ -18,8 +18,10 @@ public:
 	string locateResource(const string& path, const string& filename);
 	string locateExecutable();
 
+#ifndef __APPLE__
 	static string readFromPipe(const char* name);
 	static bool writeToPipe(string name, string textToWrite);
+#endif
 };
 
 #endif /* RESOURCELOCATOR_H_ */

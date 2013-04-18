@@ -73,7 +73,7 @@ string WinLinMacApi::locateExecutable()
 		{
 			CFURLRef executablePathUrl = CFURLCreateCopyDeletingLastPathComponent(kCFAllocatorDefault, executableURL);
 
-			CFStringRef executablePath = CFURLCopyPath(executablePathUrl);	// CFURLCopyFileSystemPath
+			CFStringRef executablePath = CFURLCopyFileSystemPath(executablePathUrl, kCFURLPOSIXPathStyle);	// CFURLCopyFileSystemPath
 			if (executablePath)
 			{
 				char fileurl[PATH_MAX + 1];
@@ -101,11 +101,6 @@ string WinLinMacApi::locateExecutable()
 		res = "./";
 	}
 	return res;
-}
-
-bool runSecondExecutable(string arguments)
-{
-	// Don't try to run the second GUI app on OS X
 }
 
 #elif __WIN32__

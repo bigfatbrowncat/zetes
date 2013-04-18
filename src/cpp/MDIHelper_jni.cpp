@@ -5,6 +5,8 @@ using namespace std;
 
 #include "WinLinMacApi.h"
 
+#ifndef __APPLE__
+
 extern "C" JNIEXPORT jstring JNICALL Java_crossbase_MDIHelper_readFromPipe(JNIEnv * env, jclass appClass, jstring name)
 {
 	const char *str= env->GetStringUTFChars(name, 0);
@@ -25,3 +27,5 @@ extern "C" JNIEXPORT jboolean JNICALL Java_crossbase_MDIHelper_writeToPipe(JNIEn
 
 	return res;
 }
+
+#endif

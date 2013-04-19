@@ -41,9 +41,6 @@ extern "C"
 } // extern "C"
 
 
-static WinLinMacApi winLinMacApi;
-
-
 int main(int argc, const char** argv)
 {
 #ifdef __MINGW32__
@@ -69,7 +66,7 @@ int main(int argc, const char** argv)
 	options[1].optionString = const_cast<char*>("-Xmx16000m");	// 16GB should be enough
 
 	// Setting SWT libraries path
-	string execPath = winLinMacApi.locateExecutable();
+	string execPath = WinLinMacApi::locateExecutable();
 	execPath = "-Dswt.library.path=" + execPath;
 	options[2].optionString = const_cast<char*>(execPath.c_str());
 

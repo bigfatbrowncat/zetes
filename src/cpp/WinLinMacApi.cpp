@@ -153,11 +153,11 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 
 #define BUFFER_SIZE		10
 
-string WinLinMacApi::readFromPipe(const char* name)
+string WinLinMacApi::readFromPipe(string name)
 {
 	string res = "";
 
-	HANDLE hPipe = CreateNamedPipe(name,             // pipe name
+	HANDLE hPipe = CreateNamedPipe(name.c_str(),             // pipe name
 			PIPE_ACCESS_DUPLEX,       // read/write access
 			PIPE_TYPE_MESSAGE |       // message type pipe
 					PIPE_READMODE_MESSAGE |   // message-read mode

@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
@@ -34,19 +33,21 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import crossbase.ui.AboutBox;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.events.DragDetectEvent;
 
-public class MainWindow
+public class ViewWindow
 {
-
 	protected Shell shell;
-	private Label imageLabel;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
-	
-	private MenuItem helpMenuItem;
-	
-	private AboutBox aboutBox;
-
+	DropTarget imageContainerDropTarget, imageLabelDropTarget;
+	private ViewWindowClosedListener closedListener;
+	private ImageView imageView;
+		
 	protected static Image loadImage(InputStream stream) throws IOException {
 		try {
 			Display display = Display.getCurrent();
@@ -69,10 +70,10 @@ public class MainWindow
 	/**
 	 * Open the window.
 	 */
-	public void open()
+	public void open(MenuConstructor menuConstructor)
 	{
 		Display display = Display.getDefault();
-		createContents();
+		createContents(menuConstructor);
 		
 		if (SWT.getPlatform().equals("cocoa"))
 		{
@@ -81,13 +82,6 @@ public class MainWindow
 		
 		shell.open();
 		shell.layout();
-		while (!shell.isDisposed())
-		{
-			if (!display.readAndDispatch())
-			{
-				display.sleep();
-			}
-		}
 	}
 
 	private void setCocoaFullscreenButton(boolean on)
@@ -116,106 +110,55 @@ public class MainWindow
 
 	}
 	
-	private DropTargetAdapter fileDropTargetAdapter = new DropTargetAdapter() {
-		public void drop(DropTargetEvent event) {
-			String fileList[] = null;
-			FileTransfer ft = FileTransfer.getInstance();
-			if (ft.isSupportedType(event.currentDataType)) {
-				fileList = (String[]) event.data;
-				if (fileList.length > 0)
-				{
-					openImageFile(fileList[0]);
-				}
-			}
-		}
-	};
+	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
+	{
+		imageContainerDropTarget.addDropListener(dropTargetAdapter);
+//		imageLabelDropTarget.addDropListener(dropTargetAdapter);
+	}
 	
+	public void removeDropTargetListener(DropTargetAdapter dropTargetAdapter)
+	{
+		imageContainerDropTarget.removeDropListener(dropTargetAdapter);
+//		imageLabelDropTarget.removeDropListener(dropTargetAdapter);
+	}
+	
+	public void setClosedListener(ViewWindowClosedListener closedListener)
+	{
+		this.closedListener = closedListener;
+	}
+
 	/**
 	 * Create contents of the window.
 	 * 
 	 * @wbp.parser.entryPoint
 	 */
-	protected void createContents()
+	protected void createContents(MenuConstructor menuConstructor)
 	{
 		shell = new Shell();
+		shell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent arg0) {
+				Image oldImage = imageView.getImage();
+				if (oldImage != null) 
+				{
+					oldImage.dispose();
+				}
+				if (closedListener != null) closedListener.windowClosed(ViewWindow.this);
+			}
+		});
+		
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		shell.setMinimumSize(new Point(150, 200));
-		shell.setImage(SWTResourceManager.getImage(MainWindow.class,
+		shell.setImage(SWTResourceManager.getImage(ViewWindow.class,
 				"/crossbase/icon.png"));
-		
-		aboutBox = new AboutBox(shell);
-
-		//shell.setSize(480, 360);
-		
+	
 		shell.setText("SWT Application");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 
-		MenuItem mntmFile_1 = new MenuItem(menu, SWT.CASCADE);
-		mntmFile_1.setText("&File");
-
-		Menu menu_1 = new Menu(mntmFile_1);
-		mntmFile_1.setMenu(menu_1);
-
-		// "Open" menu item
-		MenuItem mainMenuItemOpen = new MenuItem(menu_1, SWT.NONE);
-		mainMenuItemOpen.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0)
-			{
-				FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
-				fileDialog.setText("Open image");
-				fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
-				fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
-				String fileName = fileDialog.open();
-				if (fileName != null)
-				{
-					openImageFile(fileName);
-				}
-			}
-		});
-		
-		HotKey openHotKey = new HotKey(HotKey.MOD1, 'O');
-		mainMenuItemOpen.setText("&Open...\t" + openHotKey.toString());
-		mainMenuItemOpen.setAccelerator(openHotKey.toAccelerator());
-		
-		if (!SWT.getPlatform().equals("cocoa"))
-		{
-			new MenuItem(menu_1, SWT.SEPARATOR);
-
-			// "Exit" menu item
-			MenuItem mainMenuItemExit = new MenuItem(menu_1, SWT.NONE);
-			mainMenuItemExit.addSelectionListener(new SelectionAdapter()
-			{
-				@Override
-				public void widgetSelected(SelectionEvent arg0)
-				{
-					userClose();
-				}
-			});
-
-			mainMenuItemExit.setText("E&xit");
-			
-			// "Help" menu item
-			helpMenuItem = new MenuItem(menu, SWT.CASCADE);
-			helpMenuItem.setText("&Help");
-			
-			Menu menu_2 = new Menu(helpMenuItem);
-			helpMenuItem.setMenu(menu_2);
-			
-			// "About" menu item
-			MenuItem mntmAbout = new MenuItem(menu_2, SWT.NONE);
-			mntmAbout.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent arg0) {
-					userAbout();
-				}
-			});
-			mntmAbout.setText("&About...");
-		}
+		// Creating "File" menu
+		menuConstructor.appendMenusToShell(shell);
 		
 		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
@@ -224,21 +167,12 @@ public class MainWindow
 		imageContainerComposite = new Composite(scrolledComposite, SWT.NONE);
 		imageContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		imageContainerComposite.setLayout(null);
-		DropTarget imageContainerDropTarget = new DropTarget(imageContainerComposite, DND.DROP_DEFAULT	| DND.DROP_MOVE);
+		
+		imageView = new ImageView(imageContainerComposite, SWT.NONE);
+		imageView.setBounds(0, 0, 200, 127);
+		imageContainerDropTarget = new DropTarget(imageView, DND.DROP_MOVE);
 		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
-		imageContainerDropTarget.addDropListener(fileDropTargetAdapter);
-		
-		
-		imageLabel = new Label(imageContainerComposite, SWT.NONE);
-		imageLabel.setImage(null);
-		imageLabel.setAlignment(SWT.CENTER);
-		imageLabel.setBounds(0, 0, 50, 50);
-		imageLabel.setVisible(false);
-		DropTarget imageLabelDropTarget = new DropTarget(imageLabel, DND.DROP_DEFAULT	| DND.DROP_MOVE);
-		imageLabelDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
-		imageLabelDropTarget.addDropListener(fileDropTargetAdapter);
 
-		
 		scrolledComposite.setContent(imageContainerComposite);
 		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
@@ -248,10 +182,11 @@ public class MainWindow
 		try
 		{
 			System.out.println("Opening " + fileName);
-			Image oldImage = imageLabel.getImage();
-			imageLabel.setImage(loadImage(fileName));
-			imageLabel.setSize(imageLabel.getImage().getImageData().width, imageLabel.getImage().getImageData().height);
-			imageLabel.setVisible(true);
+			Image oldImage = imageView.getImage();
+			imageView.setImage(loadImage(fileName));
+			shell.setText(fileName);
+			imageView.setSize(imageView.getImage().getImageData().width, imageView.getImage().getImageData().height);
+			imageView.setVisible(true);
 			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			if (oldImage != null) oldImage.dispose();
 		}
@@ -270,19 +205,14 @@ public class MainWindow
 			cantOpenFileMessageBox.open();			
 		}
 	}
-
-	public void userClose()
+	
+	public boolean isOccupied()
 	{
-		shell.close();
-	}
-
-	public void userAbout()
-	{
-		aboutBox.open();		
+		return imageView.getImage() != null;
 	}
 	
-	public void userPreferences()
+	public boolean isDisposed()
 	{
-		// TODO Implement preferences window
+		return shell.isDisposed();
 	}
 }

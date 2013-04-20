@@ -37,8 +37,19 @@ public class AboutBox extends Dialog
 
 	private void centerWindow()
 	{
-        // Move the dialog to the center of the top level shell.
-        Rectangle shellBounds = getParent().getBounds();
+		Rectangle shellBounds;
+	
+		if (getParent().isVisible())
+		{
+			// Move the dialog to the center of the parent shell.
+			shellBounds = getParent().getBounds();
+		}
+		else
+		{
+			// Move the dialog to the center of the display
+			shellBounds = getParent().getDisplay().getBounds();
+		}
+		
         Point dialogSize = aboutBoxShell.getSize();
 
         aboutBoxShell.setLocation(shellBounds.x + (shellBounds.width - dialogSize.x) / 2,
@@ -71,6 +82,20 @@ public class AboutBox extends Dialog
 		label.setFont(newFont);
 	}
 	
+	private void updateTextFont(Control label)
+	{
+		if (SWT.getPlatform().equals("cocoa"))
+		{
+			// Making the button
+			Font defaultFont = label.getFont();
+			FontData fontData = defaultFont.getFontData()[0];
+			fontData.height -= 2;
+		
+			Font newFont = new Font(label.getDisplay(), fontData);
+			label.setFont(newFont);
+		}
+	}
+	
 	
 	/**
 	 * Open the dialog.
@@ -83,8 +108,8 @@ public class AboutBox extends Dialog
 			createContents();
 			centerWindow();
 	
-			aboutBoxShell.open();
 			aboutBoxShell.layout();
+			aboutBoxShell.open();
 			Display display = getParent().getDisplay();
 			while (!aboutBoxShell.isDisposed())
 			{
@@ -147,6 +172,7 @@ public class AboutBox extends Dialog
 		fd_descriptionLabel.right = new FormAttachment(100, -15);
 		descriptionLabel.setLayoutData(fd_descriptionLabel);
 		descriptionLabel.setText("This app demonstrates Avian + SWT power");
+		updateTextFont(descriptionLabel);
 		
 		Label copyrightLabel = new Label(aboutBoxShell, SWT.NONE);
 		fd_descriptionLabel.bottom = new FormAttachment(copyrightLabel, -6);
@@ -156,10 +182,10 @@ public class AboutBox extends Dialog
 		fd_copyrightLabel.bottom = new FormAttachment(okButton, -6);
 		fd_copyrightLabel.right = new FormAttachment(100, -15);
 		copyrightLabel.setLayoutData(fd_copyrightLabel);
+		updateTextFont(copyrightLabel);
 		
 		Label titleLabel = new Label(aboutBoxShell, SWT.NONE);
 		fd_descriptionLabel.top = new FormAttachment(titleLabel, 6);
-		//titleLabel.setFont(SWTResourceManager.getFont("Lucida Grande", 12, SWT.BOLD));
 		updateTitleFont(titleLabel);
 		titleLabel.setText("CrossBase SWT Application");
 		FormData fd_titleLabel = new FormData();
@@ -174,5 +200,10 @@ public class AboutBox extends Dialog
 			
 			aboutBoxShell.setSize(new Point((int)(size.x * 1.2f), (int)(size.y * 1.2f)));
 		}
+	}
+	
+	public boolean isDisposed()
+	{
+		return aboutBoxShell == null || aboutBoxShell.isDisposed();
 	}
 }

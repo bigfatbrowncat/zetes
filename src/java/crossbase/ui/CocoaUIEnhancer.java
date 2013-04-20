@@ -4,9 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.internal.C;
 import org.eclipse.swt.internal.Callback;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
@@ -66,8 +69,8 @@ public class CocoaUIEnhancer {
      * @param preferencesAction
      *            The action to run when the Preferences menu is invoked.
      */
-    public void hookApplicationMenu( Display display, Listener quitListener, final Runnable aboutAction,
-                                     final Runnable preferencesAction ) {
+    public void hookApplicationMenu( Display display, final SelectionAdapter exitSelectionAdapter, final SelectionAdapter aboutSelectionAdapter,
+                                     final SelectionAdapter preferencesSelectionAdapter ) {
         // This is our callbackObject whose 'actionProc' method will be called when the About or
         // Preferences menuItem is invoked.
         //
@@ -77,9 +80,9 @@ public class CocoaUIEnhancer {
             @SuppressWarnings( "unused" )
             long actionProc( long id, long sel, long arg0 ) {
                 if ( sel == sel_aboutMenuItemSelected_ ) {
-                    aboutAction.run();
+                	aboutSelectionAdapter.widgetSelected(new SelectionEvent(new Event()));
                 } else if ( sel == sel_preferencesMenuItemSelected_ ) {
-                    preferencesAction.run();
+                	preferencesSelectionAdapter.widgetSelected(new SelectionEvent(new Event()));
                 } else {
                     // Unknown selection!
                 }
@@ -97,7 +100,14 @@ public class CocoaUIEnhancer {
 
         // Connect the quit/exit menu.
         if ( !display.isDisposed() ) {
-            display.addListener( SWT.Close, quitListener );
+            display.addListener( SWT.Close, new Listener() {
+				
+				@Override
+				public void handleEvent(Event arg0) {
+					exitSelectionAdapter.widgetSelected(new SelectionEvent(arg0));
+					
+				}
+			} );
         }
 
         // Schedule disposal of callback object

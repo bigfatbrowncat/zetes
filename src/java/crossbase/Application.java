@@ -122,6 +122,14 @@ public class Application
 		public void windowClosed(ViewWindow window)
 		{
 			windows.remove(window);
+			
+			if (!SWT.getPlatform().equals("cocoa"))
+			{
+				if (windows.size() == 0)
+				{
+					Display.getDefault().dispose();
+				}
+			}
 		}
 	};
 	

@@ -151,6 +151,34 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 	return ss.str();
 }
 
+bool WinLinMacApi::globalLock(string name)
+{
+	HANDLE mutex = CreateMutex(NULL, true, name.c_str());
+	if (mutex == NULL)
+	{
+		printf("Can't create mutex named %s. Error: %d\n", name.c_str(), GetLastError());
+		return false;
+	}
+
+	bool res = WaitForSingleObject(mutex, INFINITE) == WAIT_OBJECT_0;
+	CloseHandle(mutex);
+	return true;
+}
+
+bool WinLinMacApi::globalUnlock(string name)
+{
+	HANDLE mutex = OpenMutex(SYNCHRONIZE, false, name.c_str());
+	if (mutex == NULL)
+	{
+		printf("Can't open mutex named %s. Error: %d\n", name.c_str(), GetLastError());
+		return false;
+	}
+
+	bool res = ReleaseMutex(mutex);
+	CloseHandle(mutex);
+	return true;
+}
+
 #define BUFFER_SIZE		10
 
 string WinLinMacApi::readFromPipe(string name)
@@ -214,10 +242,17 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 {
 	bool res = true;
 
-	if (!WaitNamedPipe(name.c_str(), 1000))
+	bool ok = false;
+	for (int i = 0; i < 100; i++)
 	{
-		return false;
+		if (WaitNamedPipe(name.c_str(), 10))
+		{
+			ok = true;
+			break;
+		}
+		Sleep(10);
 	}
+	if (!ok) return false;
 
 	HANDLE hPipe = CreateFile(
 		name.c_str(),

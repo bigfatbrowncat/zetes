@@ -6,6 +6,9 @@ import org.eclipse.swt.widgets.Listener;
 
 public class MDIHelper
 {
+	private native static boolean globalLock(String name);
+	private native static boolean globalUnlock(String name);
+
 	private native static String readFromPipe(String name);
 	private native static boolean writeToPipe(String name, String data);
 
@@ -46,6 +49,7 @@ public class MDIHelper
 
 	public MDIHelper(String[] fileNames, Listener fileHandler)
 	{
+		globalLock("mymutex");
 		this.fileHandler = fileHandler;
 		
 		System.out.println("Trying to send file names to our other instance...");
@@ -64,7 +68,7 @@ public class MDIHelper
 		{
 			filesListener.start();
 		}
-		
+		globalUnlock("mymutex");
 	}
 	
 	public boolean areFilesSent()

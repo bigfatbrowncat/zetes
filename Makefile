@@ -43,7 +43,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_TAG = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
-  PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
+  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all

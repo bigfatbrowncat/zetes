@@ -7,6 +7,24 @@ using namespace std;
 
 #ifndef __APPLE__
 
+extern "C" JNIEXPORT jboolean JNICALL Java_crossbase_MDIHelper_globalLock(JNIEnv * env, jclass appClass, jstring name)
+{
+	const char *str= env->GetStringUTFChars(name, 0);
+	jboolean res = WinLinMacApi::globalLock(string(str));
+	env->ReleaseStringUTFChars(name, str);
+
+	return res;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_crossbase_MDIHelper_globalUnlock(JNIEnv * env, jclass appClass, jstring name)
+{
+	const char *str= env->GetStringUTFChars(name, 0);
+	jboolean res = WinLinMacApi::globalUnlock(string(str));
+	env->ReleaseStringUTFChars(name, str);
+
+	return res;
+}
+
 extern "C" JNIEXPORT jstring JNICALL Java_crossbase_MDIHelper_readFromPipe(JNIEnv * env, jclass appClass, jstring name)
 {
 	const char *str= env->GetStringUTFChars(name, 0);

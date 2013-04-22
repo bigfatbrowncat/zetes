@@ -9,14 +9,19 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
+import tinyviewer.ui.TinyViewerApplication;
 import tinyviewer.ui.ViewWindow;
 import tinyviewer.ui.ViewWindowFactory;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import crossbase.ui.AboutBox;
+import crossbase.ui.AboutHandler;
 import crossbase.ui.CocoaUIEnhancer;
+import crossbase.ui.DocumentWindow;
 import crossbase.ui.DocumentWindowsManager;
+import crossbase.ui.DocumentHandler;
 import crossbase.ui.MenuConstructor;
+import crossbase.ui.PreferencesHandler;
 
 
 public class Application
@@ -24,8 +29,22 @@ public class Application
 	public static final String APP_NAME = "SWT Application";
 	
 	private MenuConstructor menuConstructor;
-	private AboutBox aboutBox = null;
-	private DocumentWindowsManager<ViewWindow> documentWindowsManager;
+	private DocumentWindowsManager<? extends DocumentWindow> documentWindowsManager;
+
+	protected void showAbout()
+	{
+		
+	}
+	
+	protected void showPreferences()
+	{
+		
+	}
+	
+	protected void processOpenDocument(String fileName)
+	{
+		
+	}
 	
 	private Listener openDocumentListener = new Listener()
 	{
@@ -33,7 +52,7 @@ public class Application
 		@Override
 		public void handleEvent(Event arg0) {
 			String fileName = arg0.text;
-			documentWindowsManager.openFile(fileName);
+			processOpenDocument(fileName);
 		}
 	};
 	
@@ -43,26 +62,24 @@ public class Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			if (aboutBox == null || aboutBox.isDisposed())
+			/*if (aboutBox == null || aboutBox.isDisposed())
 			{
 				Shell dummyShell = new Shell(Display.getDefault());
 				aboutBox = new AboutBox(dummyShell);
 				aboutBox.open();
 				dummyShell.dispose();
-			}
+			}*/
+			
+			showAbout();
 		}
 	};
 	
 	private SelectionAdapter preferencesSelectionAdapter = new SelectionAdapter()
 	{
-		
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-/*			if (mainWindow != null)
-			{
-				mainWindow.userPreferences();
-			}	*/
+			showPreferences();
 		}
 	};
 	
@@ -78,25 +95,6 @@ public class Application
 		}
 	}
 	
-	private SelectionAdapter openSelectionAdapter = new SelectionAdapter()
-	{
-		@Override
-		public void widgetSelected(SelectionEvent arg0)
-		{
-			Shell dummyShell = new Shell(Display.getDefault());
-			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
-			fileDialog.setText("Open image");
-			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
-			fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
-			String fileName = fileDialog.open();
-			if (fileName != null)
-			{
-				documentWindowsManager.openFile(fileName);
-			}
-			dummyShell.dispose();
-		}
-	};
-		
 	private SelectionAdapter exitSelectionAdapter = new SelectionAdapter()
 	{
 		@Override
@@ -109,13 +107,12 @@ public class Application
 	protected Application(String[] arguments)
 	{
 		Display.setAppName(APP_NAME);
-		
-		menuConstructor = new MenuConstructor();
-		menuConstructor.setOpenSelectionAdapter(openSelectionAdapter);
+
+		menuConstructor = prepareMenuConstructor();
 		menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 		menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
 
-		documentWindowsManager = new DocumentWindowsManager<ViewWindow>(new ViewWindowFactory(menuConstructor));
+		documentWindowsManager = prepareDocumentWindowsManager();
 		
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		
@@ -162,8 +159,29 @@ public class Application
 		System.out.print("Bye!\n");	
 	}
 	
+	protected DocumentWindowsManager<? extends DocumentWindow> prepareDocumentWindowsManager()
+	{
+		return null;
+	}
+
+	protected MenuConstructor prepareMenuConstructor()
+	{
+		return null;
+	}
+
+	public DocumentWindowsManager<? extends DocumentWindow> getDocumentWindowsManager()
+	{
+		return documentWindowsManager;
+	}
+	
+	public MenuConstructor getMenuConstructor()
+	{
+		return menuConstructor;
+	}
+	
 	public static void main(String... args)
 	{
-		new Application(args);
+		//new Application(args);
+		new TinyViewerApplication(args);
 	}
 }

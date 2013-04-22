@@ -7,35 +7,24 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
-public class MenuConstructor
+public abstract class MenuConstructor
 {
-	private SelectionAdapter openSelectionAdapter, exitSelectionAdapter, aboutSelectionAdapter;
+	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
 	
-	private void appendFileMenu(Display display, Shell shell)
+	protected void appendCustomFileMenuItems(Menu fileMenu, Display display, Shell shell)
 	{
-		Menu menu;
-		
-		if (shell != null) 
-			menu = shell.getMenuBar();
-		else if (display != null) 
-			menu = display.getMenuBar();
-		else 
-			throw new RuntimeException("Strange case");
-		
+		// To be defined in child classes...
+	}
+	
+	private void appendFileMenu(Menu menu, Display display, Shell shell)
+	{
 		MenuItem fileMenuItem = new MenuItem(menu, SWT.CASCADE);
 		fileMenuItem.setText("&File");
 
 		Menu fileMenu = new Menu(fileMenuItem);
 		fileMenuItem.setMenu(fileMenu);
 
-		// "Open" menu item
-		MenuItem openMenuItem = new MenuItem(fileMenu, SWT.NONE);
-		openMenuItem.addSelectionListener(openSelectionAdapter);
-		
-		HotKey openHotKey = new HotKey(HotKey.MOD1, 'O');
-		openMenuItem.setText("&Open...\t" + openHotKey.toString());
-		openMenuItem.setAccelerator(openHotKey.toAccelerator());
-
+		appendCustomFileMenuItems(fileMenu, display, shell);
 		
 		if (!SWT.getPlatform().equals("cocoa"))
 		{
@@ -48,6 +37,10 @@ public class MenuConstructor
 			mainMenuItemExit.setText("E&xit");
 		}
 		
+	}
+	
+	private void appendHelpMenu(Menu menu, Display display, Shell shell)
+	{
 		// "Help" menu item
 		MenuItem helpMenuItem = new MenuItem(menu, SWT.CASCADE);
 		helpMenuItem.setText("&Help");
@@ -67,34 +60,35 @@ public class MenuConstructor
 	
 	public void appendMenusToGlobalMenu()
 	{
-		appendFileMenu(Display.getDefault(), null);
+		Display display = Display.getDefault();
+		Menu menu = display.getMenuBar();
+		appendFileMenu(menu, display, null);
+		appendHelpMenu(menu, display, null);
 	}
 	public void appendMenusToShell(Shell shell)
 	{
-		appendFileMenu(null, shell);
+		Menu menu = shell.getMenuBar();
+		appendFileMenu(menu, null, shell);
+		appendHelpMenu(menu, null, shell);
 	}
 
-	public SelectionAdapter getOpenSelectionAdapter() {
-		return openSelectionAdapter;
-	}
-
-	public void setOpenSelectionAdapter(SelectionAdapter openSelectionAdapter) {
-		this.openSelectionAdapter = openSelectionAdapter;
-	}
-
-	public SelectionAdapter getExitSelectionAdapter() {
+	public SelectionAdapter getExitSelectionAdapter()
+	{
 		return exitSelectionAdapter;
 	}
 
-	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter) {
+	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
+	{
 		this.exitSelectionAdapter = exitSelectionAdapter;
 	}
 
-	public SelectionAdapter getAboutSelectionAdapter() {
+	public SelectionAdapter getAboutSelectionAdapter()
+	{
 		return aboutSelectionAdapter;
 	}
 
-	public void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter) {
+	public void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter)
+	{
 		this.aboutSelectionAdapter = aboutSelectionAdapter;
 	}
 }

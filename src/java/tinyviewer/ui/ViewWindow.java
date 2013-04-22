@@ -90,7 +90,6 @@ public class ViewWindow implements DocumentWindow
 	 */
 	public void open(MenuConstructor menuConstructor)
 	{
-		Display display = Display.getDefault();
 		createContents(menuConstructor);
 		
 		if (SWT.getPlatform().equals("cocoa"))

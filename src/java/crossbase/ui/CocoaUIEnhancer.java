@@ -1,5 +1,6 @@
 package crossbase.ui;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -8,9 +9,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.internal.C;
 import org.eclipse.swt.internal.Callback;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * Provide a hook to connecting the Preferences, About and Quit menu items of the Mac OS X
@@ -290,4 +293,5 @@ public class CocoaUIEnhancer {
             throw new IllegalStateException( e );
         }
     }
+    
 }

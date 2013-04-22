@@ -1,69 +1,43 @@
 package crossbase;
 
-import java.util.ArrayList;
-
-import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
-import crossbase.ui.AboutBox;
-import crossbase.ui.CocoaUIEnhancer;
-import crossbase.ui.HotKey;
-import crossbase.ui.ViewWindow;
-import crossbase.ui.MenuConstructor;
-import crossbase.ui.ViewWindowClosedListener;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+
+import tinyviewer.ui.ViewWindow;
+import tinyviewer.ui.ViewWindowFactory;
+
+import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
+import crossbase.ui.AboutBox;
+import crossbase.ui.CocoaUIEnhancer;
+import crossbase.ui.DocumentWindowsManager;
+import crossbase.ui.MenuConstructor;
 
 
 public class Application
 {
 	public static final String APP_NAME = "SWT Application";
 	
-	private static ArrayList<ViewWindow> windows = new ArrayList<ViewWindow>();
-	private static MenuConstructor menuConstructor;
-	private static AboutBox aboutBox = null;
+	private MenuConstructor menuConstructor;
+	private AboutBox aboutBox = null;
+	private DocumentWindowsManager<ViewWindow> documentWindowsManager;
 	
-	private static SelectionAdapter openSelectionAdapter = new SelectionAdapter()
+	private Listener openDocumentListener = new Listener()
 	{
+		
 		@Override
-		public void widgetSelected(SelectionEvent arg0)
-		{
-			Shell dummyShell = new Shell(Display.getDefault());
-			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
-			fileDialog.setText("Open image");
-			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
-			fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
-			String fileName = fileDialog.open();
-			if (fileName != null)
-			{
-				openFile(fileName);
-			}
-			dummyShell.dispose();
+		public void handleEvent(Event arg0) {
+			String fileName = arg0.text;
+			documentWindowsManager.openFile(fileName);
 		}
 	};
 	
-	private static SelectionAdapter exitSelectionAdapter = new SelectionAdapter()
-	{
-		@Override
-		public void widgetSelected(SelectionEvent arg0)
-		{
-			Display.getDefault().dispose();
-		}
-	};
-	
-	private static SelectionAdapter aboutSelectionAdapter = new SelectionAdapter()
+	private SelectionAdapter aboutSelectionAdapter = new SelectionAdapter()
 	{
 		
 		@Override
@@ -79,7 +53,7 @@ public class Application
 		}
 	};
 	
-	private static SelectionAdapter preferencesSelectionAdapter = new SelectionAdapter()
+	private SelectionAdapter preferencesSelectionAdapter = new SelectionAdapter()
 	{
 		
 		@Override
@@ -92,80 +66,7 @@ public class Application
 		}
 	};
 	
-	private static Listener openDocumentListener = new Listener() {
-		
-		@Override
-		public void handleEvent(Event arg0) {
-			String fileName = arg0.text;
-			openFile(fileName);
-		}
-	};
-	
-	private static DropTargetAdapter viewWindowDropTargetAdapter = new DropTargetAdapter()
-	{
-		public void drop(DropTargetEvent event) {
-			String fileList[] = null;
-			FileTransfer ft = FileTransfer.getInstance();
-			if (ft.isSupportedType(event.currentDataType)) {
-				fileList = (String[]) event.data;
-				if (fileList.length > 0)
-				{
-					System.out.println("drop");
-					openFile(fileList[0]);
-				}
-			}
-		}
-	};
-	
-	private static ViewWindowClosedListener viewWindowClosedListener = new ViewWindowClosedListener()
-	{
-		@Override
-		public void windowClosed(ViewWindow window)
-		{
-			windows.remove(window);
-			
-			if (!SWT.getPlatform().equals("cocoa"))
-			{
-				if (windows.size() == 0)
-				{
-					Display.getDefault().dispose();
-				}
-			}
-		}
-	};
-	
-	private static ViewWindow openNewWindow(String fileName)
-	{
-		System.out.println("opening new");
-		ViewWindow newWindow = new ViewWindow();
-		newWindow.open(menuConstructor);
-		newWindow.addDropTargetListener(viewWindowDropTargetAdapter);
-		newWindow.setClosedListener(viewWindowClosedListener);
-		if (fileName != null)
-		{
-			newWindow.openImageFile(fileName);
-		}
-		windows.add(newWindow);
-		return newWindow;
-	}
-	
-	private static ViewWindow openFile(String fileName)
-	{
-		// Searching for an empty window
-		for (ViewWindow vw : windows)
-		{
-			if (!vw.isOccupied())
-			{
-				vw.openImageFile(fileName);
-				return vw;
-			}
-		}
-		
-		// If we haven't found an empty window, we open a new one
-		return openNewWindow(fileName);
-	}
-	
-	private static void eventLoop()
+	private void eventLoop()
 	{
 		Display display = Display.getDefault();
 		while (!display.isDisposed())
@@ -177,15 +78,44 @@ public class Application
 		}
 	}
 	
+	private SelectionAdapter openSelectionAdapter = new SelectionAdapter()
+	{
+		@Override
+		public void widgetSelected(SelectionEvent arg0)
+		{
+			Shell dummyShell = new Shell(Display.getDefault());
+			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
+			fileDialog.setText("Open image");
+			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
+			fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
+			String fileName = fileDialog.open();
+			if (fileName != null)
+			{
+				documentWindowsManager.openFile(fileName);
+			}
+			dummyShell.dispose();
+		}
+	};
+		
+	private SelectionAdapter exitSelectionAdapter = new SelectionAdapter()
+	{
+		@Override
+		public void widgetSelected(SelectionEvent arg0)
+		{
+			Display.getDefault().dispose();
+		}
+	};
 	
-	
-	public static void main(String... args) throws InterruptedException
+	protected Application(String[] arguments)
 	{
 		Display.setAppName(APP_NAME);
+		
 		menuConstructor = new MenuConstructor();
 		menuConstructor.setOpenSelectionAdapter(openSelectionAdapter);
 		menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 		menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
+
+		documentWindowsManager = new DocumentWindowsManager<ViewWindow>(new ViewWindowFactory(menuConstructor));
 		
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		
@@ -206,7 +136,7 @@ public class Application
 		{
 			try
 			{
-				mdiHelper = new SingleAppInstanceDocumentHandler(args, openDocumentListener);
+				mdiHelper = new SingleAppInstanceDocumentHandler(arguments, openDocumentListener);
 				if (!mdiHelper.isServer())
 				{
 					// In that case we have done our job and just exiting "main"
@@ -219,11 +149,7 @@ public class Application
 				return;
 			}
 
-			if (windows.size() == 0)
-			{
-				// Opening a new empty window -- we need it to show menus
-				openNewWindow(null);
-			}
+			documentWindowsManager.ensureThereIsOpenedWindow();
 		}
 		
 		eventLoop();
@@ -233,6 +159,11 @@ public class Application
 			mdiHelper.stop();
 		}
 
-		System.out.print("Bye!\n");
+		System.out.print("Bye!\n");	
+	}
+	
+	public static void main(String... args)
+	{
+		new Application(args);
 	}
 }

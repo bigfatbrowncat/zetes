@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class SingleAppInstanceDocumentHandler
 {
+	@SuppressWarnings("serial")
 	public class MutexError extends Error
 	{
 		MutexError(String message)
@@ -14,6 +15,7 @@ public class SingleAppInstanceDocumentHandler
 		}
 	}
 	
+	@SuppressWarnings("serial")
 	public class FileNamesSendingFailed extends Exception
 	{
 		public FileNamesSendingFailed(String message)

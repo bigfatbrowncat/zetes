@@ -1,4 +1,4 @@
-package crossbase.ui;
+package tinyviewer.ui;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,11 +12,10 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -24,30 +23,49 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.ui.AboutBox;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.events.DragDetectListener;
-import org.eclipse.swt.events.DragDetectEvent;
+import crossbase.ui.DocumentWindow;
+import crossbase.ui.DocumentWindowClosedListener;
+import crossbase.ui.ImageView;
+import crossbase.ui.MenuConstructor;
 
-public class ViewWindow
+public class ViewWindow implements DocumentWindow
 {
 	protected Shell shell;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;
-	private ViewWindowClosedListener closedListener;
+	private DocumentWindowClosedListener closedListener;
 	private ImageView imageView;
-		
+	
+	private void setCocoaFullscreenButton(boolean on)
+	{
+		try
+		{
+			Field field = Control.class.getDeclaredField("view");
+			Object /*NSView*/ view = field.get(shell);
+	
+			if (view != null)
+			{
+			    Class<?> c = Class.forName("org.eclipse.swt.internal.cocoa.NSView");
+			    Object /*NSWindow*/ window = c.getDeclaredMethod("window").invoke(view);
+	
+			    c = Class.forName("org.eclipse.swt.internal.cocoa.NSWindow");
+			    Method setCollectionBehavior = c.getDeclaredMethod(
+			        "setCollectionBehavior", long.class);
+			    setCollectionBehavior.invoke(window, on ? (1 << 7) : 0);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	protected static Image loadImage(InputStream stream) throws IOException {
 		try {
 			Display display = Display.getCurrent();
@@ -84,30 +102,6 @@ public class ViewWindow
 		shell.layout();
 	}
 
-	private void setCocoaFullscreenButton(boolean on)
-	{
-		try
-		{
-			Field field = Control.class.getDeclaredField("view");
-			Object /*NSView*/ view = field.get(shell);
-	
-			if (view != null)
-			{
-			    Class<?> c = Class.forName("org.eclipse.swt.internal.cocoa.NSView");
-			    Object /*NSWindow*/ window = c.getDeclaredMethod("window").invoke(view);
-	
-			    c = Class.forName("org.eclipse.swt.internal.cocoa.NSWindow");
-			    Method setCollectionBehavior = c.getDeclaredMethod(
-			        "setCollectionBehavior", long.class);
-			    setCollectionBehavior.invoke(window, on ? (1 << 7) : 0);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
 	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
 		imageContainerDropTarget.addDropListener(dropTargetAdapter);
@@ -120,7 +114,7 @@ public class ViewWindow
 		imageViewDropTarget.removeDropListener(dropTargetAdapter);
 	}
 	
-	public void setClosedListener(ViewWindowClosedListener closedListener)
+	public void setClosedListener(DocumentWindowClosedListener closedListener)
 	{
 		this.closedListener = closedListener;
 	}
@@ -178,7 +172,8 @@ public class ViewWindow
 		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
-	public void openImageFile(String fileName)
+	@Override
+	public void loadFile(String fileName)
 	{
 		try
 		{
@@ -208,6 +203,7 @@ public class ViewWindow
 		}
 	}
 	
+	@Override
 	public boolean isOccupied()
 	{
 		return imageView.getImage() != null;

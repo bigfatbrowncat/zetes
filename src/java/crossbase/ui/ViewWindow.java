@@ -170,6 +170,7 @@ public class ViewWindow
 		
 		imageView = new ImageView(imageContainerComposite, SWT.NONE);
 		imageView.setBounds(0, 0, 200, 127);
+		imageView.setVisible(false);
 		imageContainerDropTarget = new DropTarget(imageView, DND.DROP_MOVE);
 		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
 
@@ -188,6 +189,7 @@ public class ViewWindow
 			imageView.setSize(imageView.getImage().getImageData().width, imageView.getImage().getImageData().height);
 			imageView.setVisible(true);
 			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			shell.forceActive();
 			if (oldImage != null) oldImage.dispose();
 		}
 		catch (IOException e)

@@ -151,35 +151,53 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 	return ss.str();
 }
 
-bool WinLinMacApi::globalLock(string name)
+HANDLE WinLinMacApi::globalLock(string name)
 {
-	HANDLE mutex = CreateMutex(NULL, true, name.c_str());
-	if (mutex == NULL)
+	HANDLE hMutex = CreateMutex(NULL, false, name.c_str());
+	if (hMutex == NULL)
 	{
 		printf("Can't create mutex named %s. Error: %d\n", name.c_str(), GetLastError());
-		return false;
+		return NULL;
 	}
 
-	bool res = WaitForSingleObject(mutex, INFINITE) == WAIT_OBJECT_0;
-	CloseHandle(mutex);
-	return true;
+	bool res = (WaitForSingleObject(hMutex, INFINITE) == WAIT_OBJECT_0);
+
+	return hMutex;
 }
 
-bool WinLinMacApi::globalUnlock(string name)
+bool WinLinMacApi::isLocked(string name)
 {
-	HANDLE mutex = OpenMutex(SYNCHRONIZE, false, name.c_str());
-	if (mutex == NULL)
+	HANDLE hMutex = CreateMutex(NULL, false, name.c_str());
+	if (hMutex == NULL)
 	{
-		printf("Can't open mutex named %s. Error: %d\n", name.c_str(), GetLastError());
-		return false;
+		printf("Can't create mutex named %s. Error: %d\n", name.c_str(), GetLastError());
+		return NULL;
 	}
 
-	bool res = ReleaseMutex(mutex);
-	CloseHandle(mutex);
-	return true;
+	bool res;
+	int w = WaitForSingleObject(hMutex, 0);
+	switch (w)
+	{
+	case WAIT_OBJECT_0:
+		res = false;
+		break;
+	case WAIT_TIMEOUT:
+		res = true;
+		break;
+	default:
+		printf("Problem with mutex\n");
+		break;
+	}
+
+	return res;
 }
 
-#define BUFFER_SIZE		10
+bool WinLinMacApi::globalUnlock(HANDLE hMutex)
+{
+	bool res = ReleaseMutex(hMutex);
+	CloseHandle(hMutex);
+	return res;
+}
 
 string WinLinMacApi::readFromPipe(string name)
 {
@@ -242,17 +260,17 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 {
 	bool res = true;
 
-	bool ok = false;
-	for (int i = 0; i < 100; i++)
+	bool waitSuccess = false;
+	for (int attempt = 0; attempt < ATTEMPTS; attempt++)
 	{
-		if (WaitNamedPipe(name.c_str(), 10))
+		if (WaitNamedPipe(name.c_str(), 0))
 		{
-			ok = true;
+			waitSuccess = true;
 			break;
 		}
 		Sleep(10);
 	}
-	if (!ok) return false;
+	if (!waitSuccess) return false;
 
 	HANDLE hPipe = CreateFile(
 		name.c_str(),

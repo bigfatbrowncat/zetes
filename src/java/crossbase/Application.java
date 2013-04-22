@@ -2,6 +2,7 @@ package crossbase;
 
 import java.util.ArrayList;
 
+import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import crossbase.ui.AboutBox;
 import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.HotKey;
@@ -156,7 +157,6 @@ public class Application
 			if (!vw.isOccupied())
 			{
 				vw.openImageFile(fileName);
-				System.out.println("found empty");
 				return vw;
 			}
 		}
@@ -178,27 +178,36 @@ public class Application
 	}
 	
 	
+	
 	public static void main(String... args) throws InterruptedException
 	{
 		Display.setAppName(APP_NAME);
-		
-		MDIHelper mdiHelper = null;
-		
-		if (SWT.getPlatform().equals("win32"))
-		{
-			mdiHelper = new MDIHelper(args, openDocumentListener);
-			if (mdiHelper.areFilesSent())
-			{
-				// In that case we have done our job and just exiting the "main"
-				return;
-			}
-		}
-		
 		menuConstructor = new MenuConstructor();
 		menuConstructor.setOpenSelectionAdapter(openSelectionAdapter);
 		menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 		menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
+		
+		SingleAppInstanceDocumentHandler mdiHelper = null;
+		
+		if (!SWT.getPlatform().equals("cocoa"))
+		{
+			try
+			{
+				mdiHelper = new SingleAppInstanceDocumentHandler(args, openDocumentListener);
+				if (!mdiHelper.isServer())
+				{
+					// In that case we have done our job and just exiting the "main"
+					return;
+				}
 
+			}
+			catch (FileNamesSendingFailed e)
+			{
+				e.printStackTrace();
+				return;
+			}
+		}
+		
 		if (SWT.getPlatform().equals("cocoa"))
 		{
 			// In Cocoa we use a special hook class to handle the default
@@ -214,8 +223,11 @@ public class Application
 		}
 		else
 		{
-			// Opening a new empty window -- we need it to show menus
-			openNewWindow(null);
+			if (windows.size() == 0)
+			{
+				// Opening a new empty window -- we need it to show menus
+				openNewWindow(null);
+			}
 		}
 		
 		eventLoop();

@@ -44,7 +44,7 @@ public class ViewWindow
 	protected Shell shell;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
-	DropTarget imageContainerDropTarget, imageLabelDropTarget;
+	private DropTarget imageContainerDropTarget, imageViewDropTarget;
 	private ViewWindowClosedListener closedListener;
 	private ImageView imageView;
 		
@@ -104,22 +104,20 @@ public class ViewWindow
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 	
 	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
 		imageContainerDropTarget.addDropListener(dropTargetAdapter);
-//		imageLabelDropTarget.addDropListener(dropTargetAdapter);
+		imageViewDropTarget.addDropListener(dropTargetAdapter);
 	}
 	
 	public void removeDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
 		imageContainerDropTarget.removeDropListener(dropTargetAdapter);
-//		imageLabelDropTarget.removeDropListener(dropTargetAdapter);
+		imageViewDropTarget.removeDropListener(dropTargetAdapter);
 	}
 	
 	public void setClosedListener(ViewWindowClosedListener closedListener)
@@ -167,12 +165,14 @@ public class ViewWindow
 		imageContainerComposite = new Composite(scrolledComposite, SWT.NONE);
 		imageContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		imageContainerComposite.setLayout(null);
+		imageContainerDropTarget = new DropTarget(imageContainerComposite, DND.DROP_MOVE);
+		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
 		
 		imageView = new ImageView(imageContainerComposite, SWT.NONE);
 		imageView.setBounds(0, 0, 200, 127);
 		imageView.setVisible(false);
-		imageContainerDropTarget = new DropTarget(imageView, DND.DROP_MOVE);
-		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		imageViewDropTarget = new DropTarget(imageView, DND.DROP_MOVE);
+		imageViewDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
 
 		scrolledComposite.setContent(imageContainerComposite);
 		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));

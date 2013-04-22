@@ -88,7 +88,7 @@ public class Application
 /*			if (mainWindow != null)
 			{
 				mainWindow.userPreferences();
-			}	*/		
+			}	*/
 		}
 	};
 	
@@ -189,25 +189,6 @@ public class Application
 		
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		
-		if (!SWT.getPlatform().equals("cocoa"))
-		{
-			try
-			{
-				mdiHelper = new SingleAppInstanceDocumentHandler(args, openDocumentListener);
-				if (!mdiHelper.isServer())
-				{
-					// In that case we have done our job and just exiting the "main"
-					return;
-				}
-
-			}
-			catch (FileNamesSendingFailed e)
-			{
-				e.printStackTrace();
-				return;
-			}
-		}
-		
 		if (SWT.getPlatform().equals("cocoa"))
 		{
 			// In Cocoa we use a special hook class to handle the default
@@ -223,6 +204,21 @@ public class Application
 		}
 		else
 		{
+			try
+			{
+				mdiHelper = new SingleAppInstanceDocumentHandler(args, openDocumentListener);
+				if (!mdiHelper.isServer())
+				{
+					// In that case we have done our job and just exiting "main"
+					return;
+				}
+			}
+			catch (FileNamesSendingFailed e)
+			{
+				e.printStackTrace();
+				return;
+			}
+
 			if (windows.size() == 0)
 			{
 				// Opening a new empty window -- we need it to show menus
@@ -232,7 +228,7 @@ public class Application
 		
 		eventLoop();
 		
-		if (SWT.getPlatform().equals("win32"))
+		if (!SWT.getPlatform().equals("cocoa"))
 		{
 			mdiHelper.stop();
 		}

@@ -9,12 +9,31 @@ import org.eclipse.swt.widgets.Shell;
 
 import crossbase.Application;
 import crossbase.ui.AboutBox;
+import crossbase.ui.DocumentWindow;
 import crossbase.ui.DocumentWindowsManager;
 import crossbase.ui.MenuConstructor;
 
 public class TinyViewerApplication extends Application
 {
 	private AboutBox aboutBox = null;
+	private SelectionAdapter fileOpenSelectionAdapter = new SelectionAdapter()
+	{
+		@Override
+		public void widgetSelected(SelectionEvent arg0)
+		{
+			Shell dummyShell = new Shell(Display.getDefault());
+			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
+			fileDialog.setText("Open image");
+			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
+			fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
+			String fileName = fileDialog.open();
+			if (fileName != null)
+			{
+				getDocumentWindowsManager().openFile(fileName);
+			}
+			dummyShell.dispose();
+		}
+	};
 	
 	@Override
 	protected void showAbout()
@@ -28,42 +47,15 @@ public class TinyViewerApplication extends Application
 		}
 	}
 	
-	public TinyViewerApplication(String[] arguments)
-	{
-		super(arguments);
-	}
-	
 	@Override
-	protected DocumentWindowsManager<ViewWindow> prepareDocumentWindowsManager()
-	{
-		return new DocumentWindowsManager<ViewWindow>(new ViewWindowFactory(getMenuConstructor()));
-	}
-	
-	@Override
-	protected MenuConstructor prepareMenuConstructor()
+	public void run(String[] arguments)
 	{
 		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
-		
-		menuConstructor.setOpenSelectionAdapter(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0)
-			{
-				Shell dummyShell = new Shell(Display.getDefault());
-				FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
-				fileDialog.setText("Open image");
-				fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
-				fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
-				String fileName = fileDialog.open();
-				if (fileName != null)
-				{
-					getDocumentWindowsManager().openFile(fileName);
-				}
-				dummyShell.dispose();
-			}
-		});
-		
-		return menuConstructor;
-	}
+		menuConstructor.setOpenSelectionAdapter(fileOpenSelectionAdapter);
+		setMenuConstructor(menuConstructor);
 
+		setDocumentWindowsManager(new DocumentWindowsManager<ViewWindow>(new ViewWindowFactory(menuConstructor)));
+		
+		super.run(arguments);
+	}
 }

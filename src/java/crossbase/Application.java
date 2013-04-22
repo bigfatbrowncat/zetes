@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
 import tinyviewer.ui.TinyViewerApplication;
@@ -90,18 +91,20 @@ public class Application
 		}
 	};
 	
-	protected Application(String[] arguments)
+	protected Application()
+	{
+
+	}
+	
+	public void run(String[] arguments)
 	{
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		try
 		{
 			Display.setAppName(APP_NAME);
 	
-			menuConstructor = prepareMenuConstructor();
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
-	
-			documentWindowsManager = prepareDocumentWindowsManager();
 			
 			if (SWT.getPlatform().equals("cocoa"))
 			{
@@ -147,22 +150,17 @@ public class Application
 			}
 	
 			System.out.print("Bye!\n");
-		}
+		}		
 	}
 	
-	protected DocumentWindowsManager<? extends DocumentWindow> prepareDocumentWindowsManager()
-	{
-		return null;
-	}
-
-	protected MenuConstructor prepareMenuConstructor()
-	{
-		return null;
-	}
-
 	public DocumentWindowsManager<? extends DocumentWindow> getDocumentWindowsManager()
 	{
 		return documentWindowsManager;
+	}
+	
+	public void setDocumentWindowsManager(DocumentWindowsManager<? extends DocumentWindow> documentWindowsManager)
+	{
+		this.documentWindowsManager = documentWindowsManager;
 	}
 	
 	public MenuConstructor getMenuConstructor()
@@ -170,9 +168,15 @@ public class Application
 		return menuConstructor;
 	}
 	
+	public void setMenuConstructor(MenuConstructor menuConstructor)
+	{
+		this.menuConstructor = menuConstructor;
+	}
+	
 	public static void main(String... args)
 	{
 		//new Application(args);
-		new TinyViewerApplication(args);
+		new TinyViewerApplication().run(args);
+		
 	}
 }

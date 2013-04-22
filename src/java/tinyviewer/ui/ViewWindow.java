@@ -35,7 +35,7 @@ import crossbase.ui.MenuConstructor;
 
 public class ViewWindow implements DocumentWindow
 {
-	protected Shell shell;
+	private Shell shell;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;

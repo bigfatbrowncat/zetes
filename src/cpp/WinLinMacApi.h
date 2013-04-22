@@ -7,7 +7,9 @@
 
 #include <string>
 
+#ifdef __MINGW32__
 #include "Windows.h"
+#endif
 
 using namespace std;
 

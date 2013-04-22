@@ -41,35 +41,21 @@ public class Application
 		
 	}
 	
-	protected void processOpenDocument(String fileName)
-	{
-		
-	}
-	
 	private Listener openDocumentListener = new Listener()
 	{
 		
 		@Override
 		public void handleEvent(Event arg0) {
 			String fileName = arg0.text;
-			processOpenDocument(fileName);
+			documentWindowsManager.openFile(fileName);
 		}
 	};
 	
 	private SelectionAdapter aboutSelectionAdapter = new SelectionAdapter()
 	{
-		
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			/*if (aboutBox == null || aboutBox.isDisposed())
-			{
-				Shell dummyShell = new Shell(Display.getDefault());
-				aboutBox = new AboutBox(dummyShell);
-				aboutBox.open();
-				dummyShell.dispose();
-			}*/
-			
 			showAbout();
 		}
 	};
@@ -106,57 +92,62 @@ public class Application
 	
 	protected Application(String[] arguments)
 	{
-		Display.setAppName(APP_NAME);
-
-		menuConstructor = prepareMenuConstructor();
-		menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
-		menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
-
-		documentWindowsManager = prepareDocumentWindowsManager();
-		
 		SingleAppInstanceDocumentHandler mdiHelper = null;
-		
-		if (SWT.getPlatform().equals("cocoa"))
+		try
 		{
-			// In Cocoa we use a special hook class to handle the default
-			// About, Quit and Preferences items from the system menu.
-			new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
-
-			// Add listener to OpenDocument event thus user can open documents
-			// with our Cocoa application
-			Display.getCurrent().addListener(SWT.OpenDocument, openDocumentListener);
+			Display.setAppName(APP_NAME);
+	
+			menuConstructor = prepareMenuConstructor();
+			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
+			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
+	
+			documentWindowsManager = prepareDocumentWindowsManager();
 			
-			// Creating the main application menu
-			menuConstructor.appendMenusToGlobalMenu();
-		}
-		else
-		{
-			try
+			if (SWT.getPlatform().equals("cocoa"))
 			{
-				mdiHelper = new SingleAppInstanceDocumentHandler(arguments, openDocumentListener);
-				if (!mdiHelper.isServer())
+				// In Cocoa we use a special hook class to handle the default
+				// About, Quit and Preferences items from the system menu.
+				new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
+	
+				// Add listener to OpenDocument event thus user can open documents
+				// with our Cocoa application
+				Display.getCurrent().addListener(SWT.OpenDocument, openDocumentListener);
+				
+				// Creating the main application menu
+				menuConstructor.appendMenusToGlobalMenu();
+			}
+			else
+			{
+				try
 				{
-					// In that case we have done our job and just exiting "main"
+					mdiHelper = new SingleAppInstanceDocumentHandler(arguments, openDocumentListener);
+					if (!mdiHelper.isServer())
+					{
+						// In that case we have done our job and just exiting "main"
+						return;
+					}
+				}
+				catch (FileNamesSendingFailed e)
+				{
+					e.printStackTrace();
 					return;
 				}
+	
+				documentWindowsManager.ensureThereIsOpenedWindow();
 			}
-			catch (FileNamesSendingFailed e)
-			{
-				e.printStackTrace();
-				return;
-			}
-
-			documentWindowsManager.ensureThereIsOpenedWindow();
+			
+			eventLoop();
+			
 		}
-		
-		eventLoop();
-		
-		if (!SWT.getPlatform().equals("cocoa"))
+		finally
 		{
-			mdiHelper.stop();
+			if (!SWT.getPlatform().equals("cocoa"))
+			{
+				mdiHelper.stop();
+			}
+	
+			System.out.print("Bye!\n");
 		}
-
-		System.out.print("Bye!\n");	
 	}
 	
 	protected DocumentWindowsManager<? extends DocumentWindow> prepareDocumentWindowsManager()

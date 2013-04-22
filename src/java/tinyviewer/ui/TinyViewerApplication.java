@@ -16,29 +16,21 @@ public class TinyViewerApplication extends Application
 {
 	private AboutBox aboutBox = null;
 	
-	private SelectionAdapter openSelectionAdapter = new SelectionAdapter()
+	@Override
+	protected void showAbout()
 	{
-		@Override
-		public void widgetSelected(SelectionEvent arg0)
+		if (aboutBox == null || aboutBox.isDisposed())
 		{
 			Shell dummyShell = new Shell(Display.getDefault());
-			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
-			fileDialog.setText("Open image");
-			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
-			fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
-			String fileName = fileDialog.open();
-			if (fileName != null)
-			{
-				getDocumentWindowsManager().openFile(fileName);
-			}
+			aboutBox = new AboutBox(dummyShell);
+			aboutBox.open();
 			dummyShell.dispose();
 		}
-	};
-
+	}
+	
 	public TinyViewerApplication(String[] arguments)
 	{
 		super(arguments);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -51,7 +43,26 @@ public class TinyViewerApplication extends Application
 	protected MenuConstructor prepareMenuConstructor()
 	{
 		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
-		menuConstructor.setOpenSelectionAdapter(openSelectionAdapter);
+		
+		menuConstructor.setOpenSelectionAdapter(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0)
+			{
+				Shell dummyShell = new Shell(Display.getDefault());
+				FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
+				fileDialog.setText("Open image");
+				fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
+				fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
+				String fileName = fileDialog.open();
+				if (fileName != null)
+				{
+					getDocumentWindowsManager().openFile(fileName);
+				}
+				dummyShell.dispose();
+			}
+		});
+		
 		return menuConstructor;
 	}
 

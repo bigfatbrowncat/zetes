@@ -35,5 +35,4 @@ public class TinyViewerMenuConstructor extends MenuConstructor
 	{
 		this.openSelectionAdapter = openSelectionAdapter;
 	}
-
 }

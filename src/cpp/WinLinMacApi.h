@@ -16,8 +16,9 @@ using namespace std;
 #ifndef RESOURCELOCATOR_H_
 #define RESOURCELOCATOR_H_
 
-#define BUFFER_SIZE		10
+#define BUFFER_SIZE		4096
 #define ATTEMPTS		1000
+#define SERVER_WAIT		30000
 
 class WinLinMacApi
 {

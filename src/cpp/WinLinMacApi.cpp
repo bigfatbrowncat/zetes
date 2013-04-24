@@ -211,7 +211,7 @@ string WinLinMacApi::readFromPipe(string name)
 			PIPE_UNLIMITED_INSTANCES, // max. instances
 			BUFFER_SIZE,               // output buffer size
 			BUFFER_SIZE,                  // input buffer size
-			1000,                        // client time-out
+			SERVER_WAIT,                        // client time-out
 			NULL);
 
 	if (hPipe == INVALID_HANDLE_VALUE)

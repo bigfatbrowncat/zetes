@@ -1,3 +1,5 @@
+include App.mk
+
 UNAME := $(shell uname)
 ARCH := $(shell uname -m)
 
@@ -66,19 +68,19 @@ SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf
 SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
 ifeq ($(UNAME), Darwin)	# OS X
-all: $(BINARY_PATH)/SWT\ Application.app
+all: $(BINARY_PATH)/$(APPLICATION_NAME).app
 
-$(BINARY_PATH)/SWT\ Application.app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/crossbase $(SWT_LIBS)
+$(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(SWT_LIBS)
 	@echo Building OS X bundle...
-	mkdir -p $(BINARY_PATH)/SWT\ Application/SWT\ Application.app/Contents/MacOS
-	cp -r osx-bundle/* $(BINARY_PATH)/SWT\ Application/SWT\ Application.app
-	cp $(BINARY_PATH)/crossbase $(BINARY_PATH)/SWT\ Application/SWT\ Application.app/Contents/MacOS
-	cp $(SWT_LIBS) $(BINARY_PATH)/SWT\ Application/SWT\ Application.app/Contents/MacOS
+	mkdir -p $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
+	cp -r osx-bundle/* $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app
+	cp $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
+	cp $(SWT_LIBS) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
 	@echo Creating DMG image...
-	hdiutil create $(BINARY_PATH)/crossbase-darwin-universal.dmg -srcfolder $(BINARY_PATH)/SWT\ Application -ov
+	hdiutil create $(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg -srcfolder $(BINARY_PATH)/$(APPLICATION_NAME) -ov
 
 else
-all: $(BINARY_PATH)/crossbase
+all: $(BINARY_PATH)/$(BINARY_NAME)
 endif
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
@@ -91,7 +93,7 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/crossbase: $(BIN)/java/boot.jar $(CPP_OBJECTS)
+$(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	@echo Linking $@...
 	mkdir -p $(BINARY_PATH);
 

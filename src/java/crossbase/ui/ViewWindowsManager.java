@@ -3,9 +3,6 @@ package crossbase.ui;
 import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.widgets.Display;
 
 import crossbase.ui.abstracts.ViewWindow;
@@ -15,7 +12,7 @@ import crossbase.ui.abstracts.ViewWindowFactory;
 public class ViewWindowsManager<T extends ViewWindow>
 {
 	private ArrayList<ViewWindow> windows = new ArrayList<ViewWindow>();
-	private ViewWindowFactory<T> documentWindowFactory;
+	private ViewWindowFactory<T> viewWindowFactory;
 
 	private ViewWindowClosedListener viewWindowClosedListener = new ViewWindowClosedListener()
 	{
@@ -34,21 +31,6 @@ public class ViewWindowsManager<T extends ViewWindow>
 		}
 	};
 
-	private DropTargetAdapter viewWindowDropTargetAdapter = new DropTargetAdapter()
-	{
-		public void drop(DropTargetEvent event) {
-			String fileList[] = null;
-			FileTransfer ft = FileTransfer.getInstance();
-			if (ft.isSupportedType(event.currentDataType)) {
-				fileList = (String[]) event.data;
-				if (fileList.length > 0)
-				{
-					openFile(fileList[0]);
-				}
-			}
-		}
-	};
-	
 	/**
 	 * Opens a new window. If <code>fileName</code> argument isn't null, opens
 	 * the selected file in that window. Otherwise it opens an empty window.
@@ -57,9 +39,8 @@ public class ViewWindowsManager<T extends ViewWindow>
 	 */
 	public ViewWindow openNewWindow(String fileName)
 	{
-		T newWindow = documentWindowFactory.create();
+		T newWindow = viewWindowFactory.create();
 		
-		newWindow.addDropTargetListener(viewWindowDropTargetAdapter);
 		newWindow.setClosedListener(viewWindowClosedListener);
 		
 		if (fileName != null)
@@ -106,8 +87,17 @@ public class ViewWindowsManager<T extends ViewWindow>
 		}
 	}
 	
-	public ViewWindowsManager(ViewWindowFactory<T> documentWindowFactory)
+	public ViewWindowsManager()
 	{
-		this.documentWindowFactory = documentWindowFactory;
+	}
+	
+	public void setViewWindowFactory(ViewWindowFactory<T> viewWindowFactory)
+	{
+		this.viewWindowFactory = viewWindowFactory;
+	}
+	
+	public ViewWindowFactory<T> getViewWindowFactory()
+	{
+		return viewWindowFactory;
 	}
 }

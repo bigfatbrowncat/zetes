@@ -252,6 +252,8 @@ public class MenuConstructorBase implements MenuConstructor
 	@Override
 	public void updateMenus()
 	{
+		eraseAllMenusForWindow(null);
+		addMenusToGlobalMenu();
 		for (ViewWindow viewWindow : viewWindows)
 		{
 			eraseAllMenusForWindow(viewWindow);
@@ -279,7 +281,5 @@ public class MenuConstructorBase implements MenuConstructor
 		viewWindows = new ArrayList<ViewWindow>();
 		shellMenuItems = new HashMap<ViewWindow, Set<MenuItem>>();
 		globalMenuItems = new HashSet<MenuItem>();
-		
-		addMenusToGlobalMenu();
 	}
 }

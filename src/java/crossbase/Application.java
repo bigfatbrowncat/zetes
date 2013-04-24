@@ -76,7 +76,15 @@ public class Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			showAbout(arg0.display.getActiveShell());
+			if (arg0.display != null)
+			{
+				showAbout(arg0.display.getActiveShell());
+			}
+			else
+			{
+				showAbout(null);
+			}
+				
 		}
 	};
 	

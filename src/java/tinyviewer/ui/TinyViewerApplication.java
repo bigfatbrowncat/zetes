@@ -54,6 +54,8 @@ public class TinyViewerApplication extends Application
 		
 		setDocumentWindowsManager(imageViewWindowsManager);
 		
+		menuConstructor.updateMenus();
+		
 		super.run(arguments);
 	}
 }

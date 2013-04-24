@@ -168,7 +168,6 @@ public class ImageViewWindow implements ViewWindow
 		
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
-				System.out.println("removing window: " + fileName);
 				ImageViewWindow.this.menuConstructor.removeWindow(ImageViewWindow.this);
 				Image oldImage = imageView.getImage();
 				if (oldImage != null) 

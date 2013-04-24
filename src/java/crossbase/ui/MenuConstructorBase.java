@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 
-public class DefaultMenuConstructor implements MenuConstructor
+public class MenuConstructorBase implements MenuConstructor
 {
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
 	private ArrayList<ViewWindow> viewWindows;
@@ -115,7 +115,7 @@ public class DefaultMenuConstructor implements MenuConstructor
 	{
 		MenuItem windowsMenuItem = new MenuItem(menu, SWT.CASCADE);
 		
-		windowsMenuItem.setText("&Windows");
+		windowsMenuItem.setText("&Window");
 
 		Menu windowsMenu = new Menu(windowsMenuItem);
 		windowsMenuItem.setMenu(windowsMenu);
@@ -274,7 +274,7 @@ public class DefaultMenuConstructor implements MenuConstructor
 		updateMenus();
 	}
 
-	public DefaultMenuConstructor()
+	public MenuConstructorBase()
 	{
 		viewWindows = new ArrayList<ViewWindow>();
 		shellMenuItems = new HashMap<ViewWindow, Set<MenuItem>>();

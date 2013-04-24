@@ -89,7 +89,7 @@ public class SingleAppInstanceDocumentHandler
 	});
 	
 	
-	public SingleAppInstanceDocumentHandler(String[] fileNames, Listener fileHandler) throws FileNamesSendingFailed
+	public SingleAppInstanceDocumentHandler(String[] fileNames, final Listener fileHandler) throws FileNamesSendingFailed
 	{
 		this.fileHandler = fileHandler;
 
@@ -126,9 +126,18 @@ public class SingleAppInstanceDocumentHandler
 			// Opening the files from our command line 
 			for (int i = 0; i < fileNames.length; i++)
 			{
-				Event evt = new Event();
+				final Event evt = new Event();
 				evt.text = fileNames[i];
-				fileHandler.handleEvent(evt);				
+				Display.getDefault().asyncExec(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						fileHandler.handleEvent(evt);						
+					}
+				});
+							
 			}
 		}
 	}

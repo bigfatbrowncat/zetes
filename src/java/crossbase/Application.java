@@ -12,7 +12,7 @@ import tinyviewer.ui.TinyViewerApplication;
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import crossbase.ui.AboutBox;
 import crossbase.ui.CocoaUIEnhancer;
-import crossbase.ui.DefaultMenuConstructor;
+import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 import crossbase.ui.abstracts.AboutBoxFactory;
 import crossbase.ui.abstracts.MenuConstructor;
@@ -26,7 +26,7 @@ public class Application
 	private AboutBox aboutBox = null;
 	private AboutBoxFactory<? extends AboutBox> aboutBoxFactory;
 
-	private DefaultMenuConstructor menuConstructor;
+	private MenuConstructorBase menuConstructor;
 	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
 
 	/**
@@ -189,7 +189,7 @@ public class Application
 		return menuConstructor;
 	}
 	
-	public void setMenuConstructor(DefaultMenuConstructor menuConstructor)
+	public void setMenuConstructor(MenuConstructorBase menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
 	}

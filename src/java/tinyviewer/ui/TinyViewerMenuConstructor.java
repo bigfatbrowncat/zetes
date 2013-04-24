@@ -5,10 +5,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import crossbase.ui.DefaultMenuConstructor;
+import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.HotKey;
 
-public class TinyViewerMenuConstructor extends DefaultMenuConstructor
+public class TinyViewerMenuConstructor extends MenuConstructorBase
 {
 	private SelectionAdapter openSelectionAdapter;
 	

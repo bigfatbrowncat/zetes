@@ -55,7 +55,7 @@ public class SWTResourceManager {
 	 * @return the system {@link Color} matching the specific ID
 	 */
 	public static Color getColor(int systemColorID) {
-		Display display = Display.getCurrent();
+		Display display = Display.getDefault();
 		return display.getSystemColor(systemColorID);
 	}
 	/**
@@ -82,7 +82,7 @@ public class SWTResourceManager {
 	public static Color getColor(RGB rgb) {
 		Color color = m_colorMap.get(rgb);
 		if (color == null) {
-			Display display = Display.getCurrent();
+			Display display = Display.getDefault();
 			color = new Color(display, rgb);
 			m_colorMap.put(rgb, color);
 		}
@@ -115,7 +115,7 @@ public class SWTResourceManager {
 	 */
 	protected static Image getImage(InputStream stream) throws IOException {
 		try {
-			Display display = Display.getCurrent();
+			Display display = Display.getDefault();
 			ImageData data = new ImageData(stream);
 			if (data.transparentPixel > 0) {
 				return new Image(display, data, data.getTransparencyMask());
@@ -173,7 +173,7 @@ public class SWTResourceManager {
 	 * @return the small {@link Image} that can be used as placeholder for missing image.
 	 */
 	private static Image getMissingImage() {
-		Image image = new Image(Display.getCurrent(), MISSING_IMAGE_SIZE, MISSING_IMAGE_SIZE);
+		Image image = new Image(Display.getDefault(), MISSING_IMAGE_SIZE, MISSING_IMAGE_SIZE);
 		//
 		GC gc = new GC(image);
 		gc.setBackground(getColor(SWT.COLOR_RED));
@@ -250,7 +250,7 @@ public class SWTResourceManager {
 			Rectangle bib = baseImage.getBounds();
 			Rectangle dib = decorator.getBounds();
 			//
-			result = new Image(Display.getCurrent(), bib.width, bib.height);
+			result = new Image(Display.getDefault(), bib.width, bib.height);
 			//
 			GC gc = new GC(result);
 			gc.drawImage(baseImage, 0, 0);
@@ -358,7 +358,7 @@ public class SWTResourceManager {
 					System.err.println("Unable to set underline or strikeout" + " (probably on a non-Windows platform). " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-			font = new Font(Display.getCurrent(), fontData);
+			font = new Font(Display.getDefault(), fontData);
 			m_fontMap.put(fontName, font);
 		}
 		return font;
@@ -375,7 +375,7 @@ public class SWTResourceManager {
 		if (font == null) {
 			FontData fontDatas[] = baseFont.getFontData();
 			FontData data = fontDatas[0];
-			font = new Font(Display.getCurrent(), data.getName(), data.getHeight(), SWT.BOLD);
+			font = new Font(Display.getDefault(), data.getName(), data.getHeight(), SWT.BOLD);
 			m_fontToBoldFontMap.put(baseFont, font);
 		}
 		return font;
@@ -415,7 +415,7 @@ public class SWTResourceManager {
 		Integer key = Integer.valueOf(id);
 		Cursor cursor = m_idToCursorMap.get(key);
 		if (cursor == null) {
-			cursor = new Cursor(Display.getCurrent(), id);
+			cursor = new Cursor(Display.getDefault(), id);
 			m_idToCursorMap.put(key, cursor);
 		}
 		return cursor;

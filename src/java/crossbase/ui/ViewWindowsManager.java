@@ -34,9 +34,9 @@ public class ViewWindowsManager<T extends ViewWindow>
 		
 		if (!SWT.getPlatform().equals("cocoa"))
 		{
-			if (windows.size() == 0 && Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+			if (windows.size() == 0 && Display.getDefault() != null && !Display.getDefault().isDisposed())
 			{
-				Display.getCurrent().dispose();
+				Display.getDefault().dispose();
 			}
 		}
 	}

@@ -71,7 +71,7 @@ public class ImageViewWindow implements ViewWindow
 	
 	protected static Image loadImage(InputStream stream) throws IOException {
 		try {
-			Display display = Display.getCurrent();
+			Display display = Display.getDefault();
 			ImageData data = new ImageData(stream);
 			if (data.transparentPixel > 0) {
 				return new Image(display, data, data.getTransparencyMask());

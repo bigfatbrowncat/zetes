@@ -42,7 +42,7 @@ public class Application
 			boolean dummyShell = false;
 			if (shell == null) 
 			{
-				shell = new Shell(Display.getCurrent());
+				shell = new Shell(Display.getDefault());
 				dummyShell = true;
 			}
 			
@@ -91,7 +91,7 @@ public class Application
 	
 	private void eventLoop()
 	{
-		Display display = Display.getCurrent();
+		Display display = Display.getDefault();
 		while (!display.isDisposed())
 		{
 			if (!display.readAndDispatch())
@@ -107,9 +107,9 @@ public class Application
 		public void widgetSelected(SelectionEvent arg0)
 		{
 			documentWindowsManager.closeAllWindows();
-			if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+			if (Display.getDefault() != null && !Display.getDefault().isDisposed())
 			{
-				Display.getCurrent().dispose();
+				Display.getDefault().dispose();
 			}
 		}
 	};
@@ -133,11 +133,11 @@ public class Application
 			{
 				// In Cocoa we use a special hook class to handle the default
 				// About, Quit and Preferences items from the system menu.
-				new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getCurrent(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
+				new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
 	
 				// Add listener to OpenDocument event thus user can open documents
 				// with our Cocoa application
-				Display.getCurrent().addListener(SWT.OpenDocument, openDocumentListener);
+				Display.getDefault().addListener(SWT.OpenDocument, openDocumentListener);
 				
 			}
 			else

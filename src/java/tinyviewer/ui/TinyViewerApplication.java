@@ -20,7 +20,7 @@ public class TinyViewerApplication extends Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			Shell dummyShell = new Shell(Display.getCurrent());
+			Shell dummyShell = new Shell(Display.getDefault());
 			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
 			fileDialog.setText("Open image");
 			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });

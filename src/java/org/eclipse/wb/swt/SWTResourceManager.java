@@ -415,7 +415,7 @@ public class SWTResourceManager {
 		Integer key = Integer.valueOf(id);
 		Cursor cursor = m_idToCursorMap.get(key);
 		if (cursor == null) {
-			cursor = new Cursor(Display.getDefault(), id);
+			cursor = new Cursor(Display.getCurrent(), id);
 			m_idToCursorMap.put(key, cursor);
 		}
 		return cursor;

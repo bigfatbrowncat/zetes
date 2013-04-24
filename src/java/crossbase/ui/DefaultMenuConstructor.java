@@ -141,7 +141,7 @@ public class DefaultMenuConstructor implements MenuConstructor
 					windowMenuItem.setText(viewWindow.getDocumentTitle());
 				}
 
-				windowMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());
+				windowMenuItem.setSelection(Display.getCurrent().getActiveShell() == viewWindow.getShell());
 				windowMenuItem.addSelectionListener(new SelectionAdapter()
 				{
 					@Override
@@ -224,7 +224,7 @@ public class DefaultMenuConstructor implements MenuConstructor
 	{
 		if (SWT.getPlatform().equals("cocoa"))
 		{
-			Display display = Display.getDefault();
+			Display display = Display.getCurrent();
 			Menu menu = display.getMenuBar();
 			addShellMenu(null, createAndAppendFileMenu(menu));
 			MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu);

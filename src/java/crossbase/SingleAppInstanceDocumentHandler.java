@@ -70,7 +70,7 @@ public class SingleAppInstanceDocumentHandler
 						for (int i = 1; i < resParsed.length; i++)
 						{
 							final String fileName = resParsed[i];
-							Display.getDefault().asyncExec(new Runnable()
+							Display.getCurrent().asyncExec(new Runnable()
 							{
 								@Override
 								public void run()

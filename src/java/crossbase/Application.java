@@ -63,7 +63,7 @@ public class Application
 	
 	private void eventLoop()
 	{
-		Display display = Display.getDefault();
+		Display display = Display.getCurrent();
 		while (!display.isDisposed())
 		{
 			if (!display.readAndDispatch())
@@ -78,7 +78,7 @@ public class Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			Display.getDefault().dispose();
+			Display.getCurrent().dispose();
 		}
 	};
 	
@@ -101,7 +101,7 @@ public class Application
 			{
 				// In Cocoa we use a special hook class to handle the default
 				// About, Quit and Preferences items from the system menu.
-				new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
+				new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getCurrent(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
 	
 				// Add listener to OpenDocument event thus user can open documents
 				// with our Cocoa application

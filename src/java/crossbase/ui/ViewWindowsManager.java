@@ -25,7 +25,7 @@ public class ViewWindowsManager<T extends ViewWindow>
 			{
 				if (windows.size() == 0)
 				{
-					Display.getDefault().dispose();
+					Display.getCurrent().dispose();
 				}
 			}
 		}

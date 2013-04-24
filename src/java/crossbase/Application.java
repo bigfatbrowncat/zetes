@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
 import tinyviewer.ui.TinyViewerApplication;
-import tinyviewer.ui.ViewWindow;
+import tinyviewer.ui.ImageViewWindow;
 import tinyviewer.ui.ViewWindowFactory;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
@@ -19,7 +19,7 @@ import crossbase.ui.AboutBox;
 import crossbase.ui.AboutHandler;
 import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.DefaultMenuConstructor;
-import crossbase.ui.DocumentWindow;
+import crossbase.ui.ViewWindow;
 import crossbase.ui.DocumentWindowsManager;
 import crossbase.ui.DocumentHandler;
 import crossbase.ui.MenuConstructor;
@@ -31,7 +31,7 @@ public class Application
 	public static final String APP_NAME = "SWT Application";
 	
 	private DefaultMenuConstructor menuConstructor;
-	private DocumentWindowsManager<? extends DocumentWindow> documentWindowsManager;
+	private DocumentWindowsManager<? extends ViewWindow> documentWindowsManager;
 
 	protected void showAbout()
 	{
@@ -152,12 +152,12 @@ public class Application
 		}		
 	}
 	
-	public DocumentWindowsManager<? extends DocumentWindow> getDocumentWindowsManager()
+	public DocumentWindowsManager<? extends ViewWindow> getDocumentWindowsManager()
 	{
 		return documentWindowsManager;
 	}
 	
-	public void setDocumentWindowsManager(DocumentWindowsManager<? extends DocumentWindow> documentWindowsManager)
+	public void setDocumentWindowsManager(DocumentWindowsManager<? extends ViewWindow> documentWindowsManager)
 	{
 		this.documentWindowsManager = documentWindowsManager;
 	}

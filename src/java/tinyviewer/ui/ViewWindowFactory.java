@@ -3,7 +3,7 @@ package tinyviewer.ui;
 import crossbase.ui.DocumentWindowFactory;
 import crossbase.ui.MenuConstructor;
 
-public class ViewWindowFactory implements DocumentWindowFactory<ViewWindow>
+public class ViewWindowFactory implements DocumentWindowFactory<ImageViewWindow>
 {
 	private MenuConstructor menuConstructor;
 	
@@ -13,9 +13,9 @@ public class ViewWindowFactory implements DocumentWindowFactory<ViewWindow>
 	}
 	
 	@Override
-	public ViewWindow create()
+	public ImageViewWindow create()
 	{
-		ViewWindow vw = new ViewWindow();
+		ImageViewWindow vw = new ImageViewWindow();
 		vw.open(menuConstructor);
 		return vw;
 	}

@@ -28,12 +28,12 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.ui.DocumentWindow;
+import crossbase.ui.ViewWindow;
 import crossbase.ui.DocumentWindowClosedListener;
 import crossbase.ui.ImageView;
 import crossbase.ui.MenuConstructor;
 
-public class ViewWindow implements DocumentWindow
+public class ImageViewWindow implements ViewWindow
 {
 	private Shell shell;
 	private Composite imageContainerComposite;
@@ -133,13 +133,13 @@ public class ViewWindow implements DocumentWindow
 				{
 					oldImage.dispose();
 				}
-				if (closedListener != null) closedListener.windowClosed(ViewWindow.this);
+				if (closedListener != null) closedListener.windowClosed(ImageViewWindow.this);
 			}
 		});
 		
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		shell.setMinimumSize(new Point(150, 200));
-		shell.setImage(SWTResourceManager.getImage(ViewWindow.class,
+		shell.setImage(SWTResourceManager.getImage(ImageViewWindow.class,
 				"/crossbase/icon.png"));
 	
 		shell.setText("TinyView");
@@ -149,7 +149,7 @@ public class ViewWindow implements DocumentWindow
 		shell.setMenuBar(menu);
 
 		// Creating "File" menu
-		menuConstructor.addShell(shell);
+		menuConstructor.addWindow(this);
 		
 		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
@@ -211,5 +211,11 @@ public class ViewWindow implements DocumentWindow
 	public boolean isDisposed()
 	{
 		return shell.isDisposed();
+	}
+
+	@Override
+	public Shell getShell()
+	{
+		return shell;
 	}
 }

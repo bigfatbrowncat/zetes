@@ -52,7 +52,7 @@ public class TinyViewerApplication extends Application
 		menuConstructor.setOpenSelectionAdapter(fileOpenSelectionAdapter);
 		setMenuConstructor(menuConstructor);
 
-		setDocumentWindowsManager(new DocumentWindowsManager<ViewWindow>(new ViewWindowFactory(menuConstructor)));
+		setDocumentWindowsManager(new DocumentWindowsManager<ImageViewWindow>(new ViewWindowFactory(menuConstructor)));
 		
 		super.run(arguments);
 	}

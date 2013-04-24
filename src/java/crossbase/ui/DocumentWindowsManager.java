@@ -8,15 +8,15 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.widgets.Display;
 
-public class DocumentWindowsManager<T extends DocumentWindow>
+public class DocumentWindowsManager<T extends ViewWindow>
 {
-	private ArrayList<DocumentWindow> windows = new ArrayList<DocumentWindow>();
+	private ArrayList<ViewWindow> windows = new ArrayList<ViewWindow>();
 	private DocumentWindowFactory<T> documentWindowFactory;
 
 	private DocumentWindowClosedListener viewWindowClosedListener = new DocumentWindowClosedListener()
 	{
 		@Override
-		public void windowClosed(DocumentWindow window)
+		public void windowClosed(ViewWindow window)
 		{
 			windows.remove(window);
 			
@@ -51,7 +51,7 @@ public class DocumentWindowsManager<T extends DocumentWindow>
 	 * @param fileName The file's name to open in the new window (can be null)
 	 * @return The opened window
 	 */
-	public DocumentWindow openNewWindow(String fileName)
+	public ViewWindow openNewWindow(String fileName)
 	{
 		/*DocumentWindow newWindow = new ViewWindow();
 		newWindow.open(menuConstructor);*/
@@ -75,11 +75,11 @@ public class DocumentWindowsManager<T extends DocumentWindow>
 	 * @param fileName The file's name to open
 	 * @return The window where file is opened
 	 */
-	public DocumentWindow openFile(String fileName)
+	public ViewWindow openFile(String fileName)
 	{
 		if (fileName == null) throw new IllegalArgumentException("file name shouldn't be null");
 		// Searching for an empty window
-		for (DocumentWindow vw : windows)
+		for (ViewWindow vw : windows)
 		{
 			if (!vw.isOccupied())
 			{

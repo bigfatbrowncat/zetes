@@ -9,44 +9,43 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 
 public class DefaultMenuConstructor implements MenuConstructor
 {
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private Set<Shell> shells;
-	private HashMap<Shell, Set<MenuItem>> shellMenuItems;
+	private Set<ViewWindow> shells;
+	private HashMap<ViewWindow, Set<MenuItem>> shellMenuItems;
 	private Set<MenuItem> globalMenuItems;
 	
 	/**
 	 * Adds a menu to the storage
-	 * @param shell The shell the menu connected to. If it's null, the global menu will be assumed 
+	 * @param viewWindow The window the menu connected to. If it's null, the global menu will be assumed 
 	 * @param menu The menu
 	 */
-	protected void addShellMenu(Shell shell, MenuItem menuItem)
+	protected void addShellMenu(ViewWindow viewWindow, MenuItem menuItem)
 	{
-		if (shell == null)
+		if (viewWindow == null)
 		{
 			globalMenuItems.add(menuItem);
 		}
 		else
 		{
-			if (!shellMenuItems.containsKey(shell))
+			if (!shellMenuItems.containsKey(viewWindow))
 			{
-				shellMenuItems.put(shell, new HashSet<MenuItem>());
+				shellMenuItems.put(viewWindow, new HashSet<MenuItem>());
 			}
-			shellMenuItems.get(shell).add(menuItem);
+			shellMenuItems.get(viewWindow).add(menuItem);
 		}
 	}
 	
 	/**
 	 * Erases all menus and menu items for the selected shell. 
 	 * If the shell is null, erases all menus form global menu. 
-	 * @param shell Shell to erase menus from
+	 * @param viewWindow The window to erase menus from
 	 */
-	protected void eraseAllMenusForShell(Shell shell)
+	protected void eraseAllMenusForShell(ViewWindow viewWindow)
 	{
-		if (shell == null)
+		if (viewWindow == null)
 		{
 			while (globalMenuItems.size() > 0)
 			{
@@ -59,15 +58,15 @@ public class DefaultMenuConstructor implements MenuConstructor
 		}
 		else
 		{
-			if (shellMenuItems.containsKey(shell))
+			if (shellMenuItems.containsKey(viewWindow))
 			{
-				while (shellMenuItems.get(shell).size() > 0)
+				while (shellMenuItems.get(viewWindow).size() > 0)
 				{
-					for (MenuItem mi : shellMenuItems.get(shell))
+					for (MenuItem mi : shellMenuItems.get(viewWindow))
 					{
 						if (!mi.isDisposed()) mi.dispose();
 					}
-					shellMenuItems.get(shell).clear();
+					shellMenuItems.get(viewWindow).clear();
 				}				
 			}
 		}
@@ -171,41 +170,41 @@ public class DefaultMenuConstructor implements MenuConstructor
 		}
 	}
 
-	protected void addMenusToShell(Shell shell)
+	protected void addMenusToShell(ViewWindow viewWindow)
 	{
-		Menu menu = shell.getMenuBar();
-		addShellMenu(shell, createAndAppendFileMenu(menu));
-		addShellMenu(shell, createAndAppendHelpMenu(menu));
+		Menu menu = viewWindow.getShell().getMenuBar();
+		addShellMenu(viewWindow, createAndAppendFileMenu(menu));
+		addShellMenu(viewWindow, createAndAppendHelpMenu(menu));
 	}
 
 	@Override
 	public void updateMenus()
 	{
-		for (Shell shell : shells)
+		for (ViewWindow viewWindow : shells)
 		{
-			eraseAllMenusForShell(shell);
-			addMenusToShell(shell);
+			eraseAllMenusForShell(viewWindow);
+			addMenusToShell(viewWindow);
 		}
 	}
 
 	@Override
-	public void addShell(Shell shell)
+	public void addWindow(ViewWindow viewWindow)
 	{
-		shells.add(shell);
+		shells.add(viewWindow);
 		updateMenus();
 	}
 
 	@Override
-	public void removeShell(Shell shell)
+	public void removeWindow(ViewWindow viewWindow)
 	{
-		eraseAllMenusForShell(shell);
+		eraseAllMenusForShell(viewWindow);
 		updateMenus();
 	}
 
 	public DefaultMenuConstructor()
 	{
-		shells = new HashSet<Shell>();
-		shellMenuItems = new HashMap<Shell, Set<MenuItem>>();
+		shells = new HashSet<ViewWindow>();
+		shellMenuItems = new HashMap<ViewWindow, Set<MenuItem>>();
 		globalMenuItems = new HashSet<MenuItem>();
 		
 		addMenusToGlobalMenu();

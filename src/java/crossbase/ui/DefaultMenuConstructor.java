@@ -118,15 +118,29 @@ public class DefaultMenuConstructor implements MenuConstructor
 
 		Menu windowsMenu = new Menu(windowsMenuItem);
 		windowsMenuItem.setMenu(windowsMenu);
-
+		
+		char hotKey = '1';
 		for (ViewWindow viewWindow : viewWindows)
 		{
 			if (viewWindow.getDocumentTitle() != null)
 			{
 				// An item for the window
 				MenuItem windowMenuItem = new MenuItem(windowsMenu, SWT.RADIO);
+				HotKey windowHotKey = new HotKey(HotKey.MOD1, hotKey);
 				windowMenuItem.setData(viewWindow);
-				windowMenuItem.setText(viewWindow.getDocumentTitle());
+				if (hotKey <= '9')
+				{
+					// Cmd+1, Cmd+2, ..., Cmd+9
+					windowMenuItem.setAccelerator(windowHotKey.toAccelerator());
+					windowMenuItem.setText(viewWindow.getDocumentTitle() + "\t" + windowHotKey.toString());
+					hotKey ++;
+				}
+				else
+				{
+					// No hotkey
+					windowMenuItem.setText(viewWindow.getDocumentTitle());
+				}
+
 				windowMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());
 				windowMenuItem.addSelectionListener(new SelectionAdapter()
 				{

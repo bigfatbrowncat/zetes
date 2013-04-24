@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import crossbase.Application;
 import crossbase.ui.AboutBox;
-import crossbase.ui.DocumentWindowsManager;
+import crossbase.ui.ViewWindowsManager;
 
 public class TinyViewerApplication extends Application
 {
@@ -52,7 +52,7 @@ public class TinyViewerApplication extends Application
 		menuConstructor.setOpenSelectionAdapter(fileOpenSelectionAdapter);
 		setMenuConstructor(menuConstructor);
 
-		setDocumentWindowsManager(new DocumentWindowsManager<ImageViewWindow>(new ViewWindowFactory(menuConstructor)));
+		setDocumentWindowsManager(new ViewWindowsManager<ImageViewWindow>(new ImageViewWindowFactory(menuConstructor)));
 		
 		super.run(arguments);
 	}

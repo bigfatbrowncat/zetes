@@ -5,25 +5,15 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 
 import tinyviewer.ui.TinyViewerApplication;
-import tinyviewer.ui.ImageViewWindow;
-import tinyviewer.ui.ViewWindowFactory;
-
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
-import crossbase.ui.AboutBox;
-import crossbase.ui.AboutHandler;
 import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.DefaultMenuConstructor;
-import crossbase.ui.ViewWindow;
-import crossbase.ui.DocumentWindowsManager;
-import crossbase.ui.DocumentHandler;
-import crossbase.ui.MenuConstructor;
-import crossbase.ui.PreferencesHandler;
+import crossbase.ui.ViewWindowsManager;
+import crossbase.ui.abstracts.MenuConstructor;
+import crossbase.ui.abstracts.ViewWindow;
 
 
 public class Application
@@ -31,7 +21,7 @@ public class Application
 	public static final String APP_NAME = "SWT Application";
 	
 	private DefaultMenuConstructor menuConstructor;
-	private DocumentWindowsManager<? extends ViewWindow> documentWindowsManager;
+	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
 
 	protected void showAbout()
 	{
@@ -152,12 +142,12 @@ public class Application
 		}		
 	}
 	
-	public DocumentWindowsManager<? extends ViewWindow> getDocumentWindowsManager()
+	public ViewWindowsManager<? extends ViewWindow> getDocumentWindowsManager()
 	{
 		return documentWindowsManager;
 	}
 	
-	public void setDocumentWindowsManager(DocumentWindowsManager<? extends ViewWindow> documentWindowsManager)
+	public void setDocumentWindowsManager(ViewWindowsManager<? extends ViewWindow> documentWindowsManager)
 	{
 		this.documentWindowsManager = documentWindowsManager;
 	}

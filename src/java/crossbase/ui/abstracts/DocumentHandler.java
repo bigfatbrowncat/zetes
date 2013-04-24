@@ -1,4 +1,4 @@
-package crossbase.ui;
+package crossbase.ui.abstracts;
 
 public interface DocumentHandler
 {

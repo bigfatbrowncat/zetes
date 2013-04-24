@@ -1,7 +1,8 @@
-package crossbase.ui;
+package crossbase.ui.abstracts;
 
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.widgets.Shell;
+
 
 public interface ViewWindow
 {
@@ -12,5 +13,5 @@ public interface ViewWindow
 	String getDocumentTitle();
 	
 	void addDropTargetListener(DropTargetAdapter dropTargetAdapter);
-	void setClosedListener(DocumentWindowClosedListener documentWindowClosedListener);
+	void setClosedListener(ViewWindowClosedListener documentWindowClosedListener);
 }

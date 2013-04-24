@@ -1,13 +1,13 @@
 package tinyviewer.ui;
 
-import crossbase.ui.DocumentWindowFactory;
-import crossbase.ui.MenuConstructor;
+import crossbase.ui.abstracts.MenuConstructor;
+import crossbase.ui.abstracts.ViewWindowFactory;
 
-public class ViewWindowFactory implements DocumentWindowFactory<ImageViewWindow>
+public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow>
 {
 	private MenuConstructor menuConstructor;
 	
-	public ViewWindowFactory(MenuConstructor menuConstructor)
+	public ImageViewWindowFactory(MenuConstructor menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
 	}

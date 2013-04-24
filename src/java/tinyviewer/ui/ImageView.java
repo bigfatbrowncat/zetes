@@ -1,4 +1,4 @@
-package crossbase.ui;
+package tinyviewer.ui;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;

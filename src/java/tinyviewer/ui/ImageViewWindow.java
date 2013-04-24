@@ -14,7 +14,6 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -31,10 +30,9 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.ui.ViewWindow;
-import crossbase.ui.DocumentWindowClosedListener;
-import crossbase.ui.ImageView;
-import crossbase.ui.MenuConstructor;
+import crossbase.ui.abstracts.MenuConstructor;
+import crossbase.ui.abstracts.ViewWindow;
+import crossbase.ui.abstracts.ViewWindowClosedListener;
 
 public class ImageViewWindow implements ViewWindow
 {
@@ -43,7 +41,7 @@ public class ImageViewWindow implements ViewWindow
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;
-	private DocumentWindowClosedListener closedListener;
+	private ViewWindowClosedListener closedListener;
 	private ImageView imageView;
 	private MenuConstructor menuConstructor;
 	
@@ -118,7 +116,7 @@ public class ImageViewWindow implements ViewWindow
 		imageViewDropTarget.removeDropListener(dropTargetAdapter);
 	}
 	
-	public void setClosedListener(DocumentWindowClosedListener closedListener)
+	public void setClosedListener(ViewWindowClosedListener closedListener)
 	{
 		this.closedListener = closedListener;
 	}

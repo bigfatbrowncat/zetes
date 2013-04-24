@@ -8,12 +8,16 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.widgets.Display;
 
-public class DocumentWindowsManager<T extends ViewWindow>
+import crossbase.ui.abstracts.ViewWindow;
+import crossbase.ui.abstracts.ViewWindowClosedListener;
+import crossbase.ui.abstracts.ViewWindowFactory;
+
+public class ViewWindowsManager<T extends ViewWindow>
 {
 	private ArrayList<ViewWindow> windows = new ArrayList<ViewWindow>();
-	private DocumentWindowFactory<T> documentWindowFactory;
+	private ViewWindowFactory<T> documentWindowFactory;
 
-	private DocumentWindowClosedListener viewWindowClosedListener = new DocumentWindowClosedListener()
+	private ViewWindowClosedListener viewWindowClosedListener = new ViewWindowClosedListener()
 	{
 		@Override
 		public void windowClosed(ViewWindow window)
@@ -53,9 +57,6 @@ public class DocumentWindowsManager<T extends ViewWindow>
 	 */
 	public ViewWindow openNewWindow(String fileName)
 	{
-		/*DocumentWindow newWindow = new ViewWindow();
-		newWindow.open(menuConstructor);*/
-		
 		T newWindow = documentWindowFactory.create();
 		
 		newWindow.addDropTargetListener(viewWindowDropTargetAdapter);
@@ -105,7 +106,7 @@ public class DocumentWindowsManager<T extends ViewWindow>
 		}
 	}
 	
-	public DocumentWindowsManager(DocumentWindowFactory<T> documentWindowFactory)
+	public ViewWindowsManager(ViewWindowFactory<T> documentWindowFactory)
 	{
 		this.documentWindowFactory = documentWindowFactory;
 	}

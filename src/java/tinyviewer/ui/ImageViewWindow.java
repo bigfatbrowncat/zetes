@@ -39,6 +39,7 @@ import crossbase.ui.MenuConstructor;
 public class ImageViewWindow implements ViewWindow
 {
 	private Shell shell;
+	private String fileName = null;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;
@@ -136,22 +137,19 @@ public class ImageViewWindow implements ViewWindow
 			@Override
 			public void shellIconified(ShellEvent arg0)
 			{
-				// TODO Auto-generated method stub
-				
+				ImageViewWindow.this.menuConstructor.updateMenus();
 			}
 			
 			@Override
 			public void shellDeiconified(ShellEvent arg0)
 			{
-				// TODO Auto-generated method stub
-				
+				ImageViewWindow.this.menuConstructor.updateMenus();
 			}
 			
 			@Override
 			public void shellDeactivated(ShellEvent arg0)
 			{
-				// TODO Auto-generated method stub
-				
+				ImageViewWindow.this.menuConstructor.updateMenus();
 			}
 			
 			@Override
@@ -163,8 +161,7 @@ public class ImageViewWindow implements ViewWindow
 			@Override
 			public void shellActivated(ShellEvent arg0)
 			{
-				// TODO Auto-generated method stub
-				
+				ImageViewWindow.this.menuConstructor.updateMenus();
 			}
 		});
 		
@@ -184,7 +181,7 @@ public class ImageViewWindow implements ViewWindow
 		shell.setImage(SWTResourceManager.getImage(ImageViewWindow.class,
 				"/crossbase/icon.png"));
 	
-		shell.setText("TinyView");
+		shell.setText(TinyViewerApplication.APP_NAME);
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Menu menu = new Menu(shell, SWT.BAR);
@@ -218,10 +215,10 @@ public class ImageViewWindow implements ViewWindow
 	{
 		try
 		{
-			System.out.println("Opening " + fileName);
 			Image oldImage = imageView.getImage();
 			imageView.setImage(loadImage(fileName));
-			shell.setText(fileName);
+			this.fileName = fileName;
+			shell.setText(fileName + " \u2013 " + TinyViewerApplication.APP_NAME);
 			imageView.setSize(imageView.getImage().getImageData().width, imageView.getImage().getImageData().height);
 			imageView.setVisible(true);
 			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -260,5 +257,11 @@ public class ImageViewWindow implements ViewWindow
 	public Shell getShell()
 	{
 		return shell;
+	}
+
+	@Override
+	public String getDocumentTitle()
+	{
+		return fileName;
 	}
 }

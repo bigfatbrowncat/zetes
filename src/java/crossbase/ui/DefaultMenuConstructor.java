@@ -45,7 +45,7 @@ public class DefaultMenuConstructor implements MenuConstructor
 	 * If the shell is null, erases all menus form global menu. 
 	 * @param viewWindow The window to erase menus from
 	 */
-	protected void eraseAllMenusForShell(ViewWindow viewWindow)
+	protected void eraseAllMenusForWindow(ViewWindow viewWindow)
 	{
 		if (viewWindow == null)
 		{
@@ -119,24 +119,35 @@ public class DefaultMenuConstructor implements MenuConstructor
 
 		for (ViewWindow viewWindow : viewWindows)
 		{
-			// An item for the window
-			MenuItem windowMenuItem = new MenuItem(windowsMenu, SWT.NONE);
-			windowMenuItem.setData(viewWindow);
-			windowMenuItem.setText(viewWindow.getShell().getText());
-			windowMenuItem.addSelectionListener(new SelectionAdapter()
+			if (viewWindow.getDocumentTitle() != null)
 			{
-				@Override
-				public void widgetSelected(SelectionEvent arg0)
+				// An item for the window
+				MenuItem windowMenuItem = new MenuItem(windowsMenu, SWT.RADIO);
+				windowMenuItem.setData(viewWindow);
+				windowMenuItem.setText(viewWindow.getDocumentTitle());
+				windowMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());
+				windowMenuItem.addSelectionListener(new SelectionAdapter()
 				{
-					ViewWindow targetWindow = (ViewWindow)arg0.widget.getData();
-					targetWindow.getShell().setActive();
-				}
-			});
+					@Override
+					public void widgetSelected(SelectionEvent arg0)
+					{
+						ViewWindow targetWindow = (ViewWindow)arg0.widget.getData();
+						targetWindow.getShell().setMinimized(false);
+						targetWindow.getShell().setActive();
+					}
+				});
+			}
 		}
 		
-
-		
-		return windowsMenuItem;		
+		if (windowsMenu.getItemCount() > 0)
+		{
+			return windowsMenuItem;
+		}
+		else
+		{
+			windowsMenuItem.dispose();
+			return null;
+		}
 	}
 	
 	
@@ -200,16 +211,24 @@ public class DefaultMenuConstructor implements MenuConstructor
 			Display display = Display.getDefault();
 			Menu menu = display.getMenuBar();
 			addShellMenu(null, createAndAppendFileMenu(menu));
-			addShellMenu(null, createAndAppendWindowsMenu(menu));
+			MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu);
+			if (windowsMenuItem != null)
+			{
+				addShellMenu(null, windowsMenuItem);
+			}
 			addShellMenu(null, createAndAppendHelpMenu(menu));
 		}
 	}
 
-	protected void addMenusToShell(ViewWindow viewWindow)
+	protected void addMenusToWindow(ViewWindow viewWindow)
 	{
 		Menu menu = viewWindow.getShell().getMenuBar();
 		addShellMenu(viewWindow, createAndAppendFileMenu(menu));
-		addShellMenu(viewWindow, createAndAppendWindowsMenu(menu));
+		MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu);
+		if (windowsMenuItem != null)
+		{
+			addShellMenu(viewWindow, windowsMenuItem);
+		}
 		addShellMenu(viewWindow, createAndAppendHelpMenu(menu));
 	}
 
@@ -218,8 +237,8 @@ public class DefaultMenuConstructor implements MenuConstructor
 	{
 		for (ViewWindow viewWindow : viewWindows)
 		{
-			eraseAllMenusForShell(viewWindow);
-			addMenusToShell(viewWindow);
+			eraseAllMenusForWindow(viewWindow);
+			addMenusToWindow(viewWindow);
 		}
 	}
 

@@ -9,6 +9,7 @@ public interface ViewWindow
 	void loadFile(String fileName);
 	
 	Shell getShell();
+	String getDocumentTitle();
 	
 	void addDropTargetListener(DropTargetAdapter dropTargetAdapter);
 	void setClosedListener(DocumentWindowClosedListener documentWindowClosedListener);

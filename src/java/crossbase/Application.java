@@ -6,12 +6,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 import tinyviewer.ui.TinyViewerApplication;
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
+import crossbase.ui.AboutBox;
 import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.DefaultMenuConstructor;
 import crossbase.ui.ViewWindowsManager;
+import crossbase.ui.abstracts.AboutBoxFactory;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 
@@ -20,12 +23,37 @@ public class Application
 {
 	public static final String APP_NAME = "SWT Application";
 	
+	private AboutBox aboutBox = null;
+	private AboutBoxFactory<? extends AboutBox> aboutBoxFactory;
+
 	private DefaultMenuConstructor menuConstructor;
 	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
 
-	protected void showAbout()
+	/**
+	 * Shows the about box. The box shouldn't be opened already. If it is not, it will be
+	 * created using <code>aboutBoxFactory</code>.
+	 * @param shell The parent shell for about box window to create.
+	 *              May be null &#151; in that case the about box will be created for the whole display.
+	 */
+	protected void showAbout(Shell shell)
 	{
-		
+		if (aboutBox == null || aboutBox.isDisposed())
+		{
+			boolean dummyShell = false;
+			if (shell == null) 
+			{
+				shell = new Shell(Display.getCurrent());
+				dummyShell = true;
+			}
+			
+			aboutBox = aboutBoxFactory.create(shell);
+			aboutBox.open();
+
+			if (dummyShell)
+			{
+				shell.dispose();
+			}
+		}		
 	}
 	
 	protected void showPreferences()
@@ -48,7 +76,7 @@ public class Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			showAbout();
+			showAbout(arg0.display.getActiveShell());
 		}
 	};
 	
@@ -78,7 +106,11 @@ public class Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			Display.getCurrent().dispose();
+			documentWindowsManager.closeAllWindows();
+			if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+			{
+				Display.getCurrent().dispose();
+			}
 		}
 	};
 	
@@ -135,7 +167,7 @@ public class Application
 		{
 			if (!SWT.getPlatform().equals("cocoa"))
 			{
-				mdiHelper.stop();
+				if (mdiHelper != null) mdiHelper.stop();
 			}
 	
 			System.out.print("Bye!\n");
@@ -162,6 +194,16 @@ public class Application
 		this.menuConstructor = menuConstructor;
 	}
 	
+	public AboutBoxFactory<? extends AboutBox> getAboutBoxFactory()
+	{
+		return aboutBoxFactory;
+	}
+
+	public void setAboutBoxFactory(AboutBoxFactory<? extends AboutBox> aboutBoxFactory)
+	{
+		this.aboutBoxFactory = aboutBoxFactory;
+	}
+
 	public static void main(String... args)
 	{
 		//new Application(args);

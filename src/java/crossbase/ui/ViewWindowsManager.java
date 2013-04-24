@@ -11,33 +11,56 @@ import crossbase.ui.abstracts.ViewWindowFactory;
 
 public class ViewWindowsManager<T extends ViewWindow>
 {
-	private ArrayList<ViewWindow> windows = new ArrayList<ViewWindow>();
+	private ArrayList<T> windows = new ArrayList<T>();
 	private ViewWindowFactory<T> viewWindowFactory;
 
-	private ViewWindowClosedListener viewWindowClosedListener = new ViewWindowClosedListener()
+	private ViewWindowClosedListener<T> viewWindowClosedListener = new ViewWindowClosedListener<T>()
 	{
 		@Override
-		public void windowClosed(ViewWindow window)
+		public void windowClosed(T viewWindow)
 		{
-			windows.remove(window);
-			
-			if (!SWT.getPlatform().equals("cocoa"))
-			{
-				if (windows.size() == 0)
-				{
-					Display.getCurrent().dispose();
-				}
-			}
+			closeWindow(viewWindow);
 		}
 	};
 
+	/**
+	 * Closes the window. If no windows remain opened 
+	 * and we are not in OS X, terminates the application.
+	 * @param viewWindow The window to close
+	 */
+	public void closeWindow(T viewWindow)
+	{
+		windows.remove(viewWindow);
+		
+		if (!SWT.getPlatform().equals("cocoa"))
+		{
+			if (windows.size() == 0 && Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+			{
+				Display.getCurrent().dispose();
+			}
+		}
+	}
+	
+	/**
+	 * Closes every window. After all windows are closed 
+	 * if we are not in OS X, terminates the application.
+	 * @param viewWindow The window to close
+	 */
+	public void closeAllWindows()
+	{
+		while (windows.size() > 0)
+		{
+			closeWindow(windows.get(0));
+		}
+	}
+	
 	/**
 	 * Opens a new window. If <code>fileName</code> argument isn't null, opens
 	 * the selected file in that window. Otherwise it opens an empty window.
 	 * @param fileName The file's name to open in the new window (can be null)
 	 * @return The opened window
 	 */
-	public ViewWindow openNewWindow(String fileName)
+	public T openNewWindow(String fileName)
 	{
 		T newWindow = viewWindowFactory.create();
 		
@@ -57,11 +80,12 @@ public class ViewWindowsManager<T extends ViewWindow>
 	 * @param fileName The file's name to open
 	 * @return The window where file is opened
 	 */
-	public ViewWindow openFile(String fileName)
+	public T openFile(String fileName)
 	{
 		if (fileName == null) throw new IllegalArgumentException("file name shouldn't be null");
+		
 		// Searching for an empty window
-		for (ViewWindow vw : windows)
+		for (T vw : windows)
 		{
 			if (!vw.isOccupied())
 			{

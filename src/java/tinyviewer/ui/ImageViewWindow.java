@@ -41,7 +41,7 @@ public class ImageViewWindow implements ViewWindow
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;
-	private ViewWindowClosedListener closedListener;
+	private ViewWindowClosedListener<ImageViewWindow> closedListener;
 	private ImageView imageView;
 	private MenuConstructor menuConstructor;
 	
@@ -116,9 +116,12 @@ public class ImageViewWindow implements ViewWindow
 		imageViewDropTarget.removeDropListener(dropTargetAdapter);
 	}
 	
-	public void setClosedListener(ViewWindowClosedListener closedListener)
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setClosedListener(ViewWindowClosedListener<? extends ViewWindow> documentWindowClosedListener)
 	{
-		this.closedListener = closedListener;
+		this.closedListener = (ViewWindowClosedListener<ImageViewWindow>)documentWindowClosedListener;		
 	}
 
 	/**
@@ -153,7 +156,7 @@ public class ImageViewWindow implements ViewWindow
 			@Override
 			public void shellClosed(ShellEvent arg0)
 			{
-				ImageViewWindow.this.menuConstructor.removeWindow(ImageViewWindow.this);
+				if (closedListener != null) closedListener.windowClosed(ImageViewWindow.this);
 			}
 			
 			@Override
@@ -165,12 +168,13 @@ public class ImageViewWindow implements ViewWindow
 		
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
+				System.out.println("removing window: " + fileName);
+				ImageViewWindow.this.menuConstructor.removeWindow(ImageViewWindow.this);
 				Image oldImage = imageView.getImage();
 				if (oldImage != null) 
 				{
 					oldImage.dispose();
 				}
-				if (closedListener != null) closedListener.windowClosed(ImageViewWindow.this);
 			}
 		});
 		

@@ -1,5 +1,6 @@
 package crossbase.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +18,7 @@ import crossbase.ui.abstracts.ViewWindow;
 public class DefaultMenuConstructor implements MenuConstructor
 {
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private Set<ViewWindow> viewWindows;
+	private ArrayList<ViewWindow> viewWindows;
 	private HashMap<ViewWindow, Set<MenuItem>> shellMenuItems;
 	private Set<MenuItem> globalMenuItems;
 	
@@ -269,12 +270,13 @@ public class DefaultMenuConstructor implements MenuConstructor
 	public void removeWindow(ViewWindow viewWindow)
 	{
 		viewWindows.remove(viewWindow);
+		eraseAllMenusForWindow(viewWindow);
 		updateMenus();
 	}
 
 	public DefaultMenuConstructor()
 	{
-		viewWindows = new HashSet<ViewWindow>();
+		viewWindows = new ArrayList<ViewWindow>();
 		shellMenuItems = new HashMap<ViewWindow, Set<MenuItem>>();
 		globalMenuItems = new HashSet<MenuItem>();
 		

@@ -1,7 +1,7 @@
 package crossbase.ui.abstracts;
 
 
-public interface ViewWindowClosedListener
+public interface ViewWindowClosedListener<T extends ViewWindow>
 {
-	void windowClosed(ViewWindow window);
+	void windowClosed(T window);
 }

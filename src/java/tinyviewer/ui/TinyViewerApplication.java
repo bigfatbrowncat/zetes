@@ -13,7 +13,8 @@ import crossbase.ui.ViewWindowsManager;
 
 public class TinyViewerApplication extends Application
 {
-	private AboutBox aboutBox = null;
+	public static final String APP_NAME = "Tiny Viewer";
+
 	private SelectionAdapter fileOpenSelectionAdapter = new SelectionAdapter()
 	{
 		@Override
@@ -34,20 +35,11 @@ public class TinyViewerApplication extends Application
 	};
 	
 	@Override
-	protected void showAbout()
-	{
-		if (aboutBox == null || aboutBox.isDisposed())
-		{
-			Shell dummyShell = new Shell(Display.getCurrent());
-			aboutBox = new AboutBox(dummyShell);
-			aboutBox.open();
-			dummyShell.dispose();
-		}
-	}
-	
-	@Override
 	public void run(String[] arguments)
 	{
+		TinyViewAboutBoxFactory tinyViewAboutBoxFactory = new TinyViewAboutBoxFactory();
+		setAboutBoxFactory(tinyViewAboutBoxFactory);
+		
 		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
 		menuConstructor.setOpenSelectionAdapter(fileOpenSelectionAdapter);
 

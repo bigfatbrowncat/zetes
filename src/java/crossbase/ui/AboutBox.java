@@ -20,19 +20,18 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class AboutBox extends Dialog
 {
-
 	protected Object result;
 	protected Shell aboutBoxShell;
+	private String applicationName, descriptionText, copyrightText, iconResourceName;
+	private Point windowSize = new Point(370, 160);
 
 	/**
 	 * Create the dialog.
 	 * @param parent
-	 * @param style
 	 */
 	public AboutBox(Shell parent)
 	{
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.CENTER);
-		setText("SWT Dialog");
 	}
 
 	private void centerWindow()
@@ -136,13 +135,13 @@ public class AboutBox extends Dialog
 	{
 		aboutBoxShell = new Shell(getParent(), getStyle());
 		aboutBoxShell.setSize(368, 150);
-		aboutBoxShell.setText("About SWT Application");
+		aboutBoxShell.setText("About " + applicationName /*"SWT Application"*/);
 		aboutBoxShell.setLayout(new FormLayout());
 		
 
  		Label iconLabel = new Label(aboutBoxShell, SWT.NONE);
 		iconLabel.setAlignment(SWT.CENTER);
-		iconLabel.setImage(SWTResourceManager.getImage(AboutBox.class, "/crossbase/icon.png"));
+		iconLabel.setImage(SWTResourceManager.getImage(AboutBox.class, iconResourceName /*"/crossbase/icon.png"*/));
 		FormData fd_iconLabel = new FormData();
 		fd_iconLabel.top = new FormAttachment(0, 15);
 		fd_iconLabel.left = new FormAttachment(0, 15);
@@ -166,17 +165,17 @@ public class AboutBox extends Dialog
 		okButton.setText("OK");
 		aboutBoxShell.setDefaultButton(okButton);
 		
-		Label descriptionLabel = new Label(aboutBoxShell, SWT.NONE);
+		Label descriptionLabel = new Label(aboutBoxShell, SWT.WRAP);
 		FormData fd_descriptionLabel = new FormData();
 		fd_descriptionLabel.left = new FormAttachment(iconLabel, 15);
 		fd_descriptionLabel.right = new FormAttachment(100, -15);
 		descriptionLabel.setLayoutData(fd_descriptionLabel);
-		descriptionLabel.setText("This app demonstrates Avian + SWT power");
+		descriptionLabel.setText(descriptionText /* "This app demonstrates Avian + SWT power"*/);
 		updateTextFont(descriptionLabel);
 		
 		Label copyrightLabel = new Label(aboutBoxShell, SWT.NONE);
 		fd_descriptionLabel.bottom = new FormAttachment(copyrightLabel, -6);
-		copyrightLabel.setText("Copyright Ilya Mizus, 2013");
+		copyrightLabel.setText(copyrightText /*"Copyright Ilya Mizus, 2013"*/);
 		FormData fd_copyrightLabel = new FormData();
 		fd_copyrightLabel.left = new FormAttachment(iconLabel, 15);
 		fd_copyrightLabel.bottom = new FormAttachment(okButton, -6);
@@ -187,7 +186,7 @@ public class AboutBox extends Dialog
 		Label titleLabel = new Label(aboutBoxShell, SWT.NONE);
 		fd_descriptionLabel.top = new FormAttachment(titleLabel, 6);
 		updateTitleFont(titleLabel);
-		titleLabel.setText("CrossBase SWT Application");
+		titleLabel.setText(applicationName);
 		FormData fd_titleLabel = new FormData();
 		fd_titleLabel.left = new FormAttachment(iconLabel, 15);
 		fd_titleLabel.right = new FormAttachment(100, -15);
@@ -196,14 +195,67 @@ public class AboutBox extends Dialog
 
 		if (SWT.getPlatform().equals("gtk"))
 		{
-			Point size = aboutBoxShell.getSize();
+			aboutBoxShell.setSize(new Point((int)(windowSize.x * 1.2f), (int)(windowSize.y * 1.2f)));
+		}
+		else
+		{
+			aboutBoxShell.setSize(windowSize);
 			
-			aboutBoxShell.setSize(new Point((int)(size.x * 1.2f), (int)(size.y * 1.2f)));
 		}
 	}
 	
 	public boolean isDisposed()
 	{
 		return aboutBoxShell == null || aboutBoxShell.isDisposed();
+	}
+
+	public String getApplicationName()
+	{
+		return applicationName;
+	}
+
+	public void setApplicationName(String applicationName)
+	{
+		this.applicationName = applicationName;
+	}
+
+	public String getDescriptionText()
+	{
+		return descriptionText;
+	}
+
+	public void setDescriptionText(String descriptionText)
+	{
+		this.descriptionText = descriptionText;
+	}
+
+	public String getCopyrightText()
+	{
+		return copyrightText;
+	}
+
+	public void setCopyrightText(String copyrightText)
+	{
+		this.copyrightText = copyrightText;
+	}
+
+	public String getIconResourceName()
+	{
+		return iconResourceName;
+	}
+
+	public void setIconResourceName(String iconResourceName)
+	{
+		this.iconResourceName = iconResourceName;
+	}
+
+	public Point getWindowSize()
+	{
+		return windowSize;
+	}
+
+	public void setWindowSize(Point windowSize)
+	{
+		this.windowSize = windowSize;
 	}
 }

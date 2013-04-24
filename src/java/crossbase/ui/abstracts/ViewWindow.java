@@ -11,5 +11,5 @@ public interface ViewWindow
 	Shell getShell();
 	String getDocumentTitle();
 	
-	void setClosedListener(ViewWindowClosedListener documentWindowClosedListener);
+	void setClosedListener(ViewWindowClosedListener<? extends ViewWindow> documentWindowClosedListener);
 }

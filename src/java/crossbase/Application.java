@@ -18,6 +18,7 @@ import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import crossbase.ui.AboutBox;
 import crossbase.ui.AboutHandler;
 import crossbase.ui.CocoaUIEnhancer;
+import crossbase.ui.DefaultMenuConstructor;
 import crossbase.ui.DocumentWindow;
 import crossbase.ui.DocumentWindowsManager;
 import crossbase.ui.DocumentHandler;
@@ -29,7 +30,7 @@ public class Application
 {
 	public static final String APP_NAME = "SWT Application";
 	
-	private MenuConstructor menuConstructor;
+	private DefaultMenuConstructor menuConstructor;
 	private DocumentWindowsManager<? extends DocumentWindow> documentWindowsManager;
 
 	protected void showAbout()
@@ -116,8 +117,6 @@ public class Application
 				// with our Cocoa application
 				Display.getCurrent().addListener(SWT.OpenDocument, openDocumentListener);
 				
-				// Creating the main application menu
-				menuConstructor.appendMenusToGlobalMenu();
 			}
 			else
 			{
@@ -168,7 +167,7 @@ public class Application
 		return menuConstructor;
 	}
 	
-	public void setMenuConstructor(MenuConstructor menuConstructor)
+	public void setMenuConstructor(DefaultMenuConstructor menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
 	}

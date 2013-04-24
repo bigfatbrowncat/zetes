@@ -142,14 +142,14 @@ public class ViewWindow implements DocumentWindow
 		shell.setImage(SWTResourceManager.getImage(ViewWindow.class,
 				"/crossbase/icon.png"));
 	
-		shell.setText("SWT Application");
+		shell.setText("TinyView");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 
 		// Creating "File" menu
-		menuConstructor.appendMenusToShell(shell);
+		menuConstructor.addShell(shell);
 		
 		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);

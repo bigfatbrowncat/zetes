@@ -1,20 +1,14 @@
 package crossbase.ui;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
-public abstract class MenuConstructor
+public interface MenuConstructor
 {
-	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
+	void addShell(Shell shell);
+	void removeShell(Shell shell);
+	void updateMenus();
 	
-	protected void appendCustomFileMenuItems(Menu fileMenu, Display display, Shell shell)
-	{
-		// To be defined in child classes...
-	}
+/*	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
 	
 	private void appendFileMenu(Menu menu, Display display, Shell shell)
 	{
@@ -38,7 +32,7 @@ public abstract class MenuConstructor
 		}
 		
 	}
-	
+
 	private void appendHelpMenu(Menu menu, Display display, Shell shell)
 	{
 		// "Help" menu item
@@ -90,5 +84,5 @@ public abstract class MenuConstructor
 	public void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter)
 	{
 		this.aboutSelectionAdapter = aboutSelectionAdapter;
-	}
+	}*/
 }

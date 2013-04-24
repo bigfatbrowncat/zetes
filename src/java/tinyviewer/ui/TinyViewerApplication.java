@@ -9,9 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import crossbase.Application;
 import crossbase.ui.AboutBox;
-import crossbase.ui.DocumentWindow;
 import crossbase.ui.DocumentWindowsManager;
-import crossbase.ui.MenuConstructor;
 
 public class TinyViewerApplication extends Application
 {

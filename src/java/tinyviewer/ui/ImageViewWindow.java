@@ -14,8 +14,11 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -41,6 +44,7 @@ public class ImageViewWindow implements ViewWindow
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;
 	private DocumentWindowClosedListener closedListener;
 	private ImageView imageView;
+	private MenuConstructor menuConstructor;
 	
 	private void setCocoaFullscreenButton(boolean on)
 	{
@@ -126,6 +130,44 @@ public class ImageViewWindow implements ViewWindow
 	protected void createContents(MenuConstructor menuConstructor)
 	{
 		shell = new Shell();
+		shell.addShellListener(new ShellListener()
+		{
+			
+			@Override
+			public void shellIconified(ShellEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void shellDeiconified(ShellEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void shellDeactivated(ShellEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void shellClosed(ShellEvent arg0)
+			{
+				ImageViewWindow.this.menuConstructor.removeWindow(ImageViewWindow.this);
+			}
+			
+			@Override
+			public void shellActivated(ShellEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
 				Image oldImage = imageView.getImage();
@@ -148,7 +190,7 @@ public class ImageViewWindow implements ViewWindow
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 
-		// Creating "File" menu
+		this.menuConstructor = menuConstructor;
 		menuConstructor.addWindow(this);
 		
 		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -185,6 +227,7 @@ public class ImageViewWindow implements ViewWindow
 			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			shell.forceActive();
 			if (oldImage != null) oldImage.dispose();
+			menuConstructor.updateMenus();
 		}
 		catch (IOException e)
 		{

@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -13,7 +15,7 @@ import org.eclipse.swt.widgets.MenuItem;
 public class DefaultMenuConstructor implements MenuConstructor
 {
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private Set<ViewWindow> shells;
+	private Set<ViewWindow> viewWindows;
 	private HashMap<ViewWindow, Set<MenuItem>> shellMenuItems;
 	private Set<MenuItem> globalMenuItems;
 	
@@ -106,6 +108,38 @@ public class DefaultMenuConstructor implements MenuConstructor
 		// To be overridden in the inherited classes
 	}
 	
+	private MenuItem createAndAppendWindowsMenu(Menu menu)
+	{
+		MenuItem windowsMenuItem = new MenuItem(menu, SWT.CASCADE);
+		
+		windowsMenuItem.setText("&Windows");
+
+		Menu windowsMenu = new Menu(windowsMenuItem);
+		windowsMenuItem.setMenu(windowsMenu);
+
+		for (ViewWindow viewWindow : viewWindows)
+		{
+			// An item for the window
+			MenuItem windowMenuItem = new MenuItem(windowsMenu, SWT.NONE);
+			windowMenuItem.setData(viewWindow);
+			windowMenuItem.setText(viewWindow.getShell().getText());
+			windowMenuItem.addSelectionListener(new SelectionAdapter()
+			{
+				@Override
+				public void widgetSelected(SelectionEvent arg0)
+				{
+					ViewWindow targetWindow = (ViewWindow)arg0.widget.getData();
+					targetWindow.getShell().setActive();
+				}
+			});
+		}
+		
+
+		
+		return windowsMenuItem;		
+	}
+	
+	
 	private MenuItem createAndAppendHelpMenu(Menu menu)
 	{
 		// "Help" menu item
@@ -166,6 +200,7 @@ public class DefaultMenuConstructor implements MenuConstructor
 			Display display = Display.getDefault();
 			Menu menu = display.getMenuBar();
 			addShellMenu(null, createAndAppendFileMenu(menu));
+			addShellMenu(null, createAndAppendWindowsMenu(menu));
 			addShellMenu(null, createAndAppendHelpMenu(menu));
 		}
 	}
@@ -174,13 +209,14 @@ public class DefaultMenuConstructor implements MenuConstructor
 	{
 		Menu menu = viewWindow.getShell().getMenuBar();
 		addShellMenu(viewWindow, createAndAppendFileMenu(menu));
+		addShellMenu(viewWindow, createAndAppendWindowsMenu(menu));
 		addShellMenu(viewWindow, createAndAppendHelpMenu(menu));
 	}
 
 	@Override
 	public void updateMenus()
 	{
-		for (ViewWindow viewWindow : shells)
+		for (ViewWindow viewWindow : viewWindows)
 		{
 			eraseAllMenusForShell(viewWindow);
 			addMenusToShell(viewWindow);
@@ -190,20 +226,20 @@ public class DefaultMenuConstructor implements MenuConstructor
 	@Override
 	public void addWindow(ViewWindow viewWindow)
 	{
-		shells.add(viewWindow);
+		viewWindows.add(viewWindow);
 		updateMenus();
 	}
 
 	@Override
 	public void removeWindow(ViewWindow viewWindow)
 	{
-		eraseAllMenusForShell(viewWindow);
+		viewWindows.remove(viewWindow);
 		updateMenus();
 	}
 
 	public DefaultMenuConstructor()
 	{
-		shells = new HashSet<ViewWindow>();
+		viewWindows = new HashSet<ViewWindow>();
 		shellMenuItems = new HashMap<ViewWindow, Set<MenuItem>>();
 		globalMenuItems = new HashSet<MenuItem>();
 		

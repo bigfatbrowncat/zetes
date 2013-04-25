@@ -1,6 +1,7 @@
 package crossbase.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -96,6 +97,16 @@ public class ViewWindowsManager<T extends ViewWindow>
 		
 		// If we haven't found an empty window, we open a new one
 		return openNewWindow(fileName);
+	}
+	
+	public Object[] openFiles(String[] fileNames)
+	{
+		ArrayList<Object> res = new ArrayList<>();
+		for (int i = 0; i < fileNames.length; i++)
+		{
+			res.add(openFile(fileNames[i]));
+		}
+		return res.toArray();
 	}
 	
 	/**

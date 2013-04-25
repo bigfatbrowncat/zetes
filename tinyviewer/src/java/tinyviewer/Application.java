@@ -20,14 +20,22 @@ public class Application extends ApplicationBase
 		public void widgetSelected(SelectionEvent arg0)
 		{
 			Shell dummyShell = new Shell(Display.getDefault());
-			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN);
+			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN | SWT.MULTI);
 			fileDialog.setText("Open image");
 			fileDialog.setFilterNames(new String[] { "Image (*.png; *.bmp; *.jpg; *.jpeg)", "All files" });
 			fileDialog.setFilterExtensions(new String[] { "*.png; *.bmp; *.jpg; *.jpeg", "*.*" });
-			String fileName = fileDialog.open();
-			if (fileName != null)
+			String firstFile = fileDialog.open();
+			if (firstFile != null)
 			{
-				getDocumentWindowsManager().openFile(fileName);
+				String[] names = fileDialog.getFileNames();
+				String[] fullNames = new String[names.length];
+				
+				for (int i = 0; i < names.length; i++)
+				{
+					fullNames[i] = fileDialog.getFilterPath() + "/" + names[i];
+				}
+				
+				getDocumentWindowsManager().openFiles(fullNames);
 			}
 			dummyShell.dispose();
 		}

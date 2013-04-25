@@ -26,6 +26,21 @@ public class MenuConstructorBase implements MenuConstructor
 	private HashMap<ViewWindow, Set<MenuItem>> shellMenuItems;
 	private Set<MenuItem> globalMenuItems;
 	
+	protected ViewWindow getActiveViewWindow()
+	{
+		if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+		{
+			for (ViewWindow viewWindow : viewWindows)
+			{
+				if (Display.getCurrent().getActiveShell() == viewWindow.getShell())
+				{
+					return viewWindow;
+				}
+			}			
+		}
+		return null;
+	}
+	
 	/**
 	 * Adds a menu to the storage
 	 * @param viewWindow The window the menu connected to. If it's null, the global menu will be assumed 
@@ -149,9 +164,9 @@ public class MenuConstructorBase implements MenuConstructor
 			@Override
 			public void widgetSelected(SelectionEvent arg0)
 			{
-				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				if (getActiveViewWindow() != null)
 				{
-					Shell activeShell = Display.getCurrent().getActiveShell();
+					Shell activeShell = getActiveViewWindow().getShell();
 					activeShell.setMinimized(!activeShell.getMinimized());
 				}
 			}
@@ -167,15 +182,36 @@ public class MenuConstructorBase implements MenuConstructor
 			@Override
 			public void widgetSelected(SelectionEvent arg0)
 			{
-				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				if (getActiveViewWindow() != null)
 				{
-					Shell activeShell = Display.getCurrent().getActiveShell();
+					Shell activeShell = getActiveViewWindow().getShell();
+					if (activeShell.getFullScreen()) activeShell.setFullScreen(false);
 					activeShell.setMaximized(!activeShell.getMaximized());
 				}
 			}
 		});
 		maximizeMenuItem.setText("Maximize");
 
+		// "Fullscreen" menu item
+		final MenuItem fullscreenMenuItem = new MenuItem(windowMenu, SWT.NONE);
+		fullscreenMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0)
+			{
+				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				{
+					Shell activeShell = Display.getCurrent().getActiveShell();
+					if (activeShell.getMaximized()) activeShell.setMaximized(false);
+					activeShell.setFullScreen(!activeShell.getFullScreen());
+				}
+			}
+		});
+		HotKey fullscreenHotKey = new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F');
+		fullscreenMenuItem.setAccelerator(fullscreenHotKey.toAccelerator());
+		fullscreenMenuItem.setText("Fullscreen\t" + fullscreenHotKey.toString());
+		
+		// Custom items
 		List<MenuItem> customItems = createCustomWindowMenuItems();
 
 		if (customItems != null && customItems.size() > 0) 
@@ -186,6 +222,7 @@ public class MenuConstructorBase implements MenuConstructor
 		
 		appendItems(windowMenu, customItems);
 		
+		// Window items
 		boolean anyWindowsToAdd = false;
 		for (ViewWindow viewWindow : viewWindows)
 		{
@@ -237,22 +274,15 @@ public class MenuConstructorBase implements MenuConstructor
 			}
 		}
 		
+		// Add global listener to "Window" menu
 		windowMenu.addMenuListener(new MenuListener()
 		{
-			
 			@Override
-			public void menuShown(MenuEvent arg0) {
-				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
-				{
-					Shell activeShell = Display.getCurrent().getActiveShell();
-					minimizeMenuItem.setEnabled(activeShell != null && !activeShell.isDisposed());
-					maximizeMenuItem.setEnabled(activeShell != null && !activeShell.isDisposed());
-				}
-				else
-				{
-					minimizeMenuItem.setEnabled(false);
-					maximizeMenuItem.setEnabled(false);
-				}
+			public void menuShown(MenuEvent arg0)
+			{
+				minimizeMenuItem.setEnabled(getActiveViewWindow() != null);
+				maximizeMenuItem.setEnabled(getActiveViewWindow() != null);
+				fullscreenMenuItem.setEnabled(getActiveViewWindow() != null && getActiveViewWindow().supportsFullscreen());
 			}
 			
 			@Override

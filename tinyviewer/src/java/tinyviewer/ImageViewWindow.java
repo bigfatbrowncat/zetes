@@ -30,11 +30,12 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import crossbase.ui.ViewWindowBase;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 import crossbase.ui.abstracts.ViewWindowClosedListener;
 
-public class ImageViewWindow implements ViewWindow
+public class ImageViewWindow extends ViewWindowBase
 {
 	private Shell shell;
 	private String fileName = null;
@@ -44,30 +45,6 @@ public class ImageViewWindow implements ViewWindow
 	private ViewWindowClosedListener<ImageViewWindow> closedListener;
 	private ImageView imageView;
 	private MenuConstructor menuConstructor;
-	
-	private void setCocoaFullscreenButton(boolean on)
-	{
-		try
-		{
-			Field field = Control.class.getDeclaredField("view");
-			Object /*NSView*/ view = field.get(shell);
-	
-			if (view != null)
-			{
-			    Class<?> c = Class.forName("org.eclipse.swt.internal.cocoa.NSView");
-			    Object /*NSWindow*/ window = c.getDeclaredMethod("window").invoke(view);
-	
-			    c = Class.forName("org.eclipse.swt.internal.cocoa.NSWindow");
-			    Method setCollectionBehavior = c.getDeclaredMethod(
-			        "setCollectionBehavior", long.class);
-			    setCollectionBehavior.invoke(window, on ? (1 << 7) : 0);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 	
 	protected static Image loadImage(InputStream stream) throws IOException {
 		try {
@@ -94,11 +71,6 @@ public class ImageViewWindow implements ViewWindow
 	public void open(MenuConstructor menuConstructor)
 	{
 		createContents(menuConstructor);
-		
-		if (SWT.getPlatform().equals("cocoa"))
-		{
-			setCocoaFullscreenButton(true);
-		}
 		
 		shell.open();
 		shell.layout();
@@ -264,5 +236,11 @@ public class ImageViewWindow implements ViewWindow
 	public String getDocumentTitle()
 	{
 		return fileName;
+	}
+
+	@Override
+	public boolean supportsFullscreen()
+	{
+		return true;
 	}
 }

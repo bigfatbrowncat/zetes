@@ -12,4 +12,6 @@ public interface ViewWindow
 	String getDocumentTitle();
 	
 	void setClosedListener(ViewWindowClosedListener<? extends ViewWindow> documentWindowClosedListener);
+	
+	boolean supportsFullscreen();
 }

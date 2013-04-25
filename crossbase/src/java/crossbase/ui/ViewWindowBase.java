@@ -5,11 +5,15 @@ import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
+import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 
 public abstract class ViewWindowBase implements ViewWindow
 {
+	private Shell shell;
+	
 	private void setCocoaFullscreenButton(boolean on)
 	{
 		try
@@ -36,6 +40,26 @@ public abstract class ViewWindowBase implements ViewWindow
 	
 	public ViewWindowBase()
 	{
+
+	}
+	
+	@Override
+	public Shell getShell()
+	{
+		return shell;
+	}
+	
+	public void open()
+	{
+		createContents();
+		
+		shell.layout();
+		shell.open();
+	}
+	
+	protected void createContents()
+	{
+		shell = new Shell();
 		if (SWT.getPlatform().equals("cocoa"))
 		{
 			setCocoaFullscreenButton(supportsFullscreen());

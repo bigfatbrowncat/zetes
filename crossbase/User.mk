@@ -71,12 +71,12 @@ CROSSBASE_JNI_LIBS_TARGET = $(addprefix $(BINARY_PATH)/,$(addsuffix $(JNILIB_EXT
 ifeq ($(UNAME), Darwin)	# OS X
 all: $(BINARY_PATH)/$(APPLICATION_NAME).app
 
-$(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(CROSSBASE_JNI_LIBS_TARGET)
+$(BINARY_PATH)/$(APPLICATION_NAME).app: $(CROSSBASE_PATH)/osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(CROSSBASE_JNI_LIBS_TARGET)
 	@echo Building OS X bundle...
 	mkdir -p $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
-	cp -r osx-bundle/* $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app
+	cp -r $(CROSSBASE_PATH)/osx-bundle/* $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app
 	cp $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
-	cp $(SWT_LIBS) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
+	cp $(CROSSBASE_JNI_LIBS_TARGET) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
 	@echo Creating DMG image...
 	hdiutil create $(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg -srcfolder $(BINARY_PATH)/$(APPLICATION_NAME) -ov
 

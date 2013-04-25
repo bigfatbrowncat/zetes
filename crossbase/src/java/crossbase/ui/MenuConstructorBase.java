@@ -48,6 +48,11 @@ public class MenuConstructorBase implements MenuConstructor
 	 */
 	protected void addShellMenu(ViewWindow viewWindow, MenuItem menuItem)
 	{
+		if (menuItem == null) 
+		{
+			return;
+		}
+		
 		if (viewWindow == null)
 		{
 			globalMenuItems.add(menuItem);
@@ -75,7 +80,7 @@ public class MenuConstructorBase implements MenuConstructor
 			{
 				for (MenuItem mi : globalMenuItems)
 				{
-					if (!mi.isDisposed()) mi.dispose();
+					if (mi != null && !mi.isDisposed()) mi.dispose();
 				}
 				globalMenuItems.clear();
 			}

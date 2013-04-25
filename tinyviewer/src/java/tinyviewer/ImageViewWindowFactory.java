@@ -20,9 +20,9 @@ public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow
 			FileTransfer ft = FileTransfer.getInstance();
 			if (ft.isSupportedType(event.currentDataType)) {
 				fileList = (String[]) event.data;
-				if (fileList.length > 0)
+				for (int i = 0; i < fileList.length; i++)
 				{
-					imageViewWindowsManager.openFile(fileList[0]);
+					imageViewWindowsManager.openFile(fileList[i]);
 				}
 			}
 		}

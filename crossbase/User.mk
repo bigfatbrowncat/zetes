@@ -17,6 +17,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
+  CLASSPATH_DELIM=:
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
   PLATFORM_TAG = linux-x86_64
@@ -27,6 +28,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
+  CLASSPATH_DELIM=:
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
   PLATFORM_TAG = linux-armv6l
@@ -48,6 +50,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
+  CLASSPATH_DELIM=;
 endif
 
 JAVA_SOURCE_PATH = $(SRC)/java
@@ -85,10 +88,10 @@ $(CROSSBASE_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(CROSSBASE_PATH)/bin/$(PLATFO
 	@echo Copying $<...
 	cp -f $< $@
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(CROSSBASE_PATH)/bin/java/crossbase.jar
 	@echo Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(CROSSBASE_PATH)/bin/java/crossbase.jar" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...

@@ -1,5 +1,3 @@
-include App.mk
-
 UNAME := $(shell uname)
 ARCH := $(shell uname -m)
 

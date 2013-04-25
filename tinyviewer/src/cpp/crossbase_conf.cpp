@@ -1,0 +1,1 @@
+char* applicationClass = const_cast<char*>("tinyviewer/Application");

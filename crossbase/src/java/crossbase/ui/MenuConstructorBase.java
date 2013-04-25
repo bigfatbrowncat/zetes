@@ -3,14 +3,18 @@ package crossbase.ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
@@ -77,6 +81,15 @@ public class MenuConstructorBase implements MenuConstructor
 		}
 	}
 	
+	private void appendItems(Menu menu, List<MenuItem> items)
+	{
+		if (items == null) return;
+		for (MenuItem item : items)
+		{
+			item.setMenu(menu);
+		}
+	}
+	
 	private MenuItem createAndAppendFileMenu(Menu menu)
 	{
 		MenuItem fileMenuItem = new MenuItem(menu, SWT.CASCADE);
@@ -103,7 +116,16 @@ public class MenuConstructorBase implements MenuConstructor
 			mainMenuItemExit.setText("E&xit");
 		}
 		
-		return fileMenuItem;		
+		if (fileMenu.getItemCount() > 0)
+		{
+			return fileMenuItem;
+		}
+		else
+		{
+			fileMenuItem.dispose();
+			return null;
+		}
+		
 	}
 
 	protected void appendCustomFileMenuItems(Menu fileMenu)
@@ -113,37 +135,96 @@ public class MenuConstructorBase implements MenuConstructor
 	
 	private MenuItem createAndAppendWindowsMenu(Menu menu)
 	{
-		MenuItem windowsMenuItem = new MenuItem(menu, SWT.CASCADE);
+		MenuItem windowMenuItem = new MenuItem(menu, SWT.CASCADE);
 		
-		windowsMenuItem.setText("&Window");
+		windowMenuItem.setText("&Window");
 
-		Menu windowsMenu = new Menu(windowsMenuItem);
-		windowsMenuItem.setMenu(windowsMenu);
+		Menu windowMenu = new Menu(windowMenuItem);
+		windowMenuItem.setMenu(windowMenu);
 		
+		// "Minimize" menu item
+		final MenuItem minimizeMenuItem = new MenuItem(windowMenu, SWT.NONE);
+		minimizeMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0)
+			{
+				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				{
+					Shell activeShell = Display.getCurrent().getActiveShell();
+					activeShell.setMinimized(!activeShell.getMinimized());
+				}
+			}
+		});
+		HotKey minimizeHotKey = new HotKey(HotKey.MOD1, 'M');
+		minimizeMenuItem.setAccelerator(minimizeHotKey.toAccelerator());
+		minimizeMenuItem.setText("&Minimize\t" + minimizeHotKey.toString());
+		
+		// "Maximize" menu item
+		final MenuItem maximizeMenuItem = new MenuItem(windowMenu, SWT.NONE);
+		maximizeMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent arg0)
+			{
+				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				{
+					Shell activeShell = Display.getCurrent().getActiveShell();
+					activeShell.setMaximized(!activeShell.getMaximized());
+				}
+			}
+		});
+		maximizeMenuItem.setText("Maximize");
+
+		List<MenuItem> customItems = createCustomWindowMenuItems();
+
+		if (customItems != null && customItems.size() > 0) 
+		{
+			// If the menu isn't empty yet, adding the new item
+			new MenuItem(windowMenu, SWT.SEPARATOR);
+		}
+		
+		appendItems(windowMenu, customItems);
+		
+		boolean anyWindowsToAdd = false;
+		for (ViewWindow viewWindow : viewWindows)
+		{
+			if (viewWindow.getDocumentTitle() != null)
+			{
+				anyWindowsToAdd = true;
+				break;
+			}
+		}
+		
+		if (anyWindowsToAdd)
+		{
+			new MenuItem(windowMenu, SWT.SEPARATOR);
+		}
+
 		char hotKey = '1';
 		for (ViewWindow viewWindow : viewWindows)
 		{
 			if (viewWindow.getDocumentTitle() != null)
 			{
 				// An item for the window
-				MenuItem windowMenuItem = new MenuItem(windowsMenu, SWT.RADIO);
+				MenuItem windowItemMenuItem = new MenuItem(windowMenu, SWT.RADIO);
 				HotKey windowHotKey = new HotKey(HotKey.MOD1, hotKey);
-				windowMenuItem.setData(viewWindow);
+				windowItemMenuItem.setData(viewWindow);
 				if (hotKey <= '9')
 				{
 					// Cmd+1, Cmd+2, ..., Cmd+9
-					windowMenuItem.setAccelerator(windowHotKey.toAccelerator());
-					windowMenuItem.setText(viewWindow.getDocumentTitle() + "\t" + windowHotKey.toString());
+					windowItemMenuItem.setAccelerator(windowHotKey.toAccelerator());
+					windowItemMenuItem.setText(viewWindow.getDocumentTitle() + "\t" + windowHotKey.toString());
 					hotKey ++;
 				}
 				else
 				{
 					// No hotkey
-					windowMenuItem.setText(viewWindow.getDocumentTitle());
+					windowItemMenuItem.setText(viewWindow.getDocumentTitle());
 				}
 
-				windowMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());
-				windowMenuItem.addSelectionListener(new SelectionAdapter()
+				windowItemMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());
+				windowItemMenuItem.addSelectionListener(new SelectionAdapter()
 				{
 					@Override
 					public void widgetSelected(SelectionEvent arg0)
@@ -156,15 +237,52 @@ public class MenuConstructorBase implements MenuConstructor
 			}
 		}
 		
-		if (windowsMenu.getItemCount() > 0)
+		windowMenu.addMenuListener(new MenuListener()
 		{
-			return windowsMenuItem;
+			
+			@Override
+			public void menuShown(MenuEvent arg0) {
+				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				{
+					Shell activeShell = Display.getCurrent().getActiveShell();
+					minimizeMenuItem.setEnabled(activeShell != null && !activeShell.isDisposed());
+					maximizeMenuItem.setEnabled(activeShell != null && !activeShell.isDisposed());
+				}
+				else
+				{
+					minimizeMenuItem.setEnabled(false);
+					maximizeMenuItem.setEnabled(false);
+				}
+			}
+			
+			@Override
+			public void menuHidden(MenuEvent arg0)
+			{
+			}
+		});
+
+		
+		if (windowMenu.getItemCount() > 0)
+		{
+			return windowMenuItem;
 		}
 		else
 		{
-			windowsMenuItem.dispose();
+			windowMenuItem.dispose();
 			return null;
 		}
+	}
+	
+	/**
+	 * Override this method to create custom menu items in 
+	 * the middle of <i>Window</i> menu (between Minimize/Maximize and
+	 * windows list)
+	 * @return Create a list, add all the items to it and return it.
+	 */
+	protected List<MenuItem> createCustomWindowMenuItems()
+	{
+		return null;
+		// To be overridden in the inherited classes
 	}
 	
 	
@@ -177,11 +295,11 @@ public class MenuConstructorBase implements MenuConstructor
 		Menu helpMenu = new Menu(helpMenuItem);
 		helpMenuItem.setMenu(helpMenu);
 
-		appendCustomHelpMenuItems(helpMenu);
+		boolean customItemsAppended = appendCustomHelpMenuItems(helpMenu);
 		
 		if (!SWT.getPlatform().equals("cocoa"))
 		{
-			if (helpMenu.getItemCount() > 0) 
+			if (customItemsAppended) 
 			{
 				// If the menu isn't empty yet, adding the new item
 				new MenuItem(helpMenu, SWT.SEPARATOR);
@@ -193,12 +311,27 @@ public class MenuConstructorBase implements MenuConstructor
 			aboutMenuItem.setText("&About...");
 		}
 		
-		return helpMenuItem;
+		if (helpMenu.getItemCount() > 0)
+		{
+			return helpMenuItem;
+		}
+		else
+		{
+			helpMenuItem.dispose();
+			return null;
+		}
 	}
 	
-	protected void appendCustomHelpMenuItems(Menu helpMenu)
+	/**
+	 * Override this method to create custom menu items in 
+	 * the top of <i>Help</i> menu (before About on Windows and Linux)
+	 * @param helpMenu The <i>Help</i> menu &#151; you should add your new items here
+	 * @return If you added any items, you should return true. Otherwise you should return false.
+	 */
+	protected boolean appendCustomHelpMenuItems(Menu helpMenu)
 	{
 		// To be overridden in the inherited classes
+		return false;
 	}
 	
 	public SelectionAdapter getExitSelectionAdapter()

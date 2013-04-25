@@ -37,7 +37,6 @@ import crossbase.ui.abstracts.ViewWindowClosedListener;
 
 public class ImageViewWindow extends ViewWindowBase
 {
-	private Shell shell;
 	private String fileName = null;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
@@ -46,6 +45,7 @@ public class ImageViewWindow extends ViewWindowBase
 	private ImageView imageView;
 	private MenuConstructor menuConstructor;
 	
+
 	protected static Image loadImage(InputStream stream) throws IOException {
 		try {
 			Display display = Display.getDefault();
@@ -68,13 +68,8 @@ public class ImageViewWindow extends ViewWindowBase
 	/**
 	 * Open the window.
 	 */
-	public void open(MenuConstructor menuConstructor)
-	{
-		createContents(menuConstructor);
-		
-		shell.open();
-		shell.layout();
-	}
+
+
 
 	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
@@ -101,10 +96,11 @@ public class ImageViewWindow extends ViewWindowBase
 	 * 
 	 * @wbp.parser.entryPoint
 	 */
-	protected void createContents(MenuConstructor menuConstructor)
+	@Override
+	protected void createContents()
 	{
-		shell = new Shell();
-		shell.addShellListener(new ShellListener()
+		super.createContents();
+		getShell().addShellListener(new ShellListener()
 		{
 			
 			@Override
@@ -138,7 +134,7 @@ public class ImageViewWindow extends ViewWindowBase
 			}
 		});
 		
-		shell.addDisposeListener(new DisposeListener() {
+		getShell().addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
 				ImageViewWindow.this.menuConstructor.removeWindow(ImageViewWindow.this);
 				Image oldImage = imageView.getImage();
@@ -149,21 +145,20 @@ public class ImageViewWindow extends ViewWindowBase
 			}
 		});
 		
-		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		shell.setMinimumSize(new Point(150, 200));
-		shell.setImage(SWTResourceManager.getImage(ImageViewWindow.class,
+		getShell().setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		getShell().setMinimumSize(new Point(150, 200));
+		getShell().setImage(SWTResourceManager.getImage(ImageViewWindow.class,
 				"/crossbase/icon.png"));
 	
-		shell.setText(Application.APP_NAME);
-		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
+		getShell().setText(Application.APP_NAME);
+		getShell().setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		Menu menu = new Menu(shell, SWT.BAR);
-		shell.setMenuBar(menu);
+		Menu menu = new Menu(getShell(), SWT.BAR);
+		getShell().setMenuBar(menu);
 
-		this.menuConstructor = menuConstructor;
 		menuConstructor.addWindow(this);
 		
-		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledComposite = new ScrolledComposite(getShell(), SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
@@ -191,24 +186,24 @@ public class ImageViewWindow extends ViewWindowBase
 			Image oldImage = imageView.getImage();
 			imageView.setImage(loadImage(fileName));
 			this.fileName = fileName;
-			shell.setText(fileName + " \u2013 " + Application.APP_NAME);
+			getShell().setText(fileName + " \u2013 " + Application.APP_NAME);
 			imageView.setSize(imageView.getImage().getImageData().width, imageView.getImage().getImageData().height);
 			imageView.setVisible(true);
 			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			shell.forceActive();
+			getShell().forceActive();
 			if (oldImage != null) oldImage.dispose();
 			menuConstructor.updateMenus();
 		}
 		catch (IOException e)
 		{
-			MessageBox cantOpenFileMessageBox = new MessageBox(shell, SWT.ICON_ERROR);
+			MessageBox cantOpenFileMessageBox = new MessageBox(getShell(), SWT.ICON_ERROR);
 			cantOpenFileMessageBox.setMessage("Can't open file: " + fileName);
 			cantOpenFileMessageBox.setText("Error");
 			cantOpenFileMessageBox.open();
 		}
 		catch (SWTException e)
 		{
-			MessageBox cantOpenFileMessageBox = new MessageBox(shell, SWT.ICON_ERROR);
+			MessageBox cantOpenFileMessageBox = new MessageBox(getShell(), SWT.ICON_ERROR);
 			cantOpenFileMessageBox.setMessage("Incorrect image format: " + fileName);
 			cantOpenFileMessageBox.setText("Error");
 			cantOpenFileMessageBox.open();			
@@ -223,13 +218,7 @@ public class ImageViewWindow extends ViewWindowBase
 	
 	public boolean isDisposed()
 	{
-		return shell.isDisposed();
-	}
-
-	@Override
-	public Shell getShell()
-	{
-		return shell;
+		return getShell().isDisposed();
 	}
 
 	@Override
@@ -243,4 +232,14 @@ public class ImageViewWindow extends ViewWindowBase
 	{
 		return true;
 	}
+	
+	public MenuConstructor getMenuConstructor() {
+		return menuConstructor;
+	}
+
+	public void setMenuConstructor(MenuConstructor menuConstructor) {
+		this.menuConstructor = menuConstructor;
+	}
+
+	
 }

@@ -57,7 +57,8 @@ public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow
 	public ImageViewWindow create()
 	{
 		ImageViewWindow vw = new ImageViewWindow();
-		vw.open(menuConstructor);
+		vw.setMenuConstructor(menuConstructor);
+		vw.open();
 		vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
 	}

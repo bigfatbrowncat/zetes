@@ -195,7 +195,7 @@ public class MenuConstructorBase implements MenuConstructor
 				}
 			}
 		});
-		maximizeMenuItem.setText("Maximize");
+		maximizeMenuItem.setText("Zoom");
 
 		// "Fullscreen" menu item
 		final MenuItem fullscreenMenuItem = new MenuItem(windowMenu, SWT.NONE);

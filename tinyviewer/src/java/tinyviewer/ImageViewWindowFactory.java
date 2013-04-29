@@ -10,57 +10,30 @@ import crossbase.ui.abstracts.ViewWindowFactory;
 
 public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow>
 {
-	private MenuConstructor menuConstructor;
-	private ViewWindowsManager<ImageViewWindow> imageViewWindowsManager;
-	
-	private DropTargetAdapter viewWindowDropTargetAdapter = new DropTargetAdapter()
-	{
-		public void drop(DropTargetEvent event) {
-			String fileList[] = null;
-			FileTransfer ft = FileTransfer.getInstance();
-			if (ft.isSupportedType(event.currentDataType)) {
-				fileList = (String[]) event.data;
-				for (int i = 0; i < fileList.length; i++)
-				{
-					imageViewWindowsManager.openFile(fileList[i]);
-				}
-			}
-		}
-	};
+	private DropTargetAdapter viewWindowDropTargetAdapter;
 	
 	public ImageViewWindowFactory()
 	{
 	}
 	
-	public MenuConstructor getMenuConstructor()
-	{
-		return menuConstructor;
-	}
-
-	public void setMenuConstructor(MenuConstructor menuConstructor)
-	{
-		this.menuConstructor = menuConstructor;
-	}
-
-	public ViewWindowsManager<ImageViewWindow> getImageViewWindowsManager()
-	{
-		return imageViewWindowsManager;
-	}
-
-	public void setImageViewWindowsManager(
-			ViewWindowsManager<ImageViewWindow> imageViewWindowsManager)
-	{
-		this.imageViewWindowsManager = imageViewWindowsManager;
-	}
-
 	@Override
 	public ImageViewWindow create()
 	{
 		ImageViewWindow vw = new ImageViewWindow();
-		vw.setMenuConstructor(menuConstructor);
-		vw.open();
-		vw.addDropTargetListener(viewWindowDropTargetAdapter);
+		//vw.open();
+		//vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
+	}
+
+	public DropTargetAdapter getViewWindowDropTargetAdapter()
+	{
+		return viewWindowDropTargetAdapter;
+	}
+
+	public void setViewWindowDropTargetAdapter(
+			DropTargetAdapter viewWindowDropTargetAdapter)
+	{
+		this.viewWindowDropTargetAdapter = viewWindowDropTargetAdapter;
 	}
 	
 	

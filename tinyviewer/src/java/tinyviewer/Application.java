@@ -1,6 +1,12 @@
 package tinyviewer;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -28,42 +34,75 @@ public class Application extends ApplicationBase
 			if (firstFile != null)
 			{
 				String[] names = fileDialog.getFileNames();
-				String[] fullNames = new String[names.length];
+				ArrayList<ImageDocument> documents = new ArrayList<ImageDocument>();
 				
+				// Creating documents for files
 				for (int i = 0; i < names.length; i++)
 				{
-					fullNames[i] = fileDialog.getFilterPath() + "/" + names[i];
+					String fileName = fileDialog.getFilterPath() + "/" + names[i];
+					try
+					{
+						documents.add(new ImageDocument(fileName));
+					}
+					catch (IOException e)
+					{
+						// TODO Show a message box here
+						e.printStackTrace();
+					}
 				}
 				
-				getDocumentWindowsManager().openFiles(fullNames);
+				getDocumentWindowsManager().openViewForDocuments(documents.toArray(new ImageDocument[] {}));
 			}
 			dummyShell.dispose();
 		}
 	};
-	
-	@Override
-	public void run(String[] arguments)
-	{
-		TinyViewerAboutBoxFactory tinyViewAboutBoxFactory = new TinyViewerAboutBoxFactory();
-		setAboutBoxFactory(tinyViewAboutBoxFactory);
 		
-		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
-		menuConstructor.setOpenSelectionAdapter(fileOpenSelectionAdapter);
+	private DropTargetAdapter viewWindowDropTargetAdapter = new DropTargetAdapter()
+	{
+		public void drop(DropTargetEvent event) {
+			String fileList[] = null;
+			FileTransfer ft = FileTransfer.getInstance();
+			if (ft.isSupportedType(event.currentDataType)) {
+				fileList = (String[]) event.data;
+				for (int i = 0; i < fileList.length; i++)
+				{
+					ImageDocument document;
+					try
+					{
+						document = new ImageDocument(fileList[i]);
+						getDocumentWindowsManager().openViewForDocument(document);
+					}
+					catch (IOException e)
+					{
+						// TODO Show a message box here
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	};
+		
+		
+	public Application()
+	{
+		// About box factory
+		setAboutBoxFactory(new TinyViewerAboutBoxFactory());
 
+		// Menu constructor
+		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
+		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);
 		setMenuConstructor(menuConstructor);
 
-		ViewWindowsManager<ImageViewWindow> imageViewWindowsManager = new ViewWindowsManager<ImageViewWindow>();
+		// View window factory construction
 		ImageViewWindowFactory imageViewWindowFactory = new ImageViewWindowFactory();
+		imageViewWindowFactory.setViewWindowDropTargetAdapter(viewWindowDropTargetAdapter);
 		
+		// Image view windows manager
+		ViewWindowsManager<ImageViewWindow> imageViewWindowsManager;
+		imageViewWindowsManager = new ViewWindowsManager<ImageViewWindow>();
 		imageViewWindowsManager.setViewWindowFactory(imageViewWindowFactory);
-		imageViewWindowFactory.setImageViewWindowsManager(imageViewWindowsManager);
-		imageViewWindowFactory.setMenuConstructor(menuConstructor);
-		
+		imageViewWindowsManager.setMenuConstructor(menuConstructor);
 		setDocumentWindowsManager(imageViewWindowsManager);
-		
-		menuConstructor.updateMenus();
-		
-		super.run(arguments);
 	}
 	
 	public static void main(String... args)

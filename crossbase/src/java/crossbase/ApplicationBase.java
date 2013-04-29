@@ -14,6 +14,8 @@ import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 import crossbase.ui.abstracts.AboutBoxFactory;
+import crossbase.ui.abstracts.Document;
+import crossbase.ui.abstracts.DocumentFactory;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 
@@ -24,6 +26,7 @@ public class ApplicationBase
 	
 	private AboutBox aboutBox = null;
 	private AboutBoxFactory<? extends AboutBox> aboutBoxFactory;
+	private DocumentFactory<? extends Document> documentFactory;
 
 	private MenuConstructorBase menuConstructor;
 	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
@@ -66,7 +69,11 @@ public class ApplicationBase
 		@Override
 		public void handleEvent(Event arg0) {
 			String fileName = arg0.text;
-			documentWindowsManager.openFile(fileName);
+			Document loadedDoc = documentFactory.createFromFile(fileName);
+			if (loadedDoc != null)
+			{
+				documentWindowsManager.openViewForDocument(loadedDoc);
+			}
 		}
 	};
 	
@@ -135,6 +142,7 @@ public class ApplicationBase
 	
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
+			menuConstructor.updateMenus();
 			
 			if (SWT.getPlatform().equals("cocoa"))
 			{
@@ -209,5 +217,13 @@ public class ApplicationBase
 	public void setAboutBoxFactory(AboutBoxFactory<? extends AboutBox> aboutBoxFactory)
 	{
 		this.aboutBoxFactory = aboutBoxFactory;
+	}
+
+	public DocumentFactory<? extends Document> getDocumentFactory() {
+		return documentFactory;
+	}
+
+	public void setDocumentFactory(DocumentFactory<? extends Document> documentFactory) {
+		this.documentFactory = documentFactory;
 	}
 }

@@ -31,45 +31,18 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import crossbase.ui.ViewWindowBase;
+import crossbase.ui.abstracts.Document;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 import crossbase.ui.abstracts.ViewWindowClosedListener;
 
 public class ImageViewWindow extends ViewWindowBase
 {
-	private String fileName = null;
 	private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
 	private DropTarget imageContainerDropTarget, imageViewDropTarget;
-	private ViewWindowClosedListener<ImageViewWindow> closedListener;
 	private ImageView imageView;
-	private MenuConstructor menuConstructor;
-	
-
-	protected static Image loadImage(InputStream stream) throws IOException {
-		try {
-			Display display = Display.getDefault();
-			ImageData data = new ImageData(stream);
-			if (data.transparentPixel > 0) {
-				return new Image(display, data, data.getTransparencyMask());
-			}
-			return new Image(display, data);
-		} finally {
-			stream.close();
-		}
-	}
-	
-	protected static Image loadImage(String fileName) throws IOException
-	{
-		return loadImage(new FileInputStream(fileName));
-	}
-	
-	
-	/**
-	 * Open the window.
-	 */
-
-
+	private ImageDocument imageDocument;
 
 	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
@@ -84,13 +57,6 @@ public class ImageViewWindow extends ViewWindowBase
 	}
 	
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public void setClosedListener(ViewWindowClosedListener<? extends ViewWindow> documentWindowClosedListener)
-	{
-		this.closedListener = (ViewWindowClosedListener<ImageViewWindow>)documentWindowClosedListener;		
-	}
-
 	/**
 	 * Create contents of the window.
 	 * 
@@ -100,50 +66,6 @@ public class ImageViewWindow extends ViewWindowBase
 	protected void createContents()
 	{
 		super.createContents();
-		getShell().addShellListener(new ShellListener()
-		{
-			
-			@Override
-			public void shellIconified(ShellEvent arg0)
-			{
-				ImageViewWindow.this.menuConstructor.updateMenus();
-			}
-			
-			@Override
-			public void shellDeiconified(ShellEvent arg0)
-			{
-				ImageViewWindow.this.menuConstructor.updateMenus();
-			}
-			
-			@Override
-			public void shellDeactivated(ShellEvent arg0)
-			{
-				ImageViewWindow.this.menuConstructor.updateMenus();
-			}
-			
-			@Override
-			public void shellClosed(ShellEvent arg0)
-			{
-				if (closedListener != null) closedListener.windowClosed(ImageViewWindow.this);
-			}
-			
-			@Override
-			public void shellActivated(ShellEvent arg0)
-			{
-				ImageViewWindow.this.menuConstructor.updateMenus();
-			}
-		});
-		
-		getShell().addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent arg0) {
-				ImageViewWindow.this.menuConstructor.removeWindow(ImageViewWindow.this);
-				Image oldImage = imageView.getImage();
-				if (oldImage != null) 
-				{
-					oldImage.dispose();
-				}
-			}
-		});
 		
 		getShell().setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		getShell().setMinimumSize(new Point(150, 200));
@@ -153,11 +75,6 @@ public class ImageViewWindow extends ViewWindowBase
 		getShell().setText(Application.APP_NAME);
 		getShell().setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		Menu menu = new Menu(getShell(), SWT.BAR);
-		getShell().setMenuBar(menu);
-
-		menuConstructor.addWindow(this);
-		
 		scrolledComposite = new ScrolledComposite(getShell(), SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
@@ -179,39 +96,21 @@ public class ImageViewWindow extends ViewWindowBase
 	}
 
 	@Override
-	public void loadFile(String fileName)
+	public void loadDocument(Document document)
 	{
-		try
-		{
-			Image oldImage = imageView.getImage();
-			imageView.setImage(loadImage(fileName));
-			this.fileName = fileName;
-			getShell().setText(fileName + " \u2013 " + Application.APP_NAME);
-			imageView.setSize(imageView.getImage().getImageData().width, imageView.getImage().getImageData().height);
-			imageView.setVisible(true);
-			scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			getShell().forceActive();
-			if (oldImage != null) oldImage.dispose();
-			menuConstructor.updateMenus();
-		}
-		catch (IOException e)
-		{
-			MessageBox cantOpenFileMessageBox = new MessageBox(getShell(), SWT.ICON_ERROR);
-			cantOpenFileMessageBox.setMessage("Can't open file: " + fileName);
-			cantOpenFileMessageBox.setText("Error");
-			cantOpenFileMessageBox.open();
-		}
-		catch (SWTException e)
-		{
-			MessageBox cantOpenFileMessageBox = new MessageBox(getShell(), SWT.ICON_ERROR);
-			cantOpenFileMessageBox.setMessage("Incorrect image format: " + fileName);
-			cantOpenFileMessageBox.setText("Error");
-			cantOpenFileMessageBox.open();			
-		}
+		this.imageDocument = (ImageDocument)document;
+		
+		imageView.setImage(imageDocument.getImage());
+		getShell().setText(imageDocument.getTitle() + " \u2013 " + Application.APP_NAME);
+		imageView.setSize(imageView.getImage().getImageData().width, imageView.getImage().getImageData().height);
+		imageView.setVisible(true);
+		scrolledComposite.setMinSize(imageContainerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		getShell().forceActive();
+		getMenuConstructor().updateMenus();
 	}
 	
 	@Override
-	public boolean isOccupied()
+	public boolean documentIsLoaded()
 	{
 		return imageView.getImage() != null;
 	}
@@ -222,9 +121,9 @@ public class ImageViewWindow extends ViewWindowBase
 	}
 
 	@Override
-	public String getDocumentTitle()
+	public ImageDocument getDocument()
 	{
-		return fileName;
+		return imageDocument;
 	}
 
 	@Override
@@ -232,14 +131,4 @@ public class ImageViewWindow extends ViewWindowBase
 	{
 		return true;
 	}
-	
-	public MenuConstructor getMenuConstructor() {
-		return menuConstructor;
-	}
-
-	public void setMenuConstructor(MenuConstructor menuConstructor) {
-		this.menuConstructor = menuConstructor;
-	}
-
-	
 }

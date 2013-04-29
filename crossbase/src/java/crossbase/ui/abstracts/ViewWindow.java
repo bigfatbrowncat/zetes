@@ -5,13 +5,16 @@ import org.eclipse.swt.widgets.Shell;
 
 public interface ViewWindow
 {
-	boolean isOccupied();
-	void loadFile(String fileName);
+	boolean documentIsLoaded();
+	void loadDocument(Document document);
 	
 	Shell getShell();
-	String getDocumentTitle();
+	Document getDocument();
 	
-	void setClosedListener(ViewWindowClosedListener<? extends ViewWindow> documentWindowClosedListener);
+	void setClosedListener(ViewWindowClosedListener documentWindowClosedListener);
+	void setMenuConstructor(MenuConstructor menuConstructor);
+	
+	void open();
 	
 	boolean supportsFullscreen();
 }

@@ -231,7 +231,7 @@ public class MenuConstructorBase implements MenuConstructor
 		boolean anyWindowsToAdd = false;
 		for (ViewWindow viewWindow : viewWindows)
 		{
-			if (viewWindow.getDocumentTitle() != null)
+			if (viewWindow.getDocument() != null)
 			{
 				anyWindowsToAdd = true;
 				break;
@@ -246,7 +246,7 @@ public class MenuConstructorBase implements MenuConstructor
 		char hotKey = '1';
 		for (ViewWindow viewWindow : viewWindows)
 		{
-			if (viewWindow.getDocumentTitle() != null)
+			if (viewWindow.getDocument() != null)
 			{
 				// An item for the window
 				MenuItem windowItemMenuItem = new MenuItem(windowMenu, SWT.RADIO);
@@ -256,13 +256,13 @@ public class MenuConstructorBase implements MenuConstructor
 				{
 					// Cmd+1, Cmd+2, ..., Cmd+9
 					windowItemMenuItem.setAccelerator(windowHotKey.toAccelerator());
-					windowItemMenuItem.setText(viewWindow.getDocumentTitle() + "\t" + windowHotKey.toString());
+					windowItemMenuItem.setText(viewWindow.getDocument().getTitle() + "\t" + windowHotKey.toString());
 					hotKey ++;
 				}
 				else
 				{
 					// No hotkey
-					windowItemMenuItem.setText(viewWindow.getDocumentTitle());
+					windowItemMenuItem.setText(viewWindow.getDocument().getTitle());
 				}
 
 				windowItemMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());

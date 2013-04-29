@@ -5,32 +5,33 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.HotKey;
+import crossbase.ui.MenuConstructorBase;
 
 public class TinyViewerMenuConstructor extends MenuConstructorBase
 {
-	private SelectionAdapter openSelectionAdapter;
-	
+	private SelectionAdapter fileOpenSelectionAdapter;
+		
 	@Override
 	protected void appendCustomFileMenuItems(Menu fileMenu)
 	{
 		// "Open" menu item
 		MenuItem openMenuItem = new MenuItem(fileMenu, SWT.NONE);
-		openMenuItem.addSelectionListener(openSelectionAdapter);
+		openMenuItem.addSelectionListener(fileOpenSelectionAdapter);
 		
 		HotKey openHotKey = new HotKey(HotKey.MOD1, 'O');
 		openMenuItem.setText("&Open...\t" + openHotKey.toString());
 		openMenuItem.setAccelerator(openHotKey.toAccelerator());
 	}
-	
-	public SelectionAdapter getOpenSelectionAdapter()
+
+	public SelectionAdapter getFileOpenSelectionAdapter()
 	{
-		return openSelectionAdapter;
+		return fileOpenSelectionAdapter;
 	}
 
-	public void setOpenSelectionAdapter(SelectionAdapter openSelectionAdapter)
+	public void setFileOpenSelectionAdapter(SelectionAdapter fileOpenSelectionAdapter)
 	{
-		this.openSelectionAdapter = openSelectionAdapter;
+		this.fileOpenSelectionAdapter = fileOpenSelectionAdapter;
 	}
+
 }

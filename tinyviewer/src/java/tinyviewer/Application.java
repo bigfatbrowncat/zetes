@@ -88,6 +88,9 @@ public class Application extends ApplicationBase
 		// About box factory
 		setAboutBoxFactory(new TinyViewerAboutBoxFactory());
 
+		// Document factory
+		setDocumentFactory(new ImageDocumentFactory());
+
 		// Menu constructor
 		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
 		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);

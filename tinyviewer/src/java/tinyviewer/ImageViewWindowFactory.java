@@ -1,11 +1,6 @@
 package tinyviewer;
 
 import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-
-import crossbase.ui.ViewWindowsManager;
-import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindowFactory;
 
 public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow>
@@ -20,8 +15,7 @@ public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow
 	public ImageViewWindow create()
 	{
 		ImageViewWindow vw = new ImageViewWindow();
-		//vw.open();
-		//vw.addDropTargetListener(viewWindowDropTargetAdapter);
+		vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
 	}
 

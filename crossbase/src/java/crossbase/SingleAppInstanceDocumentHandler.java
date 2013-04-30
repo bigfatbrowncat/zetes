@@ -75,9 +75,16 @@ public class SingleAppInstanceDocumentHandler
 								@Override
 								public void run()
 								{
-									Event evt = new Event();
-									evt.text = fileName;
-									fileHandler.handleEvent(evt);
+									try
+									{
+										Event evt = new Event();
+										evt.text = fileName;
+										fileHandler.handleEvent(evt);
+									}
+									catch (Exception e)
+									{
+										e.printStackTrace();
+									}
 								}
 							});
 						}

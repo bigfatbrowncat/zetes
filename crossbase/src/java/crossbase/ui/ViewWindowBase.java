@@ -10,6 +10,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
@@ -29,7 +30,7 @@ public abstract class ViewWindowBase implements ViewWindow
 		try
 		{
 			Field field = Control.class.getDeclaredField("view");
-			Object /*NSView*/ view = field.get(getShell());
+			Object /*NSView*/ view = field.get(shell);
 	
 			if (view != null)
 			{
@@ -48,56 +49,112 @@ public abstract class ViewWindowBase implements ViewWindow
 		}
 	}
 	
-	public ViewWindowBase()
-	{
-
-	}
-	
-	@Override
-	public Shell getShell()
+	protected final Shell getShell()
 	{
 		return shell;
 	}
 	
-	@Override
-	public void open()
+	public ViewWindowBase()
 	{
 		createContents();
+	}
+	
+	@Override
+	public final Menu getMenu()
+	{
+		return shell.getMenuBar();
+	}
+	
+	@Override
+	public final void open()
+	{
+		menuConstructor.addWindow(this);		
 		
 		shell.layout();
 		shell.open();
 	}
 	
+	@Override
+	public final boolean isActive()
+	{
+		if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+		{
+			return Display.getCurrent().getActiveShell() == shell;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	@Override
+	public final void activate(boolean force) 
+	{
+		shell.setMinimized(false);
+		if (force)
+		{
+			shell.forceActive();
+		}
+		else
+		{
+			shell.setActive();
+		}
+	}
+	
+	@Override
+	public final void toggleMinimized()
+	{
+		shell.setMinimized(!shell.getMinimized());
+	}
+	
+	@Override
+	public final void toggleMaximized()
+	{
+		if (shell.getFullScreen()) shell.setFullScreen(false);
+		shell.setMaximized(!shell.getMaximized());
+	}
+	
+	@Override
+	public final void toggleFullScreen()
+	{
+		if (shell.getMaximized()) shell.setMaximized(false);
+		shell.setFullScreen(!shell.getFullScreen());
+	}
+	
+	
 	protected void createContents()
 	{
 		shell = new Shell();
-		Menu menu = new Menu(getShell(), SWT.BAR);
-		getShell().setMenuBar(menu);
+		Menu menu = new Menu(shell, SWT.BAR);
+		shell.setMenuBar(menu);
 
 		if (SWT.getPlatform().equals("cocoa"))
 		{
 			setCocoaFullscreenButton(supportsFullscreen());
 		}
 		
-		getShell().addShellListener(new ShellListener()
+		shell.addShellListener(new ShellListener()
 		{
 			
 			@Override
 			public void shellIconified(ShellEvent arg0)
 			{
 				ViewWindowBase.this.menuConstructor.updateMenus();
+				// TODO Add custom event
 			}
 			
 			@Override
 			public void shellDeiconified(ShellEvent arg0)
 			{
 				ViewWindowBase.this.menuConstructor.updateMenus();
+				// TODO Add custom event
 			}
 			
 			@Override
 			public void shellDeactivated(ShellEvent arg0)
 			{
 				ViewWindowBase.this.menuConstructor.updateMenus();
+				// TODO Add custom event
 			}
 			
 			@Override
@@ -110,10 +167,11 @@ public abstract class ViewWindowBase implements ViewWindow
 			public void shellActivated(ShellEvent arg0)
 			{
 				ViewWindowBase.this.menuConstructor.updateMenus();
+				// TODO Add custom event
 			}
 		});
 		
-		getShell().addDisposeListener(new DisposeListener()
+		shell.addDisposeListener(new DisposeListener()
 		{
 			public void widgetDisposed(DisposeEvent arg0)
 			{
@@ -126,27 +184,26 @@ public abstract class ViewWindowBase implements ViewWindow
 				}
 			}
 		});
-		menuConstructor.addWindow(this);		
 	}
 
-	public ViewWindowClosedListener getClosedListener()
+	public final ViewWindowClosedListener getClosedListener()
 	{
 		return closedListener;
 	}
 
 	@Override
-	public void setClosedListener(ViewWindowClosedListener closedListener)
+	public final void setClosedListener(ViewWindowClosedListener closedListener)
 	{
 		this.closedListener = closedListener;
 	}
 	
-	public MenuConstructor getMenuConstructor()
+	public final MenuConstructor getMenuConstructor()
 	{
 		return menuConstructor;
 	}
 
 	@Override
-	public void setMenuConstructor(MenuConstructor menuConstructor)
+	public final void setMenuConstructor(MenuConstructor menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
 	}

@@ -28,16 +28,13 @@ public class MenuConstructorBase implements MenuConstructor
 	
 	protected ViewWindow getActiveViewWindow()
 	{
-		if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+		for (ViewWindow viewWindow : viewWindows)
 		{
-			for (ViewWindow viewWindow : viewWindows)
+			if (viewWindow.isActive())
 			{
-				if (Display.getCurrent().getActiveShell() == viewWindow.getShell())
-				{
-					return viewWindow;
-				}
-			}			
-		}
+				return viewWindow;
+			}
+		}			
 		return null;
 	}
 	
@@ -171,8 +168,7 @@ public class MenuConstructorBase implements MenuConstructor
 			{
 				if (getActiveViewWindow() != null)
 				{
-					Shell activeShell = getActiveViewWindow().getShell();
-					activeShell.setMinimized(!activeShell.getMinimized());
+					getActiveViewWindow().toggleMinimized();
 				}
 			}
 		});
@@ -189,9 +185,7 @@ public class MenuConstructorBase implements MenuConstructor
 			{
 				if (getActiveViewWindow() != null)
 				{
-					Shell activeShell = getActiveViewWindow().getShell();
-					if (activeShell.getFullScreen()) activeShell.setFullScreen(false);
-					activeShell.setMaximized(!activeShell.getMaximized());
+					getActiveViewWindow().toggleMaximized();
 				}
 			}
 		});
@@ -206,9 +200,7 @@ public class MenuConstructorBase implements MenuConstructor
 			{
 				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
 				{
-					Shell activeShell = Display.getCurrent().getActiveShell();
-					if (activeShell.getMaximized()) activeShell.setMaximized(false);
-					activeShell.setFullScreen(!activeShell.getFullScreen());
+					getActiveViewWindow().toggleFullScreen();
 				}
 			}
 		});
@@ -265,15 +257,14 @@ public class MenuConstructorBase implements MenuConstructor
 					windowItemMenuItem.setText(viewWindow.getDocument().getTitle());
 				}
 
-				windowItemMenuItem.setSelection(Display.getDefault().getActiveShell() == viewWindow.getShell());
+				windowItemMenuItem.setSelection(viewWindow.isActive());
 				windowItemMenuItem.addSelectionListener(new SelectionAdapter()
 				{
 					@Override
 					public void widgetSelected(SelectionEvent arg0)
 					{
 						ViewWindow targetWindow = (ViewWindow)arg0.widget.getData();
-						targetWindow.getShell().setMinimized(false);
-						targetWindow.getShell().setActive();
+						targetWindow.activate(false);
 					}
 				});
 			}
@@ -407,7 +398,7 @@ public class MenuConstructorBase implements MenuConstructor
 
 	protected void addMenusToWindow(ViewWindow viewWindow)
 	{
-		Menu menu = viewWindow.getShell().getMenuBar();
+		Menu menu = viewWindow.getMenu();
 		addShellMenu(viewWindow, createAndAppendFileMenu(menu));
 		MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu);
 		if (windowsMenuItem != null)

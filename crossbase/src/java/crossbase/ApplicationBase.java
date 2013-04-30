@@ -67,7 +67,8 @@ public class ApplicationBase
 	{
 		
 		@Override
-		public void handleEvent(Event arg0) {
+		public void handleEvent(final Event arg0)
+		{
 			String fileName = arg0.text;
 			Document loadedDoc = documentFactory.createFromFile(fileName);
 			if (loadedDoc != null)

@@ -2,8 +2,6 @@ package crossbase.ui.abstracts;
 
 public interface DocumentFactory<T extends Document>
 {
-	T createNew();
-	
 	/**
 	 * This function creates a document object from a file.
 	 * @param fileName The name of the file to create a document object from

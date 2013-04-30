@@ -1,6 +1,6 @@
 package crossbase.ui.abstracts;
 
-public interface DocumentFactory<T extends Document>
+public interface DocumentLoader<T extends Document>
 {
 	/**
 	 * This function creates a document object from a file.
@@ -9,5 +9,5 @@ public interface DocumentFactory<T extends Document>
 	 * It can be null if the object can't be created from that particular file or 
 	 * if it can't be created from a file at all. 
 	 */
-	T createFromFile(String fileName);
+	T loadFromFile(String fileName);
 }

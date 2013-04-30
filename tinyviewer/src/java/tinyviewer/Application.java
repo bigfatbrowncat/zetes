@@ -89,7 +89,7 @@ public class Application extends ApplicationBase
 		setAboutBoxFactory(new TinyViewerAboutBoxFactory());
 
 		// Document factory
-		setDocumentFactory(new ImageDocumentFactory());
+		setDocumentLoader(new ImageDocumentLoader());
 
 		// Menu constructor
 		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();

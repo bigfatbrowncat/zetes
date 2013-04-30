@@ -2,12 +2,12 @@ package tinyviewer;
 
 import java.io.IOException;
 
-import crossbase.ui.abstracts.DocumentFactory;
+import crossbase.ui.abstracts.DocumentLoader;
 
-public class ImageDocumentFactory implements DocumentFactory<ImageDocument>
+public class ImageDocumentLoader implements DocumentLoader<ImageDocument>
 {
 	@Override
-	public ImageDocument createFromFile(String fileName)
+	public ImageDocument loadFromFile(String fileName)
 	{
 		try
 		{

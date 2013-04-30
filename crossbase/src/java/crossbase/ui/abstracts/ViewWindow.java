@@ -17,7 +17,15 @@ public interface ViewWindow
 	void toggleMaximized();
 	void toggleFullScreen();
 	
-	void setClosedListener(ViewWindowClosedListener documentWindowClosedListener);
+	void addClosedListener(ViewWindowClosedListener viewWindowClosedListener);
+	void removeClosedListener(ViewWindowClosedListener viewWindowClosedListener);
+
+	void addMinimizedListener(ViewWindowMinimizedListener viewWindowMinimizedListener);
+	void removeMinimizedListener(ViewWindowMinimizedListener viewWindowMinimizedListener);
+	
+	void addMaximizedListener(ViewWindowMaximizedListener viewWindowMaximizedListener);
+	void removeMaximizedListener(ViewWindowMaximizedListener viewWindowMaximizedListener);
+
 	void setMenuConstructor(MenuConstructor menuConstructor);
 	
 	void open();

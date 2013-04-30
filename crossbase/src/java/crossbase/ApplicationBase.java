@@ -15,7 +15,7 @@ import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 import crossbase.ui.abstracts.AboutBoxFactory;
 import crossbase.ui.abstracts.Document;
-import crossbase.ui.abstracts.DocumentFactory;
+import crossbase.ui.abstracts.DocumentLoader;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 
@@ -26,7 +26,7 @@ public class ApplicationBase
 	
 	private AboutBox aboutBox = null;
 	private AboutBoxFactory<? extends AboutBox> aboutBoxFactory;
-	private DocumentFactory<? extends Document> documentFactory;
+	private DocumentLoader<? extends Document> documentLoader;
 
 	private MenuConstructorBase menuConstructor;
 	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
@@ -60,7 +60,7 @@ public class ApplicationBase
 	
 	protected void showPreferences()
 	{
-		
+		// TODO Implement a default preferences window
 	}
 	
 	private Listener openDocumentListener = new Listener()
@@ -69,11 +69,15 @@ public class ApplicationBase
 		@Override
 		public void handleEvent(final Event arg0)
 		{
-			String fileName = arg0.text;
-			Document loadedDoc = documentFactory.createFromFile(fileName);
-			if (loadedDoc != null)
+			// If we have a document loader, we will use it. If we don't, that means document loading is unsupported
+			if (documentLoader != null)
 			{
-				documentWindowsManager.openViewForDocument(loadedDoc);
+				String fileName = arg0.text;
+				Document loadedDoc = documentLoader.loadFromFile(fileName);
+				if (loadedDoc != null)
+				{
+					documentWindowsManager.openViewForDocument(loadedDoc);
+				}
 			}
 		}
 	};
@@ -185,8 +189,6 @@ public class ApplicationBase
 			{
 				if (mdiHelper != null) mdiHelper.stop();
 			}
-	
-			System.out.print("Bye!\n");
 		}		
 	}
 	
@@ -220,11 +222,13 @@ public class ApplicationBase
 		this.aboutBoxFactory = aboutBoxFactory;
 	}
 
-	public DocumentFactory<? extends Document> getDocumentFactory() {
-		return documentFactory;
+	public DocumentLoader<? extends Document> getDocumentLoader()
+	{
+		return documentLoader;
 	}
 
-	public void setDocumentFactory(DocumentFactory<? extends Document> documentFactory) {
-		this.documentFactory = documentFactory;
+	public void setDocumentLoader(DocumentLoader<? extends Document> documentLoader)
+	{
+		this.documentLoader = documentLoader;
 	}
 }

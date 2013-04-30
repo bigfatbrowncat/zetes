@@ -24,6 +24,7 @@ public class ViewWindowsManager<T extends ViewWindow>
 		public void windowClosed(ViewWindow viewWindow)
 		{
 			closeWindow((T)viewWindow);
+			viewWindow.removeClosedListener(viewWindowClosedListener);
 		}
 	};
 
@@ -46,7 +47,7 @@ public class ViewWindowsManager<T extends ViewWindow>
 	}
 	
 	/**
-	 * Closes every window. After all windows are closed 
+	 * Closes every window. After all windows are closed,
 	 * if we are not in OS X, terminates the application.
 	 * @param viewWindow The window to close
 	 */
@@ -68,7 +69,7 @@ public class ViewWindowsManager<T extends ViewWindow>
 	{
 		T newWindow = viewWindowFactory.create();
 		newWindow.setMenuConstructor(menuConstructor);
-		newWindow.setClosedListener(viewWindowClosedListener);
+		newWindow.addClosedListener(viewWindowClosedListener);
 		newWindow.open();
 		
 		if (document != null)
@@ -105,7 +106,7 @@ public class ViewWindowsManager<T extends ViewWindow>
 	
 	public Object[] openViewForDocuments(Document[] documents)
 	{
-		ArrayList<Object> res = new ArrayList<>();
+		ArrayList<Object> res = new ArrayList<Object>();
 		for (int i = 0; i < documents.length; i++)
 		{
 			res.add(openViewForDocument(documents[i]));

@@ -131,7 +131,7 @@ public abstract class ViewWindowBase implements ViewWindow
 	
 	protected void createContents()
 	{
-		shell = new Shell(/*SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.DOUBLE_BUFFERED*/);
+		shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.DOUBLE_BUFFERED);
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 

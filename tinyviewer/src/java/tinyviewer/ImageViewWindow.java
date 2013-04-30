@@ -1,13 +1,6 @@
 package tinyviewer;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
@@ -16,27 +9,12 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import crossbase.ui.ViewWindowBase;
 import crossbase.ui.abstracts.Document;
-import crossbase.ui.abstracts.MenuConstructor;
-import crossbase.ui.abstracts.ViewWindow;
-import crossbase.ui.abstracts.ViewWindowClosedListener;
 
 public class ImageViewWindow extends ViewWindowBase
 {
@@ -87,7 +65,7 @@ public class ImageViewWindow extends ViewWindowBase
 		imageContainerDropTarget = new DropTarget(imageContainerComposite, DND.DROP_MOVE);
 		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });*/
 		
-		imageView = new ImageView(scrolledComposite, SWT.NONE);
+		imageView = new ImageView(scrolledComposite, SWT.NONE | SWT.DOUBLE_BUFFERED);
 		imageView.setBounds(0, 0, 200, 127);
 		imageView.setVisible(false);
 		imageView.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
@@ -97,10 +75,12 @@ public class ImageViewWindow extends ViewWindowBase
 		scrolledComposite.setContent(imageView);
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		scrolledComposite.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		
 		scrolledComposite.addControlListener(new ControlListener()
 		{
 			@Override
-			public void controlResized(ControlEvent arg0) {
+			public void controlResized(ControlEvent arg0)
+			{
 				updateImageViewSize();
 				
 			}

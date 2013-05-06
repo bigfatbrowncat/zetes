@@ -14,16 +14,15 @@ import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 import crossbase.ui.abstracts.AboutBoxFactory;
+import crossbase.ui.abstracts.Application;
 import crossbase.ui.abstracts.Document;
 import crossbase.ui.abstracts.DocumentLoader;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
 
 
-public class ApplicationBase
+public abstract class ApplicationBase implements Application
 {
-	public static final String APP_NAME = "SWT Application";
-	
 	private AboutBox aboutBox = null;
 	private AboutBoxFactory<? extends AboutBox> aboutBoxFactory;
 	private DocumentLoader<? extends Document> documentLoader;
@@ -31,6 +30,8 @@ public class ApplicationBase
 	private MenuConstructorBase menuConstructor;
 	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
 
+	public abstract String getTitle();
+	
 	/**
 	 * Shows the about box. The box shouldn't be opened already. If it is not, it will be
 	 * created using <code>aboutBoxFactory</code>.
@@ -143,7 +144,7 @@ public class ApplicationBase
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		try
 		{
-			Display.setAppName(APP_NAME);
+			Display.setAppName(getTitle());
 	
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
@@ -153,7 +154,7 @@ public class ApplicationBase
 			{
 				// In Cocoa we use a special hook class to handle the default
 				// About, Quit and Preferences items from the system menu.
-				new CocoaUIEnhancer(APP_NAME).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
+				new CocoaUIEnhancer(getTitle()).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
 	
 				// Add listener to OpenDocument event thus user can open documents
 				// with our Cocoa application

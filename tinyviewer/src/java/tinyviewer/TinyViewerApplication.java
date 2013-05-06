@@ -16,9 +16,13 @@ import org.eclipse.swt.widgets.Shell;
 import crossbase.ApplicationBase;
 import crossbase.ui.ViewWindowsManager;
 
-public class Application extends ApplicationBase
+public class TinyViewerApplication extends ApplicationBase
 {
-	public static final String APP_NAME = "Tiny Viewer";
+	@Override
+	public String getTitle()
+	{
+		return "Tiny Viewer";
+	}
 
 	private SelectionAdapter fileOpenSelectionAdapter = new SelectionAdapter()
 	{
@@ -83,10 +87,10 @@ public class Application extends ApplicationBase
 	};
 		
 		
-	public Application()
+	public TinyViewerApplication()
 	{
 		// About box factory
-		setAboutBoxFactory(new TinyViewerAboutBoxFactory());
+		setAboutBoxFactory(new TinyViewerAboutBoxFactory(this));
 
 		// Document factory
 		setDocumentLoader(new ImageDocumentLoader());
@@ -97,7 +101,7 @@ public class Application extends ApplicationBase
 		setMenuConstructor(menuConstructor);
 
 		// View window factory construction
-		ImageViewWindowFactory imageViewWindowFactory = new ImageViewWindowFactory();
+		ImageViewWindowFactory imageViewWindowFactory = new ImageViewWindowFactory(this);
 		imageViewWindowFactory.setViewWindowDropTargetAdapter(viewWindowDropTargetAdapter);
 		
 		// Image view windows manager
@@ -110,6 +114,7 @@ public class Application extends ApplicationBase
 	
 	public static void main(String... args)
 	{
-		new Application().run(args);
+		new TinyViewerApplication().run(args);
 	}
+
 }

@@ -6,15 +6,17 @@ import crossbase.ui.abstracts.ViewWindowFactory;
 public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow>
 {
 	private DropTargetAdapter viewWindowDropTargetAdapter;
+	private TinyViewerApplication application;
 	
-	public ImageViewWindowFactory()
+	public ImageViewWindowFactory(TinyViewerApplication application)
 	{
+		this.application = application;
 	}
 	
 	@Override
 	public ImageViewWindow create()
 	{
-		ImageViewWindow vw = new ImageViewWindow();
+		ImageViewWindow vw = new ImageViewWindow(application);
 		vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
 	}

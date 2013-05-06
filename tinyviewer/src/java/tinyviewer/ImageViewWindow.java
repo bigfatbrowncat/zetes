@@ -1,5 +1,7 @@
 package tinyviewer;
 
+import java.util.HashSet;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
@@ -18,24 +20,37 @@ import crossbase.ui.abstracts.Document;
 
 public class ImageViewWindow extends ViewWindowBase
 {
-	//private Composite imageContainerComposite;
 	private ScrolledComposite scrolledComposite;
-	private DropTarget /*imageContainerDropTarget, */imageViewDropTarget;
+	private DropTarget scrolledCompositeDropTarget, imageViewDropTarget;
 	private ImageView imageView;
 	private ImageDocument imageDocument;
+	private HashSet<DropTargetAdapter> dropTargetAdapters = new HashSet<DropTargetAdapter>();
 
 	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
-		//imageContainerDropTarget.addDropListener(dropTargetAdapter);
-		imageViewDropTarget.addDropListener(dropTargetAdapter);
+		dropTargetAdapters.add(dropTargetAdapter);
+		
+		if (imageViewDropTarget != null && !imageViewDropTarget.isDisposed())
+		{
+			scrolledCompositeDropTarget.addDropListener(dropTargetAdapter);
+			imageViewDropTarget.addDropListener(dropTargetAdapter);
+		}
 	}
 	
 	public void removeDropTargetListener(DropTargetAdapter dropTargetAdapter)
 	{
-		//imageContainerDropTarget.removeDropListener(dropTargetAdapter);
-		imageViewDropTarget.removeDropListener(dropTargetAdapter);
+		dropTargetAdapters.remove(dropTargetAdapter);
+		if (imageViewDropTarget != null && !imageViewDropTarget.isDisposed())
+		{
+			scrolledCompositeDropTarget.removeDropListener(dropTargetAdapter);
+			imageViewDropTarget.removeDropListener(dropTargetAdapter);
+		}
 	}
 	
+	public ImageViewWindow(TinyViewerApplication application)
+	{
+		super(application);
+	}
 	
 	/**
 	 * Create contents of the window.
@@ -43,35 +58,38 @@ public class ImageViewWindow extends ViewWindowBase
 	 * @wbp.parser.entryPoint
 	 */
 	@Override
-	protected void createContents()
+	protected void constructShell()
 	{
-		super.createContents();
+		super.constructShell();
 		
 		getShell().setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		getShell().setMinimumSize(new Point(150, 200));
 		getShell().setImage(SWTResourceManager.getImage(ImageViewWindow.class,
 				"/crossbase/icon.png"));
 	
-		getShell().setText(Application.APP_NAME);
 		getShell().setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		scrolledComposite = new ScrolledComposite(getShell(), SWT.H_SCROLL | SWT.V_SCROLL | SWT.DOUBLE_BUFFERED);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
-		/*imageContainerComposite = new Composite(scrolledComposite, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
-		imageContainerComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		imageContainerComposite.setLayout(null);
-		imageContainerDropTarget = new DropTarget(imageContainerComposite, DND.DROP_MOVE);
-		imageContainerDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });*/
-		
 		imageView = new ImageView(scrolledComposite, SWT.NONE | SWT.DOUBLE_BUFFERED);
 		imageView.setBounds(0, 0, 200, 127);
 		imageView.setVisible(false);
 		imageView.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+
+		// Drop targets
+		scrolledCompositeDropTarget = new DropTarget(scrolledComposite, DND.DROP_MOVE);
+		scrolledCompositeDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
 		imageViewDropTarget = new DropTarget(imageView, DND.DROP_MOVE);
 		imageViewDropTarget.setTransfer(new Transfer[] { FileTransfer.getInstance() });
-
+		
+		for (DropTargetAdapter adapter : dropTargetAdapters)
+		{
+			scrolledCompositeDropTarget.addDropListener(adapter);
+			imageViewDropTarget.addDropListener(adapter);
+		}
+		
 		scrolledComposite.setContent(imageView);
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		scrolledComposite.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
@@ -108,7 +126,7 @@ public class ImageViewWindow extends ViewWindowBase
 		this.imageDocument = (ImageDocument)document;
 		
 		imageView.setImage(imageDocument.getImage());
-		getShell().setText(imageDocument.getTitle() + " \u2013 " + Application.APP_NAME);
+		getShell().setText(imageDocument.getTitle() + " \u2013 " + getApplication().getTitle());
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		updateImageViewSize();
 		imageView.setVisible(true);

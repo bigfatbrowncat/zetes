@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
+import crossbase.ui.abstracts.Application;
 import crossbase.ui.abstracts.Document;
 import crossbase.ui.abstracts.MenuConstructor;
 import crossbase.ui.abstracts.ViewWindow;
@@ -23,6 +24,8 @@ import crossbase.ui.abstracts.ViewWindowMinimizedListener;
 
 public abstract class ViewWindowBase implements ViewWindow
 {
+	private Application application;
+	
 	private Shell shell;
 	private MenuConstructor menuConstructor;
 	
@@ -60,10 +63,9 @@ public abstract class ViewWindowBase implements ViewWindow
 		return shell;
 	}
 	
-	public ViewWindowBase()
+	public ViewWindowBase(Application application)
 	{
-		
-		createContents();
+		this.application = application;
 	}
 	
 	@Override
@@ -75,6 +77,8 @@ public abstract class ViewWindowBase implements ViewWindow
 	@Override
 	public final void open()
 	{
+		constructShell();
+
 		menuConstructor.addWindow(this);		
 		
 		shell.layout();
@@ -129,9 +133,11 @@ public abstract class ViewWindowBase implements ViewWindow
 	}
 	
 	
-	protected void createContents()
+	protected void constructShell()
 	{
 		shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.DOUBLE_BUFFERED);
+		getShell().setText(application.getTitle());
+
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 
@@ -243,5 +249,10 @@ public abstract class ViewWindowBase implements ViewWindow
 	public final void setMenuConstructor(MenuConstructor menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
+	}
+	
+	public Application getApplication()
+	{
+		return application;
 	}
 }

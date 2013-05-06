@@ -100,16 +100,19 @@ public class TinyViewerApplication extends ApplicationBase
 		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);
 		setMenuConstructor(menuConstructor);
 
-		// View window factory construction
-		ImageViewWindowFactory imageViewWindowFactory = new ImageViewWindowFactory(this);
-		imageViewWindowFactory.setViewWindowDropTargetAdapter(viewWindowDropTargetAdapter);
-		
 		// Image view windows manager
 		ViewWindowsManager<ImageViewWindow> imageViewWindowsManager;
 		imageViewWindowsManager = new ViewWindowsManager<ImageViewWindow>();
-		imageViewWindowsManager.setViewWindowFactory(imageViewWindowFactory);
 		imageViewWindowsManager.setMenuConstructor(menuConstructor);
 		setDocumentWindowsManager(imageViewWindowsManager);
+
+		// View window factory construction
+		ImageViewWindowFactory imageViewWindowFactory = new ImageViewWindowFactory(this);
+		imageViewWindowFactory.setViewWindowDropTargetAdapter(viewWindowDropTargetAdapter);
+
+		// Connecting image view windows manager and factory
+		imageViewWindowsManager.setViewWindowFactory(imageViewWindowFactory);
+		imageViewWindowFactory.setViewWindowsManager(imageViewWindowsManager);
 	}
 	
 	public static void main(String... args)

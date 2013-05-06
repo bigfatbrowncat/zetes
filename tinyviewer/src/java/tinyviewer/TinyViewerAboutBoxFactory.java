@@ -3,8 +3,8 @@ package tinyviewer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import crossbase.abstracts.AboutBoxFactory;
 import crossbase.ui.AboutBox;
-import crossbase.ui.abstracts.AboutBoxFactory;
 
 public class TinyViewerAboutBoxFactory implements AboutBoxFactory<AboutBox>
 {

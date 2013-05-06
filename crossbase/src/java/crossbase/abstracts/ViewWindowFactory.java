@@ -1,4 +1,6 @@
-package crossbase.ui.abstracts;
+package crossbase.abstracts;
+
+import crossbase.abstracts.ViewWindow;
 
 
 public interface ViewWindowFactory<T extends ViewWindow>

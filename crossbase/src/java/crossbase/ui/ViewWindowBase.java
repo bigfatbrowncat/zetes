@@ -14,24 +14,18 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
-import crossbase.ui.abstracts.Application;
-import crossbase.ui.abstracts.Document;
-import crossbase.ui.abstracts.MenuConstructor;
-import crossbase.ui.abstracts.ViewWindow;
-import crossbase.ui.abstracts.ViewWindowClosedListener;
-import crossbase.ui.abstracts.ViewWindowMaximizedListener;
-import crossbase.ui.abstracts.ViewWindowMinimizedListener;
+import crossbase.abstracts.Application;
+import crossbase.abstracts.Document;
+import crossbase.abstracts.MenuConstructor;
+import crossbase.abstracts.ViewWindow;
 
 public abstract class ViewWindowBase implements ViewWindow
 {
 	private Application application;
+	private ViewWindowsManager<? extends ViewWindowBase> windowsManager;
 	
 	private Shell shell;
 	private MenuConstructor menuConstructor;
-	
-	private HashSet<ViewWindowClosedListener> closedListeners = new HashSet<ViewWindowClosedListener>();
-	private HashSet<ViewWindowMinimizedListener> minimizedListeners = new HashSet<ViewWindowMinimizedListener>();
-	private HashSet<ViewWindowMaximizedListener> maximizedListeners = new HashSet<ViewWindowMaximizedListener>();
 	
 	@SuppressWarnings("rawtypes")
 	private void setCocoaFullscreenButton(boolean on)
@@ -63,9 +57,10 @@ public abstract class ViewWindowBase implements ViewWindow
 		return shell;
 	}
 	
-	public ViewWindowBase(Application application)
+	public ViewWindowBase(Application application, ViewWindowsManager<? extends ViewWindowBase> windowsManager)
 	{
 		this.application = application;
+		this.windowsManager = windowsManager;
 	}
 	
 	@Override
@@ -180,10 +175,8 @@ public abstract class ViewWindowBase implements ViewWindow
 			@Override
 			public void shellClosed(ShellEvent arg0)
 			{
-				for (ViewWindowClosedListener closedListener : closedListeners)
-				{
-					closedListener.windowClosed(ViewWindowBase.this);
-				}
+				// If we want this to work, we should guarantee that the generic parameter type of windowsManager equals to our type
+				((ViewWindowsManager)windowsManager).closeWindow(ViewWindowBase.this);
 			}
 		});
 		
@@ -191,8 +184,6 @@ public abstract class ViewWindowBase implements ViewWindow
 		{
 			public void widgetDisposed(DisposeEvent arg0)
 			{
-				closedListeners.clear();
-
 				ViewWindowBase.this.menuConstructor.removeWindow(ViewWindowBase.this);
 				
 				Document doc = getDocument();
@@ -204,42 +195,6 @@ public abstract class ViewWindowBase implements ViewWindow
 		});
 	}
 
-	@Override
-	public final void addClosedListener(ViewWindowClosedListener closedListener)
-	{
-		closedListeners.add(closedListener);
-	}
-
-	@Override
-	public final void removeClosedListener(ViewWindowClosedListener closedListener)
-	{
-		closedListeners.remove(closedListener);
-	}
-
-	@Override
-	public final void addMinimizedListener(ViewWindowMinimizedListener minimizedListener)
-	{
-		minimizedListeners.add(minimizedListener);
-	}
-
-	@Override
-	public final void removeMinimizedListener(ViewWindowMinimizedListener minimizedListener)
-	{
-		minimizedListeners.remove(minimizedListener);
-	}
-	
-	@Override
-	public final void addMaximizedListener(ViewWindowMaximizedListener maximizedListener)
-	{
-		maximizedListeners.add(maximizedListener);
-	}
-
-	@Override
-	public final void removeMaximizedListener(ViewWindowMaximizedListener maximizedListener)
-	{
-		maximizedListeners.remove(maximizedListener);
-	}
-		
 	public final MenuConstructor getMenuConstructor()
 	{
 		return menuConstructor;

@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
-import crossbase.ui.abstracts.MenuConstructor;
-import crossbase.ui.abstracts.ViewWindow;
+import crossbase.abstracts.MenuConstructor;
+import crossbase.abstracts.ViewWindow;
 
 public class MenuConstructorBase implements MenuConstructor
 {

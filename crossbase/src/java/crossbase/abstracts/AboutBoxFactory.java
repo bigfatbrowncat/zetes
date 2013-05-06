@@ -1,4 +1,4 @@
-package crossbase.ui.abstracts;
+package crossbase.abstracts;
 
 import org.eclipse.swt.widgets.Shell;
 

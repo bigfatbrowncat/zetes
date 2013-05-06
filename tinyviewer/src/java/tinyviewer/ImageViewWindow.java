@@ -15,8 +15,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import crossbase.abstracts.Document;
 import crossbase.ui.ViewWindowBase;
-import crossbase.ui.abstracts.Document;
+import crossbase.ui.ViewWindowsManager;
 
 public class ImageViewWindow extends ViewWindowBase
 {
@@ -47,9 +48,9 @@ public class ImageViewWindow extends ViewWindowBase
 		}
 	}
 	
-	public ImageViewWindow(TinyViewerApplication application)
+	public ImageViewWindow(TinyViewerApplication application, ViewWindowsManager<ImageViewWindow> windowsManager)
 	{
-		super(application);
+		super(application, windowsManager);
 	}
 	
 	/**

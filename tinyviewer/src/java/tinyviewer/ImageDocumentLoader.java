@@ -2,7 +2,7 @@ package tinyviewer;
 
 import java.io.IOException;
 
-import crossbase.ui.abstracts.DocumentLoader;
+import crossbase.abstracts.DocumentLoader;
 
 public class ImageDocumentLoader implements DocumentLoader<ImageDocument>
 {

@@ -1,4 +1,4 @@
-package crossbase.ui.abstracts;
+package crossbase.abstracts;
 
 public interface Application
 {

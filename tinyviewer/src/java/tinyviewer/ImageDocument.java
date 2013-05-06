@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 
-import crossbase.ui.abstracts.Document;
+import crossbase.abstracts.Document;
 
 public class ImageDocument implements Document
 {

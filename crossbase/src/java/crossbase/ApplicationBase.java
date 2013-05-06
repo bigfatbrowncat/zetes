@@ -9,16 +9,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
+import crossbase.abstracts.AboutBoxFactory;
+import crossbase.abstracts.Application;
+import crossbase.abstracts.Document;
+import crossbase.abstracts.DocumentLoader;
+import crossbase.abstracts.MenuConstructor;
+import crossbase.abstracts.ViewWindow;
 import crossbase.ui.AboutBox;
 import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
-import crossbase.ui.abstracts.AboutBoxFactory;
-import crossbase.ui.abstracts.Application;
-import crossbase.ui.abstracts.Document;
-import crossbase.ui.abstracts.DocumentLoader;
-import crossbase.ui.abstracts.MenuConstructor;
-import crossbase.ui.abstracts.ViewWindow;
 
 
 public abstract class ApplicationBase implements Application

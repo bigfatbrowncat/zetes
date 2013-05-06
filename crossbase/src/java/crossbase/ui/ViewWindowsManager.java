@@ -5,28 +5,16 @@ import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
-import crossbase.ui.abstracts.Document;
-import crossbase.ui.abstracts.MenuConstructor;
-import crossbase.ui.abstracts.ViewWindow;
-import crossbase.ui.abstracts.ViewWindowClosedListener;
-import crossbase.ui.abstracts.ViewWindowFactory;
+import crossbase.abstracts.Document;
+import crossbase.abstracts.MenuConstructor;
+import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowFactory;
 
 public class ViewWindowsManager<T extends ViewWindow>
 {
 	private ArrayList<T> windows = new ArrayList<T>();
 	private ViewWindowFactory<T> viewWindowFactory;
 	private MenuConstructor menuConstructor;
-
-	private ViewWindowClosedListener viewWindowClosedListener = new ViewWindowClosedListener()
-	{
-		@SuppressWarnings("unchecked")
-		@Override
-		public void windowClosed(ViewWindow viewWindow)
-		{
-			closeWindow((T)viewWindow);
-			viewWindow.removeClosedListener(viewWindowClosedListener);
-		}
-	};
 
 	/**
 	 * Closes the window. If no windows remain opened 
@@ -69,7 +57,6 @@ public class ViewWindowsManager<T extends ViewWindow>
 	{
 		T newWindow = viewWindowFactory.create();
 		newWindow.setMenuConstructor(menuConstructor);
-		newWindow.addClosedListener(viewWindowClosedListener);
 		newWindow.open();
 		
 		if (document != null)

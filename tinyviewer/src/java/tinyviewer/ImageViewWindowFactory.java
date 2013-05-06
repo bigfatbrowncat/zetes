@@ -1,12 +1,16 @@
 package tinyviewer;
 
 import org.eclipse.swt.dnd.DropTargetAdapter;
-import crossbase.ui.abstracts.ViewWindowFactory;
+
+import crossbase.abstracts.ViewWindowFactory;
+import crossbase.ui.ViewWindowsManager;
 
 public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow>
 {
-	private DropTargetAdapter viewWindowDropTargetAdapter;
 	private TinyViewerApplication application;
+
+	private DropTargetAdapter viewWindowDropTargetAdapter;
+	private ViewWindowsManager<ImageViewWindow> viewWindowsManager;
 	
 	public ImageViewWindowFactory(TinyViewerApplication application)
 	{
@@ -16,7 +20,7 @@ public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow
 	@Override
 	public ImageViewWindow create()
 	{
-		ImageViewWindow vw = new ImageViewWindow(application);
+		ImageViewWindow vw = new ImageViewWindow(application, viewWindowsManager);
 		vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
 	}
@@ -30,6 +34,16 @@ public class ImageViewWindowFactory implements ViewWindowFactory<ImageViewWindow
 			DropTargetAdapter viewWindowDropTargetAdapter)
 	{
 		this.viewWindowDropTargetAdapter = viewWindowDropTargetAdapter;
+	}
+
+	public ViewWindowsManager<ImageViewWindow> getViewWindowsManager()
+	{
+		return viewWindowsManager;
+	}
+
+	public void setViewWindowsManager(ViewWindowsManager<ImageViewWindow> viewWindowsManager)
+	{
+		this.viewWindowsManager = viewWindowsManager;
 	}
 	
 	

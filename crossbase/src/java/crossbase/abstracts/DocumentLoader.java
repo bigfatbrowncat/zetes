@@ -1,4 +1,6 @@
-package crossbase.ui.abstracts;
+package crossbase.abstracts;
+
+import crossbase.abstracts.Document;
 
 public interface DocumentLoader<T extends Document>
 {

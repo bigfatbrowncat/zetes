@@ -13,18 +13,17 @@ import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
-import crossbase.ui.AboutBox;
+import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.CocoaUIEnhancer;
-import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 
 
-public abstract class ApplicationBase<TAB extends AboutBox, 
+public abstract class ApplicationBase<TAB extends DefaultAboutBox, 
                                       TD extends Document, 
                                       TVW extends ViewWindow<TD>, 
-                                      TMC extends MenuConstructor<TD, ? extends ViewWindow<TD>>> implements Application<TAB, TD, TVW, TMC>
+                                      TMC extends MenuConstructor<TD, TVW>> implements Application<TAB, TD, TVW, TMC>
 {
-	private AboutBox aboutBox = null;
+	private DefaultAboutBox aboutBox = null;
 
 	private TMC menuConstructor;
 	private ViewWindowsManager<TD, ? extends ViewWindow<TD>> viewWindowsManager;

@@ -13,13 +13,13 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.ui.AboutBox;
 import crossbase.ui.ViewWindowBase;
 import crossbase.ui.ViewWindowsManager;
 
-public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
+public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 {
 	private ScrolledComposite scrolledComposite;
 	private DropTarget scrolledCompositeDropTarget, imageViewDropTarget;
@@ -61,25 +61,25 @@ public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
 	 * @wbp.parser.entryPoint
 	 */
 	@Override
-	protected void constructShell()
+	protected Shell constructShell()
 	{
-		super.constructShell();
-		
-		getShell().setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		getShell().setMinimumSize(new Point(150, 200));
-		getShell().setImage(SWTResourceManager.getImage(ImageViewWindow.class,
+		Shell shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER);
+
+		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		shell.setMinimumSize(new Point(150, 200));
+		shell.setImage(SWTResourceManager.getImage(ImageViewWindow.class,
 				"/crossbase/icon.png"));
 	
-		getShell().setLayout(new FillLayout(SWT.HORIZONTAL));
+		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		scrolledComposite = new ScrolledComposite(getShell(), SWT.H_SCROLL | SWT.V_SCROLL | SWT.DOUBLE_BUFFERED);
+		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL | SWT.DOUBLE_BUFFERED);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
 		imageView = new ImageView(scrolledComposite, SWT.NONE | SWT.DOUBLE_BUFFERED);
 		imageView.setBounds(0, 0, 200, 127);
 		imageView.setVisible(false);
-		imageView.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		imageView.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 
 		// Drop targets
 		scrolledCompositeDropTarget = new DropTarget(scrolledComposite, DND.DROP_MOVE);
@@ -95,7 +95,7 @@ public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
 		
 		scrolledComposite.setContent(imageView);
 		scrolledComposite.setMinSize(imageView.desiredSize());
-		scrolledComposite.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		scrolledComposite.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		
 		scrolledComposite.addControlListener(new ControlListener()
 		{
@@ -109,6 +109,8 @@ public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
 			@Override
 			public void controlMoved(ControlEvent arg0) { }
 		});
+			
+		return shell;
 	}
 
 	private void updateImageViewSize()
@@ -134,11 +136,11 @@ public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
 		this.imageDocument = (ImageDocument)document;
 		
 		imageView.setImage(imageDocument.getImage());
-		getShell().setText(imageDocument.getTitle() + " \u2013 " + getApplicationTitle());
+		shell.setText(imageDocument.getTitle() + " \u2013 " + getApplicationTitle());
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		updateImageViewSize();
 		imageView.setVisible(true);
-		getShell().forceActive();
+		shell.forceActive();
 		getMenuConstructor().updateMenus();
 	}
 	
@@ -150,7 +152,7 @@ public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
 	
 	public boolean isDisposed()
 	{
-		return getShell().isDisposed();
+		return shell.isDisposed();
 	}
 
 	@Override

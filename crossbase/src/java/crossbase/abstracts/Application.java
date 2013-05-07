@@ -2,10 +2,10 @@ package crossbase.abstracts;
 
 import org.eclipse.swt.widgets.Shell;
 
-import crossbase.ui.AboutBox;
+import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.ViewWindowsManager;
 
-public interface Application<TAB extends AboutBox, TD extends Document, TVW extends ViewWindow<TD>, TMC extends MenuConstructor<TD, ? extends ViewWindow<TD>>>
+public interface Application<TAB extends DefaultAboutBox, TD extends Document, TVW extends ViewWindow<TD>, TMC extends MenuConstructor<TD, ? extends ViewWindow<TD>>>
 {
 	String getTitle();
 	

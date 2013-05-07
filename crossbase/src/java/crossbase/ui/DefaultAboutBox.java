@@ -18,18 +18,17 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
-public class AboutBox extends Dialog
+public class DefaultAboutBox extends Dialog
 {
-	protected Object result;
 	protected Shell aboutBoxShell;
-	private String applicationName, descriptionText, copyrightText, iconResourceName;
+	private String applicationName = "", descriptionText = "", copyrightText = "", iconResourceName = "";
 	private Point windowSize = new Point(370, 160);
 
 	/**
 	 * Create the dialog.
 	 * @param parent
 	 */
-	public AboutBox(Shell parent)
+	public DefaultAboutBox(Shell parent)
 	{
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.CENTER);
 	}
@@ -98,9 +97,9 @@ public class AboutBox extends Dialog
 	
 	/**
 	 * Open the dialog.
-	 * @return the result
+	 * @return true if it has been opened, false if it had been opened when <code>open</code> was called
 	 */
-	public Object open()
+	public boolean open()
 	{
 		if (this.aboutBoxShell == null)
 		{
@@ -118,11 +117,11 @@ public class AboutBox extends Dialog
 				}
 			}
 			aboutBoxShell = null;
-			return result;
+			return true;
 		}
 		else
 		{
-			return null;
+			return false;
 		}
 	}
 
@@ -141,7 +140,7 @@ public class AboutBox extends Dialog
 
  		Label iconLabel = new Label(aboutBoxShell, SWT.NONE);
 		iconLabel.setAlignment(SWT.CENTER);
-		iconLabel.setImage(SWTResourceManager.getImage(AboutBox.class, iconResourceName /*"/crossbase/icon.png"*/));
+		iconLabel.setImage(SWTResourceManager.getImage(DefaultAboutBox.class, iconResourceName /*"/crossbase/icon.png"*/));
 		FormData fd_iconLabel = new FormData();
 		fd_iconLabel.top = new FormAttachment(0, 15);
 		fd_iconLabel.left = new FormAttachment(0, 15);

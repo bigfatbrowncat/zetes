@@ -17,12 +17,12 @@ import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 
-public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> implements ViewWindow<TD>
+public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>
 {
-	private ViewWindowsManager<TD, ? extends ViewWindowBase<TAB, TD>> windowsManager;
-	private MenuConstructor<TD, ? extends ViewWindowBase<TAB, TD>> menuConstructor;
+	private ViewWindowsManager<TD, ? extends ViewWindowBase<TD>> windowsManager;
+	private MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor;
 	
-	private Shell shell;
+	protected Shell shell;
 	private String applicationTitle;
 	
 	@SuppressWarnings("rawtypes")
@@ -49,15 +49,10 @@ public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> 
 			e.printStackTrace();
 		}
 	}
-	
-	protected final Shell getShell()
-	{
-		return shell;
-	}
-	
+
 	public ViewWindowBase(String applicationTitle, 
-	                      ViewWindowsManager<TD, ? extends ViewWindowBase<TAB, TD>> windowsManager,
-	                      MenuConstructor<TD, ? extends ViewWindowBase<TAB, TD>> menuConstructor)
+	                      ViewWindowsManager<TD, ? extends ViewWindowBase<TD>> windowsManager,
+	                      MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor)
 	{
 		this.applicationTitle = applicationTitle;
 		this.windowsManager = windowsManager;
@@ -73,7 +68,8 @@ public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> 
 	@Override
 	public final void open()
 	{
-		constructShell();
+		shell = constructShell();
+		prepareShell();
 
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type 
 		((MenuConstructor)menuConstructor).addWindow(this);		
@@ -81,6 +77,8 @@ public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> 
 		shell.layout();
 		shell.open();
 	}
+	
+	protected abstract Shell constructShell();
 	
 	@Override
 	public final boolean isActive()
@@ -130,10 +128,9 @@ public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> 
 	}
 	
 	
-	protected void constructShell()
+	private void prepareShell()
 	{
-		shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.DOUBLE_BUFFERED);
-		getShell().setText(applicationTitle);
+		shell.setText(applicationTitle);
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -198,7 +195,7 @@ public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> 
 		});
 	}
 
-	public MenuConstructor<TD, ? extends ViewWindowBase<TAB, TD>> getMenuConstructor()
+	public MenuConstructor<TD, ? extends ViewWindowBase<TD>> getMenuConstructor()
 	{
 		return menuConstructor;
 	}

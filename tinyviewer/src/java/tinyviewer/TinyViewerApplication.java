@@ -15,11 +15,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.ApplicationBase;
-import crossbase.abstracts.MenuConstructor;
-import crossbase.ui.AboutBox;
-import crossbase.ui.ViewWindowsManager;
+import crossbase.ui.DefaultAboutBox;
 
-public class TinyViewerApplication extends ApplicationBase<AboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor>
+public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor>
 {
 	@Override
 	public String getTitle()
@@ -28,9 +26,9 @@ public class TinyViewerApplication extends ApplicationBase<AboutBox, ImageDocume
 	}
 
 	@Override
-	public AboutBox createAboutBox(Shell parent)
+	public DefaultAboutBox createAboutBox(Shell parent)
 	{
-		AboutBox res = new AboutBox(parent);
+		DefaultAboutBox res = new DefaultAboutBox(parent);
 		res.setApplicationName(getTitle());
 		res.setIconResourceName("/crossbase/icon.png");
 		res.setDescriptionText("A simple image file viewer.\nThis application demonstrates the power of Avian + SWT");

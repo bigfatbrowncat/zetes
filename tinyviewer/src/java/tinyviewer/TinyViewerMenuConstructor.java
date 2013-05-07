@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import crossbase.ui.HotKey;
 import crossbase.ui.MenuConstructorBase;
 
-public class TinyViewerMenuConstructor extends MenuConstructorBase
+public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageDocument, ImageViewWindow>
 {
 	private SelectionAdapter fileOpenSelectionAdapter;
 		

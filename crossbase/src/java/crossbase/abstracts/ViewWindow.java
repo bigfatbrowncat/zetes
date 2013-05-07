@@ -5,13 +5,13 @@ import org.eclipse.swt.widgets.Menu;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 
-public interface ViewWindow
+public interface ViewWindow<TD extends Document>
 {
 	boolean documentIsLoaded();
-	void loadDocument(Document document);
+	void loadDocument(TD document);
 	
 	Menu getMenu();
-	Document getDocument();
+	TD getDocument();
 	
 	boolean isActive();
 	void activate(boolean force);
@@ -19,8 +19,6 @@ public interface ViewWindow
 	void toggleMinimized();
 	void toggleMaximized();
 	void toggleFullScreen();
-	
-	void setMenuConstructor(MenuConstructor menuConstructor);
 	
 	void open();
 	

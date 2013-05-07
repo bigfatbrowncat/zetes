@@ -8,20 +8,18 @@ import org.eclipse.swt.widgets.Display;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
-import crossbase.abstracts.ViewWindowFactory;
 
-public class ViewWindowsManager<T extends ViewWindow>
+public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWindow<TD>>
 {
-	private ArrayList<T> windows = new ArrayList<T>();
-	private ViewWindowFactory<T> viewWindowFactory;
-	private MenuConstructor menuConstructor;
+	private ArrayList<TVW> windows = new ArrayList<TVW>();
+	private MenuConstructor<TD, TVW> menuConstructor;
 
 	/**
 	 * Closes the window. If no windows remain opened 
 	 * and we are not in OS X, terminates the application.
 	 * @param viewWindow The window to close
 	 */
-	public void closeWindow(T viewWindow)
+	public void closeWindow(TVW viewWindow)
 	{
 		windows.remove(viewWindow);
 		
@@ -47,16 +45,17 @@ public class ViewWindowsManager<T extends ViewWindow>
 		}
 	}
 	
+	protected abstract TVW createViewWindow();
+	
 	/**
 	 * Opens a new window. If <code>fileName</code> argument isn't null, opens
 	 * the selected file in that window. Otherwise it opens an empty window.
 	 * @param fileName The file's name to open in the new window (can be null)
 	 * @return The opened window
 	 */
-	public T openNewWindow(Document document)
+	public TVW openNewWindow(TD document)
 	{
-		T newWindow = viewWindowFactory.create();
-		newWindow.setMenuConstructor(menuConstructor);
+		TVW newWindow = createViewWindow();
 		newWindow.open();
 		
 		if (document != null)
@@ -73,12 +72,12 @@ public class ViewWindowsManager<T extends ViewWindow>
 	 * @param fileName The file's name to open
 	 * @return The window where file is opened
 	 */
-	public T openViewForDocument(Document document)
+	public TVW openViewForDocument(TD document)
 	{
 		if (document == null) throw new IllegalArgumentException("file name shouldn't be null");
 		
 		// Searching for an empty window
-		for (T vw : windows)
+		for (TVW vw : windows)
 		{
 			if (!vw.documentIsLoaded())
 			{
@@ -91,7 +90,7 @@ public class ViewWindowsManager<T extends ViewWindow>
 		return openNewWindow(document);
 	}
 	
-	public Object[] openViewForDocuments(Document[] documents)
+	public Object[] openViewForDocuments(TD[] documents)
 	{
 		ArrayList<Object> res = new ArrayList<Object>();
 		for (int i = 0; i < documents.length; i++)
@@ -114,26 +113,12 @@ public class ViewWindowsManager<T extends ViewWindow>
 		}
 	}
 	
-	public ViewWindowsManager()
-	{
-	}
-	
-	public void setViewWindowFactory(ViewWindowFactory<T> viewWindowFactory)
-	{
-		this.viewWindowFactory = viewWindowFactory;
-	}
-	
-	public ViewWindowFactory<T> getViewWindowFactory()
-	{
-		return viewWindowFactory;
-	}
-
-	public MenuConstructor getMenuConstructor()
+	public MenuConstructor<TD, TVW> getMenuConstructor()
 	{
 		return menuConstructor;
 	}
-
-	public void setMenuConstructor(MenuConstructor menuConstructor)
+	
+	public void setMenuConstructor(MenuConstructor<TD, TVW> menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
 	}

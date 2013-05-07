@@ -14,21 +14,21 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 
+import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 
-public class MenuConstructorBase implements MenuConstructor
+public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>> implements MenuConstructor<TD, TVW>
 {
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private ArrayList<ViewWindow> viewWindows;
-	private HashMap<ViewWindow, Set<MenuItem>> shellMenuItems;
+	private ArrayList<TVW> viewWindows;
+	private HashMap<TVW, Set<MenuItem>> shellMenuItems;
 	private Set<MenuItem> globalMenuItems;
 	
-	protected ViewWindow getActiveViewWindow()
+	protected TVW getActiveViewWindow()
 	{
-		for (ViewWindow viewWindow : viewWindows)
+		for (TVW viewWindow : viewWindows)
 		{
 			if (viewWindow.isActive())
 			{
@@ -43,7 +43,7 @@ public class MenuConstructorBase implements MenuConstructor
 	 * @param viewWindow The window the menu connected to. If it's null, the global menu will be assumed 
 	 * @param menu The menu
 	 */
-	protected void addShellMenu(ViewWindow viewWindow, MenuItem menuItem)
+	protected void addShellMenu(TVW viewWindow, MenuItem menuItem)
 	{
 		if (menuItem == null) 
 		{
@@ -69,7 +69,7 @@ public class MenuConstructorBase implements MenuConstructor
 	 * If the shell is null, erases all menus form global menu. 
 	 * @param viewWindow The window to erase menus from
 	 */
-	protected void eraseAllMenusForWindow(ViewWindow viewWindow)
+	protected void eraseAllMenusForWindow(TVW viewWindow)
 	{
 		if (viewWindow == null)
 		{
@@ -221,7 +221,7 @@ public class MenuConstructorBase implements MenuConstructor
 		
 		// Window items
 		boolean anyWindowsToAdd = false;
-		for (ViewWindow viewWindow : viewWindows)
+		for (TVW viewWindow : viewWindows)
 		{
 			if (viewWindow.getDocument() != null)
 			{
@@ -236,7 +236,7 @@ public class MenuConstructorBase implements MenuConstructor
 		}
 
 		char hotKey = '1';
-		for (ViewWindow viewWindow : viewWindows)
+		for (TVW viewWindow : viewWindows)
 		{
 			if (viewWindow.getDocument() != null)
 			{
@@ -263,7 +263,7 @@ public class MenuConstructorBase implements MenuConstructor
 					@Override
 					public void widgetSelected(SelectionEvent arg0)
 					{
-						ViewWindow targetWindow = (ViewWindow)arg0.widget.getData();
+						TVW targetWindow = (TVW)arg0.widget.getData();
 						targetWindow.activate(false);
 					}
 				});
@@ -360,11 +360,13 @@ public class MenuConstructorBase implements MenuConstructor
 		return false;
 	}
 	
+	
 	public SelectionAdapter getExitSelectionAdapter()
 	{
 		return exitSelectionAdapter;
 	}
 
+	@Override
 	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
 	{
 		this.exitSelectionAdapter = exitSelectionAdapter;
@@ -375,6 +377,7 @@ public class MenuConstructorBase implements MenuConstructor
 		return aboutSelectionAdapter;
 	}
 
+	@Override
 	public void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter)
 	{
 		this.aboutSelectionAdapter = aboutSelectionAdapter;
@@ -396,7 +399,7 @@ public class MenuConstructorBase implements MenuConstructor
 		}
 	}
 
-	protected void addMenusToWindow(ViewWindow viewWindow)
+	protected void addMenusToWindow(TVW viewWindow)
 	{
 		Menu menu = viewWindow.getMenu();
 		addShellMenu(viewWindow, createAndAppendFileMenu(menu));
@@ -413,7 +416,7 @@ public class MenuConstructorBase implements MenuConstructor
 	{
 		eraseAllMenusForWindow(null);
 		addMenusToGlobalMenu();
-		for (ViewWindow viewWindow : viewWindows)
+		for (TVW viewWindow : viewWindows)
 		{
 			eraseAllMenusForWindow(viewWindow);
 			addMenusToWindow(viewWindow);
@@ -421,14 +424,14 @@ public class MenuConstructorBase implements MenuConstructor
 	}
 
 	@Override
-	public void addWindow(ViewWindow viewWindow)
+	public void addWindow(TVW viewWindow)
 	{
 		viewWindows.add(viewWindow);
 		updateMenus();
 	}
 
 	@Override
-	public void removeWindow(ViewWindow viewWindow)
+	public void removeWindow(TVW viewWindow)
 	{
 		viewWindows.remove(viewWindow);
 		eraseAllMenusForWindow(viewWindow);
@@ -437,8 +440,8 @@ public class MenuConstructorBase implements MenuConstructor
 
 	public MenuConstructorBase()
 	{
-		viewWindows = new ArrayList<ViewWindow>();
-		shellMenuItems = new HashMap<ViewWindow, Set<MenuItem>>();
+		viewWindows = new ArrayList<TVW>();
+		shellMenuItems = new HashMap<TVW, Set<MenuItem>>();
 		globalMenuItems = new HashSet<MenuItem>();
 	}
 }

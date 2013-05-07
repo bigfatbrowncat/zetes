@@ -15,11 +15,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.abstracts.Document;
+import crossbase.ui.AboutBox;
 import crossbase.ui.ViewWindowBase;
 import crossbase.ui.ViewWindowsManager;
 
-public class ImageViewWindow extends ViewWindowBase
+public class ImageViewWindow extends ViewWindowBase<AboutBox, ImageDocument>
 {
 	private ScrolledComposite scrolledComposite;
 	private DropTarget scrolledCompositeDropTarget, imageViewDropTarget;
@@ -48,9 +48,11 @@ public class ImageViewWindow extends ViewWindowBase
 		}
 	}
 	
-	public ImageViewWindow(TinyViewerApplication application, ViewWindowsManager<ImageViewWindow> windowsManager)
+	public ImageViewWindow(String applicationTitle, 
+	                       ViewWindowsManager<ImageDocument, ImageViewWindow> windowsManager, 
+	                       TinyViewerMenuConstructor menuConstructor)
 	{
-		super(application, windowsManager);
+		super(applicationTitle, windowsManager, menuConstructor);
 	}
 	
 	/**
@@ -127,12 +129,12 @@ public class ImageViewWindow extends ViewWindowBase
 	}
 	
 	@Override
-	public void loadDocument(Document document)
+	public void loadDocument(ImageDocument document)
 	{
 		this.imageDocument = (ImageDocument)document;
 		
 		imageView.setImage(imageDocument.getImage());
-		getShell().setText(imageDocument.getTitle() + " \u2013 " + getApplication().getTitle());
+		getShell().setText(imageDocument.getTitle() + " \u2013 " + getApplicationTitle());
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		updateImageViewSize();
 		imageView.setVisible(true);
@@ -162,4 +164,5 @@ public class ImageViewWindow extends ViewWindowBase
 	{
 		return true;
 	}
+
 }

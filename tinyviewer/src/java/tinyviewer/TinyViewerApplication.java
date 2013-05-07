@@ -9,14 +9,17 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.ApplicationBase;
+import crossbase.abstracts.MenuConstructor;
+import crossbase.ui.AboutBox;
 import crossbase.ui.ViewWindowsManager;
 
-public class TinyViewerApplication extends ApplicationBase
+public class TinyViewerApplication extends ApplicationBase<AboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor>
 {
 	@Override
 	public String getTitle()
@@ -24,6 +27,32 @@ public class TinyViewerApplication extends ApplicationBase
 		return "Tiny Viewer";
 	}
 
+	@Override
+	public AboutBox createAboutBox(Shell parent)
+	{
+		AboutBox res = new AboutBox(parent);
+		res.setApplicationName(getTitle());
+		res.setIconResourceName("/crossbase/icon.png");
+		res.setDescriptionText("A simple image file viewer.\nThis application demonstrates the power of Avian + SWT");
+		res.setCopyrightText("Copyright \u00a9 2013, Ilya Mizus");
+		res.setWindowSize(new Point(370, 180));
+		return res;
+	}
+	
+	@Override
+	public ImageDocument loadFromFile(String fileName)
+	{
+		try
+		{
+			return new ImageDocument(fileName);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	private SelectionAdapter fileOpenSelectionAdapter = new SelectionAdapter()
 	{
 		@Override
@@ -55,7 +84,7 @@ public class TinyViewerApplication extends ApplicationBase
 					}
 				}
 				
-				getDocumentWindowsManager().openViewForDocuments(documents.toArray(new ImageDocument[] {}));
+				getViewWindowsManager().openViewForDocuments(documents.toArray(new ImageDocument[] {}));
 			}
 			dummyShell.dispose();
 		}
@@ -74,7 +103,7 @@ public class TinyViewerApplication extends ApplicationBase
 					try
 					{
 						document = new ImageDocument(fileList[i]);
-						getDocumentWindowsManager().openViewForDocument(document);
+						getViewWindowsManager().openViewForDocument(document);
 					}
 					catch (IOException e)
 					{
@@ -89,30 +118,7 @@ public class TinyViewerApplication extends ApplicationBase
 		
 	public TinyViewerApplication()
 	{
-		// About box factory
-		setAboutBoxFactory(new TinyViewerAboutBoxFactory(this));
 
-		// Document factory
-		setDocumentLoader(new ImageDocumentLoader());
-
-		// Menu constructor
-		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
-		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);
-		setMenuConstructor(menuConstructor);
-
-		// Image view windows manager
-		ViewWindowsManager<ImageViewWindow> imageViewWindowsManager;
-		imageViewWindowsManager = new ViewWindowsManager<ImageViewWindow>();
-		imageViewWindowsManager.setMenuConstructor(menuConstructor);
-		setDocumentWindowsManager(imageViewWindowsManager);
-
-		// View window factory construction
-		ImageViewWindowFactory imageViewWindowFactory = new ImageViewWindowFactory(this);
-		imageViewWindowFactory.setViewWindowDropTargetAdapter(viewWindowDropTargetAdapter);
-
-		// Connecting image view windows manager and factory
-		imageViewWindowsManager.setViewWindowFactory(imageViewWindowFactory);
-		imageViewWindowFactory.setViewWindowsManager(imageViewWindowsManager);
 	}
 	
 	public static void main(String... args)
@@ -120,4 +126,17 @@ public class TinyViewerApplication extends ApplicationBase
 		new TinyViewerApplication().run(args);
 	}
 
+	@Override
+	public ImageViewWindowsManager createViewWindowsManager()
+	{
+		return new ImageViewWindowsManager(getTitle(), viewWindowDropTargetAdapter);
+	}
+
+	@Override
+	public TinyViewerMenuConstructor createMenuConstructor()
+	{
+		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
+		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);
+		return menuConstructor;
+	}
 }

@@ -9,10 +9,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
-import crossbase.abstracts.AboutBoxFactory;
 import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
-import crossbase.abstracts.DocumentLoader;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.AboutBox;
@@ -21,14 +19,15 @@ import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 
 
-public abstract class ApplicationBase implements Application
+public abstract class ApplicationBase<TAB extends AboutBox, 
+                                      TD extends Document, 
+                                      TVW extends ViewWindow<TD>, 
+                                      TMC extends MenuConstructor<TD, ? extends ViewWindow<TD>>> implements Application<TAB, TD, TVW, TMC>
 {
 	private AboutBox aboutBox = null;
-	private AboutBoxFactory<? extends AboutBox> aboutBoxFactory;
-	private DocumentLoader<? extends Document> documentLoader;
 
-	private MenuConstructorBase menuConstructor;
-	private ViewWindowsManager<? extends ViewWindow> documentWindowsManager;
+	private TMC menuConstructor;
+	private ViewWindowsManager<TD, ? extends ViewWindow<TD>> viewWindowsManager;
 
 	public abstract String getTitle();
 	
@@ -38,7 +37,7 @@ public abstract class ApplicationBase implements Application
 	 * @param shell The parent shell for about box window to create.
 	 *              May be null &#151; in that case the about box will be created for the whole display.
 	 */
-	protected void showAbout(Shell shell)
+	protected final void showAbout(Shell shell)
 	{
 		if (aboutBox == null || aboutBox.isDisposed())
 		{
@@ -49,7 +48,7 @@ public abstract class ApplicationBase implements Application
 				dummyShell = true;
 			}
 			
-			aboutBox = aboutBoxFactory.create(shell);
+			aboutBox = createAboutBox(shell);
 			aboutBox.open();
 
 			if (dummyShell)
@@ -70,15 +69,11 @@ public abstract class ApplicationBase implements Application
 		@Override
 		public void handleEvent(final Event arg0)
 		{
-			// If we have a document loader, we will use it. If we don't, that means document loading is unsupported
-			if (documentLoader != null)
+			String fileName = arg0.text;
+			TD loadedDoc = loadFromFile(fileName);
+			if (loadedDoc != null)
 			{
-				String fileName = arg0.text;
-				Document loadedDoc = documentLoader.loadFromFile(fileName);
-				if (loadedDoc != null)
-				{
-					documentWindowsManager.openViewForDocument(loadedDoc);
-				}
+				viewWindowsManager.openViewForDocument(loadedDoc);
 			}
 		}
 	};
@@ -126,7 +121,7 @@ public abstract class ApplicationBase implements Application
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
-			documentWindowsManager.closeAllWindows();
+			viewWindowsManager.closeAllWindows();
 			if (Display.getDefault() != null && !Display.getDefault().isDisposed())
 			{
 				Display.getDefault().dispose();
@@ -136,7 +131,6 @@ public abstract class ApplicationBase implements Application
 	
 	protected ApplicationBase()
 	{
-
 	}
 	
 	public void run(String[] arguments)
@@ -146,9 +140,16 @@ public abstract class ApplicationBase implements Application
 		{
 			Display.setAppName(getTitle());
 	
+			viewWindowsManager = createViewWindowsManager();
+
+			menuConstructor = createMenuConstructor();
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
 			menuConstructor.updateMenus();
+			
+			// Here we guarantee that menuConstructor type is compatible to viewWindowsManager
+			((ViewWindowsManager)viewWindowsManager).setMenuConstructor(menuConstructor);
+			
 			
 			if (SWT.getPlatform().equals("cocoa"))
 			{
@@ -178,7 +179,7 @@ public abstract class ApplicationBase implements Application
 					return;
 				}
 	
-				documentWindowsManager.ensureThereIsOpenedWindow();
+				viewWindowsManager.ensureThereIsOpenedWindow();
 			}
 			
 			eventLoop();
@@ -193,43 +194,8 @@ public abstract class ApplicationBase implements Application
 		}		
 	}
 	
-	public ViewWindowsManager<? extends ViewWindow> getDocumentWindowsManager()
+	public ViewWindowsManager<TD, ? extends ViewWindow<TD>> getViewWindowsManager()
 	{
-		return documentWindowsManager;
-	}
-	
-	public void setDocumentWindowsManager(ViewWindowsManager<? extends ViewWindow> documentWindowsManager)
-	{
-		this.documentWindowsManager = documentWindowsManager;
-	}
-	
-	public MenuConstructor getMenuConstructor()
-	{
-		return menuConstructor;
-	}
-	
-	public void setMenuConstructor(MenuConstructorBase menuConstructor)
-	{
-		this.menuConstructor = menuConstructor;
-	}
-	
-	public AboutBoxFactory<? extends AboutBox> getAboutBoxFactory()
-	{
-		return aboutBoxFactory;
-	}
-
-	public void setAboutBoxFactory(AboutBoxFactory<? extends AboutBox> aboutBoxFactory)
-	{
-		this.aboutBoxFactory = aboutBoxFactory;
-	}
-
-	public DocumentLoader<? extends Document> getDocumentLoader()
-	{
-		return documentLoader;
-	}
-
-	public void setDocumentLoader(DocumentLoader<? extends Document> documentLoader)
-	{
-		this.documentLoader = documentLoader;
+		return viewWindowsManager;
 	}
 }

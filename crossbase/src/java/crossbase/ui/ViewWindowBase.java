@@ -2,7 +2,6 @@ package crossbase.ui;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -14,18 +13,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
-import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 
-public abstract class ViewWindowBase implements ViewWindow
+public abstract class ViewWindowBase<TAB extends AboutBox, TD extends Document> implements ViewWindow<TD>
 {
-	private Application application;
-	private ViewWindowsManager<? extends ViewWindowBase> windowsManager;
+	private ViewWindowsManager<TD, ? extends ViewWindowBase<TAB, TD>> windowsManager;
+	private MenuConstructor<TD, ? extends ViewWindowBase<TAB, TD>> menuConstructor;
 	
 	private Shell shell;
-	private MenuConstructor menuConstructor;
+	private String applicationTitle;
 	
 	@SuppressWarnings("rawtypes")
 	private void setCocoaFullscreenButton(boolean on)
@@ -57,10 +55,13 @@ public abstract class ViewWindowBase implements ViewWindow
 		return shell;
 	}
 	
-	public ViewWindowBase(Application application, ViewWindowsManager<? extends ViewWindowBase> windowsManager)
+	public ViewWindowBase(String applicationTitle, 
+	                      ViewWindowsManager<TD, ? extends ViewWindowBase<TAB, TD>> windowsManager,
+	                      MenuConstructor<TD, ? extends ViewWindowBase<TAB, TD>> menuConstructor)
 	{
-		this.application = application;
+		this.applicationTitle = applicationTitle;
 		this.windowsManager = windowsManager;
+		this.menuConstructor = menuConstructor;
 	}
 	
 	@Override
@@ -74,7 +75,8 @@ public abstract class ViewWindowBase implements ViewWindow
 	{
 		constructShell();
 
-		menuConstructor.addWindow(this);		
+		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type 
+		((MenuConstructor)menuConstructor).addWindow(this);		
 		
 		shell.layout();
 		shell.open();
@@ -131,7 +133,7 @@ public abstract class ViewWindowBase implements ViewWindow
 	protected void constructShell()
 	{
 		shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.DOUBLE_BUFFERED);
-		getShell().setText(application.getTitle());
+		getShell().setText(applicationTitle);
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -175,7 +177,7 @@ public abstract class ViewWindowBase implements ViewWindow
 			@Override
 			public void shellClosed(ShellEvent arg0)
 			{
-				// If we want this to work, we should guarantee that the generic parameter type of windowsManager equals to our type
+				// If we want this to work, we should guarantee that the generic parameter type TVW of windowsManager equals to our type
 				((ViewWindowsManager)windowsManager).closeWindow(ViewWindowBase.this);
 			}
 		});
@@ -184,7 +186,8 @@ public abstract class ViewWindowBase implements ViewWindow
 		{
 			public void widgetDisposed(DisposeEvent arg0)
 			{
-				ViewWindowBase.this.menuConstructor.removeWindow(ViewWindowBase.this);
+				// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
+				((MenuConstructor)ViewWindowBase.this.menuConstructor).removeWindow(ViewWindowBase.this);
 				
 				Document doc = getDocument();
 				if (doc != null) 
@@ -195,19 +198,13 @@ public abstract class ViewWindowBase implements ViewWindow
 		});
 	}
 
-	public final MenuConstructor getMenuConstructor()
+	public MenuConstructor<TD, ? extends ViewWindowBase<TAB, TD>> getMenuConstructor()
 	{
 		return menuConstructor;
 	}
 
-	@Override
-	public final void setMenuConstructor(MenuConstructor menuConstructor)
+	public String getApplicationTitle()
 	{
-		this.menuConstructor = menuConstructor;
-	}
-	
-	public Application getApplication()
-	{
-		return application;
+		return applicationTitle;
 	}
 }

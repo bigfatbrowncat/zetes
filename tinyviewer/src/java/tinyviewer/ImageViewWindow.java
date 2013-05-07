@@ -114,11 +114,16 @@ public class ImageViewWindow extends ViewWindowBase
 		Point desired = imageView.desiredSize();
 		Point clientAreaSize = new Point(scrolledComposite.getClientArea().width, scrolledComposite.getClientArea().height); 
 		
-		int xw = Math.max(clientAreaSize.x, desired.x); 
-		int xh = Math.max(clientAreaSize.y, desired.y);
-		Point wh = new Point(xw - 1, xh - 1);
+		int width = Math.max(clientAreaSize.x, desired.x); 
+		int height = Math.max(clientAreaSize.y, desired.y);
+		Point newSize = new Point(width - 1, height - 1);
 		
-		imageView.setSize(wh);
+		Point oldSize = imageView.getSize();
+		
+		if (!oldSize.equals(newSize))
+		{
+			imageView.setSize(newSize);
+		}
 	}
 	
 	@Override

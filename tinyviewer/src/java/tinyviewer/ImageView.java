@@ -49,7 +49,7 @@ public class ImageView extends Canvas
 	public Point desiredSize()
 	{
 		if (image == null)
-			return new Point(100, 100);
+			return new Point(1, 1);
 		else
 			return new Point((int)(image.getImageData().width * zoom), (int)(image.getImageData().height * zoom));
 	}

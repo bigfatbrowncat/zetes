@@ -116,7 +116,7 @@ public class ImageViewWindow extends ViewWindowBase
 		
 		int width = Math.max(clientAreaSize.x, desired.x); 
 		int height = Math.max(clientAreaSize.y, desired.y);
-		Point newSize = new Point(width - 1, height - 1);
+		Point newSize = new Point(width, height);
 		
 		Point oldSize = imageView.getSize();
 		

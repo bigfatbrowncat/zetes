@@ -150,7 +150,7 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		// To be overridden in the inherited classes
 	}
 	
-	private MenuItem createAndAppendWindowsMenu(Menu menu)
+	private MenuItem createAndAppendWindowsMenu(Menu menu, final boolean addFullscreen, final boolean addMaximize)
 	{
 		MenuItem windowMenuItem = new MenuItem(menu, SWT.CASCADE);
 		
@@ -176,37 +176,53 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		minimizeMenuItem.setAccelerator(minimizeHotKey.toAccelerator());
 		minimizeMenuItem.setText("&Minimize\t" + minimizeHotKey.toString());
 		
-		// "Maximize" menu item
-		final MenuItem maximizeMenuItem = new MenuItem(windowMenu, SWT.NONE);
-		maximizeMenuItem.addSelectionListener(new SelectionAdapter()
+		final MenuItem maximizeMenuItem;
+		if (addMaximize)
 		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0)
+			// "Maximize" menu item
+			maximizeMenuItem = new MenuItem(windowMenu, SWT.NONE);
+			maximizeMenuItem.addSelectionListener(new SelectionAdapter()
 			{
-				if (getActiveViewWindow() != null)
+				@Override
+				public void widgetSelected(SelectionEvent arg0)
 				{
-					getActiveViewWindow().toggleMaximized();
+					if (getActiveViewWindow() != null)
+					{
+						getActiveViewWindow().toggleMaximized();
+					}
 				}
-			}
-		});
-		maximizeMenuItem.setText("Zoom");
-
+			});
+			maximizeMenuItem.setText("Zoom");
+		}
+		else
+		{
+			maximizeMenuItem = null;
+		}
+		
 		// "Fullscreen" menu item
-		final MenuItem fullscreenMenuItem = new MenuItem(windowMenu, SWT.NONE);
-		fullscreenMenuItem.addSelectionListener(new SelectionAdapter()
+		final MenuItem fullscreenMenuItem;
+		if (addFullscreen)
 		{
-			@Override
-			public void widgetSelected(SelectionEvent arg0)
+			fullscreenMenuItem = new MenuItem(windowMenu, SWT.NONE);
+			fullscreenMenuItem.addSelectionListener(new SelectionAdapter()
 			{
-				if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+				@Override
+				public void widgetSelected(SelectionEvent arg0)
 				{
-					getActiveViewWindow().toggleFullScreen();
+					if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+					{
+						getActiveViewWindow().toggleFullScreen();
+					}
 				}
-			}
-		});
-		HotKey fullscreenHotKey = new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F');
-		fullscreenMenuItem.setAccelerator(fullscreenHotKey.toAccelerator());
-		fullscreenMenuItem.setText("Fullscreen\t" + fullscreenHotKey.toString());
+			});
+			HotKey fullscreenHotKey = new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F');
+			fullscreenMenuItem.setAccelerator(fullscreenHotKey.toAccelerator());
+			fullscreenMenuItem.setText("Fullscreen\t" + fullscreenHotKey.toString());
+		}
+		else
+		{
+			fullscreenMenuItem = null;
+		}
 		
 		// Custom items
 		List<MenuItem> customItems = createCustomWindowMenuItems();
@@ -277,8 +293,8 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 			public void menuShown(MenuEvent arg0)
 			{
 				minimizeMenuItem.setEnabled(getActiveViewWindow() != null);
-				maximizeMenuItem.setEnabled(getActiveViewWindow() != null);
-				fullscreenMenuItem.setEnabled(getActiveViewWindow() != null && getActiveViewWindow().supportsFullscreen());
+				if (addMaximize) maximizeMenuItem.setEnabled(getActiveViewWindow() != null);
+				if (addFullscreen) fullscreenMenuItem.setEnabled(getActiveViewWindow() != null && getActiveViewWindow().supportsFullscreen());
 			}
 			
 			@Override
@@ -390,7 +406,7 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 			Display display = Display.getDefault();
 			Menu menu = display.getMenuBar();
 			addShellMenu(null, createAndAppendFileMenu(menu));
-			MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu);
+			MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu, false, false);
 			if (windowsMenuItem != null)
 			{
 				addShellMenu(null, windowsMenuItem);
@@ -399,11 +415,11 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		}
 	}
 
-	protected void addMenusToWindow(TVW viewWindow)
+	protected void addMenusToWindow(TVW viewWindow, boolean addFullscreen, boolean addMaximize)
 	{
 		Menu menu = viewWindow.getMenu();
 		addShellMenu(viewWindow, createAndAppendFileMenu(menu));
-		MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu);
+		MenuItem windowsMenuItem = createAndAppendWindowsMenu(menu, addFullscreen, addMaximize);
 		if (windowsMenuItem != null)
 		{
 			addShellMenu(viewWindow, windowsMenuItem);
@@ -419,7 +435,7 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		for (TVW viewWindow : viewWindows)
 		{
 			eraseAllMenusForWindow(viewWindow);
-			addMenusToWindow(viewWindow);
+			addMenusToWindow(viewWindow, viewWindow.supportsFullscreen(), viewWindow.supportsMaximizing());
 		}
 	}
 

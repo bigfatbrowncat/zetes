@@ -167,4 +167,9 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		return true;
 	}
 
+	@Override
+	public boolean supportsMaximizing()
+	{
+		return true;
+	}
 }

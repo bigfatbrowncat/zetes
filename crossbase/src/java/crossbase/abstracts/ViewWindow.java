@@ -23,4 +23,5 @@ public interface ViewWindow<TD extends Document>
 	void open();
 	
 	boolean supportsFullscreen();
+	boolean supportsMaximizing();
 }

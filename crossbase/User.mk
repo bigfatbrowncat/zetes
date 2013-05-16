@@ -5,6 +5,8 @@ SRC = src
 BIN = bin
 OBJ = obj
 
+PWD = $(shell pwd)
+
 DEBUG_OPTIMIZE = -O3 #-O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
@@ -22,7 +24,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
   PLATFORM_TAG = linux-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
+  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   JNILIB_EXT=.so
@@ -33,7 +35,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
   PLATFORM_TAG = linux-armv6l
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
+  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   JNILIB_EXT=.so
@@ -44,7 +46,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_ARCH = windows x86_64
   PLATFORM_TAG = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   JNILIB_EXT=.dll
@@ -61,6 +63,9 @@ OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
 
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
 JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+CUSTOM_JARS =  $(shell find lib/java -name \*.jar)
+BUILD_CLASSPATHS = $(shell echo "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(CROSSBASE_PATH)/bin/java/crossbase.jar$(CLASSPATH_DELIM)$(CUSTOM_JARS)" | awk 'gsub(/ +/, "$(CLASSPATH_DELIM)"); 1';)
+
 
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
@@ -91,7 +96,7 @@ $(CROSSBASE_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(CROSSBASE_PATH)/bin/$(PLATFO
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(CROSSBASE_PATH)/bin/java/crossbase.jar
 	@echo Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(CROSSBASE_PATH)/bin/java/crossbase.jar" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(BUILD_CLASSPATHS)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...
@@ -117,10 +122,16 @@ $(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libcrossbase/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
-$(BIN)/java/boot.jar: $(CROSSBASE_PATH)/bin/java/crossbase.jar $(JAVA_CLASSES)
+$(BIN)/java/boot.jar: $(CROSSBASE_PATH)/bin/java/crossbase.jar $(JAVA_CLASSES) $(CUSTOM_JARS)
 	@echo Constructing $@...
-	mkdir -p $(BIN)/java;
+	mkdir -p $(BIN)/java/classes;
 
+	# Extracting custom jars
+	for cust_jar in $(CUSTOM_JARS); do \
+	    echo Extracting $$cust_jar...; \
+	    (cd $(BIN)/java/classes; "$(JAVA_HOME)/bin/jar" xvf $(PWD)/$$cust_jar ); \
+	done
+	
 	# Making the java class library
 	cp -f $(CROSSBASE_PATH)/bin/java/crossbase.jar $(BIN)/java/boot.jar; \
 	( \

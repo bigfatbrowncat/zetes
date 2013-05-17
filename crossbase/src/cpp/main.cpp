@@ -57,7 +57,7 @@ int main(int argc, const char** argv)
 
 	JavaVMInitArgs vmArgs;
 	vmArgs.version = JNI_VERSION_1_2;
-	vmArgs.nOptions = 3;
+	vmArgs.nOptions = 4;
 	vmArgs.ignoreUnrecognized = JNI_TRUE;
 
 	JavaVMOption options[vmArgs.nOptions];
@@ -67,14 +67,14 @@ int main(int argc, const char** argv)
 	options[1].optionString = const_cast<char*>("-Xmx16000m");	// 16GB should be enough
 
 	// Setting SWT libraries path
-	/*string swtExecPath = WinLinMacApi::locateExecutable();
+	string swtExecPath = WinLinMacApi::locateExecutable();
 	swtExecPath = "-Dswt.library.path=" + swtExecPath;
-	options[2].optionString = const_cast<char*>(swtExecPath.c_str());*/
+	options[2].optionString = const_cast<char*>(swtExecPath.c_str());
 
 	// Setting other libraries path
 	string execPath = WinLinMacApi::locateExecutable();
 	execPath = "-Djava.library.path=" + execPath;
-	options[2].optionString = const_cast<char*>(execPath.c_str());
+	options[3].optionString = const_cast<char*>(execPath.c_str());
 
 	JavaVM* vm;
 	void* env;

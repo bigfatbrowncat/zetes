@@ -12,8 +12,8 @@ DEBUG_OPTIMIZE = -O3 #-O0 -g
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
   PLATFORM_TAG = osx-x86_64
-  PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
-  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon
+  PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers $(CUSTOM_INCLUDES)
+  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   JNILIB_EXT=.jnilib
@@ -23,7 +23,7 @@ ifeq ($(UNAME), Darwin)	# OS X
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
   PLATFORM_TAG = linux-x86_64
-  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
@@ -34,7 +34,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
   PLATFORM_TAG = linux-armv6l
-  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
@@ -45,7 +45,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
 else ifeq ($(OS), Windows_NT)	# Windows
   PLATFORM_ARCH = windows x86_64
   PLATFORM_TAG = win-x86_64
-  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
@@ -146,4 +146,4 @@ clean:
 	rm -rf $(BIN)
 
 .PHONY: all
-.SILENT:
+#.SILENT:

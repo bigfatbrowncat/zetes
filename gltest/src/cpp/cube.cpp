@@ -1,7 +1,12 @@
 #include <jni.h>
 
+#ifdef __APPLE__
+#include <gl.h>
+#include <glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 GLfloat light_diffuse[] = {1.0, 0.0, 0.0, 1.0};  /* Red diffuse light. */
 GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};  /* Infinite light location. */
@@ -62,6 +67,8 @@ void init()
 
   /* Use depth buffering for hidden surface elimination. */
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_FRONT);
 
   /* Setup the view of the cube. */
   glMatrixMode(GL_PROJECTION);

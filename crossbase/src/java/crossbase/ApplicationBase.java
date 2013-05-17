@@ -132,7 +132,7 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 	{
 	}
 	
-	public void run(String[] arguments)
+	public void run(String[] arguments, Runnable beforeEventLoop)
 	{
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		try
@@ -181,6 +181,8 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 				viewWindowsManager.ensureThereIsOpenedWindow();
 			}
 			
+			if (beforeEventLoop != null) beforeEventLoop.run();
+					
 			eventLoop();
 			
 		}

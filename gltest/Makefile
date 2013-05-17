@@ -2,6 +2,16 @@ CROSSBASE_PATH = ../crossbase
 
 APPLICATION_NAME = GL\ Demo
 BINARY_NAME = gltest
-CUSTOM_LIBS = -lopengl32 -lglu32
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Darwin)	# OS X
+  CUSTOM_INCLUDES = -I/System/Library/Frameworks/OpenGL.framework/Headers
+  CUSTOM_LIBS = -framework OpenGL
+else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
+  CUSTOM_LIBS = -lopengl32 -lglu32
+else ifeq ($(OS), Windows_NT)	# Windows
+  CUSTOM_LIBS = -lopengl32 -lglu32
+endif
 
 include $(CROSSBASE_PATH)/User.mk

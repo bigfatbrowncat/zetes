@@ -121,7 +121,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 	
 	public static void main(String... args)
 	{
-		new TinyViewerApplication().run(args);
+		new TinyViewerApplication().run(args, null);
 	}
 
 	@Override

@@ -15,7 +15,15 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocume
 	 */
 	public static void main(String[] args)
 	{
-		new GLTestApplication().run(args);
+		final GLTestApplication app = new GLTestApplication();
+		
+		app.run(args, new Runnable()
+		{
+			public void run()
+			{
+				app.getViewWindowsManager().openViewForDocument(new GLDocument());
+			}
+		});
 	}
 
 	@Override

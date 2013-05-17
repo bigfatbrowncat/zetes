@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
@@ -26,14 +23,12 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 			views.put(document, new ArrayList<TVW>());
 		}
 		
-		System.out.println("adding window: " + window + " document: " + document);
 		views.get(document).add(window);
 	}
 	
 	private void findAndRemoveWindow(TVW window)
 	{
 		TD doc = window.getDocument();
-		System.out.println("removing window: " + window + " document: " + doc);
 		views.get(doc).remove(window);
 		
 		if (views.get(doc).size() == 0)
@@ -79,8 +74,6 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 		Object[] docs = views.keySet().toArray();
 		for (int i = 0; i < docs.length; i++)
 		{
-			System.out.println("closing " + docs[i]);
-			System.out.flush();
 			closeAllWindowsForDocument((TD)docs[i]);
 		}
 	}

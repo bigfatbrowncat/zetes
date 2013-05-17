@@ -63,7 +63,7 @@ OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
 
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
 JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
-CUSTOM_JARS =  $(shell find lib/java -name \*.jar)
+CUSTOM_JARS =  $(shell if [ -d "lib/java" ]; then find lib/java -name \*.jar; fi)
 BUILD_CLASSPATHS = $(shell echo "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(CROSSBASE_PATH)/bin/java/crossbase.jar$(CLASSPATH_DELIM)$(CUSTOM_JARS)" | awk 'gsub(/ +/, "$(CLASSPATH_DELIM)"); 1';)
 
 

@@ -141,12 +141,12 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	@Override
 	public boolean supportsFullscreen()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
 	public boolean supportsMaximizing()
 	{
-		return false;
+		return true;
 	}
 }

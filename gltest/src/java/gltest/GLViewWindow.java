@@ -21,7 +21,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 public class GLViewWindow extends ViewWindowBase<GLDocument>
 {
-	private static native void initCube();
+	private static native void initScene(int width, int height);
 	private static native void redrawCube(double angle);
 	
 	private double angle = 0;
@@ -34,12 +34,28 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		super(applicationTitle, windowsManager, menuConstructor);
 	}
 	
+	private static void updateCanvas(GLCanvas canvas, boolean initSceneAnyway)
+	{
+		boolean initScene = initSceneAnyway;
+		if (!canvas.isCurrent()) 
+		{
+			canvas.setCurrent();
+			initScene = true;
+		}
+		
+		if (initScene)
+		{
+			Point size = canvas.getSize();
+			initScene(size.x, size.y);
+		}
+	}
+	
 	/**
 	 * @wbp.parser.entryPoint
 	 */
 	protected Shell constructShell()
 	{
-		Shell shell = new Shell(SWT.CLOSE | SWT.MIN | SWT.TITLE);
+		Shell shell = new Shell(SWT.CLOSE | SWT.MIN | SWT.TITLE | SWT.MAX | SWT.RESIZE);
 		
 		Point size = shell.getSize();
 		Point clientSize = new Point(shell.getClientArea().width, shell.getClientArea().height);
@@ -51,35 +67,34 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		comp.setLayout(new FillLayout());
 		GLData data = new GLData ();
 		data.doubleBuffer = true;
-		final GLCanvas canvas = new GLCanvas(comp, SWT.NONE, data);
+		final GLCanvas canvas = new GLCanvas(comp, SWT.NO_BACKGROUND, data);
 		canvas.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
 
-
-		/*canvas.addControlListener(new ControlListener() {
+		canvas.addControlListener(new ControlListener()
+		{
 			
 			@Override
-			public void controlResized(ControlEvent arg0) {
-				//canvas.redraw();
-				
+			public void controlResized(ControlEvent arg0)
+			{
+				updateCanvas(canvas, true);
 			}
 			
 			@Override
-			public void controlMoved(ControlEvent arg0) {
+			public void controlMoved(ControlEvent arg0)
+			{
 				// TODO Auto-generated method stub
 				
 			}
 		});
-		*/
-		canvas.addPaintListener(new PaintListener() {
-			
+		
+		canvas.addPaintListener(new PaintListener()
+		{
 			@Override
-			public void paintControl(PaintEvent arg0) {
-
-				if (!canvas.isCurrent()) canvas.setCurrent();
-				initCube();
+			public void paintControl(PaintEvent arg0)
+			{
+				updateCanvas(canvas, false);
 				redrawCube(angle);
 				canvas.swapBuffers();
-
 			}
 		});
 		
@@ -99,34 +114,6 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		
 		timerUpdateRunnable.run();
 
-		/*try {
-			GLContext.useContext(canvas);
-		} catch(LWJGLException e) { e.printStackTrace(); }
-
-		canvas.addListener(SWT.Resize, new Listener() {
-			public void handleEvent(Event event) {
-				Rectangle bounds = canvas.getBounds();
-				float fAspect = (float) bounds.width / (float) bounds.height;
-				canvas.setCurrent();
-				try {
-					GLContext.useContext(canvas);
-				} catch(LWJGLException e) { e.printStackTrace(); }
-				GL11.glViewport(0, 0, bounds.width, bounds.height);
-				GL11.glMatrixMode(GL11.GL_PROJECTION);
-				GL11.glLoadIdentity();
-				GLU.gluPerspective(45.0f, fAspect, 0.5f, 400.0f);
-				GL11.glMatrixMode(GL11.GL_MODELVIEW);
-				GL11.glLoadIdentity();
-			}
-		});
-
-		GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		GL11.glColor3f(1.0f, 0.0f, 0.0f);
-		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
-		GL11.glClearDepth(1.0);
-		GL11.glLineWidth(2);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);*/
-		
 		return shell;
 	}
 	

@@ -137,4 +137,10 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);
 		return menuConstructor;
 	}
+
+	@Override
+	public boolean needsAtLeastOneView()
+	{
+		return false;
+	}
 }

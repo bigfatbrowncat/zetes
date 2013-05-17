@@ -7,8 +7,7 @@ import crossbase.abstracts.MenuConstructor;
 
 public interface ViewWindow<TD extends Document>
 {
-	boolean documentIsLoaded();
-	void loadDocument(TD document);
+	void setDocument(TD document);
 	
 	Menu getMenu();
 	TD getDocument();

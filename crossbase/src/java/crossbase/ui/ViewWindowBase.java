@@ -24,6 +24,19 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	
 	protected Shell shell;
 	private String applicationTitle;
+	private TD document;
+	
+	@Override
+	public TD getDocument()
+	{
+		return document;
+	}
+	
+	@Override
+	public void setDocument(TD document)
+	{
+		this.document = document;
+	}
 	
 	@SuppressWarnings("rawtypes")
 	private void setCocoaFullscreenButton(boolean on)

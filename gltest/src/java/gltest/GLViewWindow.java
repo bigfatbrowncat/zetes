@@ -118,27 +118,6 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	}
 	
 	@Override
-	public boolean documentIsLoaded()
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void loadDocument(GLDocument document)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public GLDocument getDocument()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean supportsFullscreen()
 	{
 		return true;

@@ -23,4 +23,12 @@ public interface Application<TAB extends DefaultAboutBox, TD extends Document, T
 	 * if it can't be created from a file at all. 
 	 */
 	TD loadFromFile(String fileName);
+	
+	/**
+	 * Behaviour controlling function. Should return constant. 
+	 * @return If the overridden function returns true, when we start the application
+	 * it creates a new empty view window (even on OS X). When the last view window
+	 * (not necessarily the same) is closed, the application will close (yes, even on OS X too).
+	 */
+	boolean needsAtLeastOneView();
 }

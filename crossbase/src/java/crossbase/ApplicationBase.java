@@ -13,6 +13,7 @@ import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.ViewWindowsManager;
@@ -132,6 +133,21 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 	{
 	}
 	
+	ViewWindowsManagerListener viewWindowsManagerListener = new ViewWindowsManagerListener()
+	{
+		@Override
+		public void lastWindowClosed()
+		{
+			if (!SWT.getPlatform().equals("cocoa") || needsAtLeastOneView())
+			{
+				if (Display.getDefault() != null && !Display.getDefault().isDisposed())
+				{
+					Display.getDefault().dispose();
+				}
+			}
+		}
+	};
+	
 	public void run(String[] arguments, Runnable beforeEventLoop)
 	{
 		SingleAppInstanceDocumentHandler mdiHelper = null;
@@ -140,6 +156,8 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 			Display.setAppName(getTitle());
 	
 			viewWindowsManager = createViewWindowsManager();
+			
+			viewWindowsManager.addListener(viewWindowsManagerListener);
 
 			menuConstructor = createMenuConstructor();
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
@@ -177,7 +195,11 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 					e.printStackTrace();
 					return;
 				}
-	
+			}
+			
+			if (!SWT.getPlatform().equals("cocoa") || needsAtLeastOneView())
+			{
+				// Opening the first empty view when we need it 
 				viewWindowsManager.ensureThereIsOpenedWindow();
 			}
 			
@@ -185,6 +207,7 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 					
 			eventLoop();
 			
+			viewWindowsManager.removeListener(viewWindowsManagerListener);
 		}
 		finally
 		{

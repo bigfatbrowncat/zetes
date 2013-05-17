@@ -24,7 +24,6 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	private ScrolledComposite scrolledComposite;
 	private DropTarget scrolledCompositeDropTarget, imageViewDropTarget;
 	private ImageView imageView;
-	private ImageDocument imageDocument;
 	private HashSet<DropTargetAdapter> dropTargetAdapters = new HashSet<DropTargetAdapter>();
 
 	public void addDropTargetListener(DropTargetAdapter dropTargetAdapter)
@@ -131,12 +130,12 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	}
 	
 	@Override
-	public void loadDocument(ImageDocument document)
+	public void setDocument(ImageDocument document)
 	{
-		this.imageDocument = (ImageDocument)document;
+		super.setDocument(document);
 		
-		imageView.setImage(imageDocument.getImage());
-		shell.setText(imageDocument.getTitle() + " \u2013 " + getApplicationTitle());
+		imageView.setImage(getDocument().getImage());
+		shell.setText(getDocument().getTitle() + " \u2013 " + getApplicationTitle());
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		updateImageViewSize();
 		imageView.setVisible(true);
@@ -144,21 +143,9 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		getMenuConstructor().updateMenus();
 	}
 	
-	@Override
-	public boolean documentIsLoaded()
-	{
-		return imageView.getImage() != null;
-	}
-	
 	public boolean isDisposed()
 	{
 		return shell.isDisposed();
-	}
-
-	@Override
-	public ImageDocument getDocument()
-	{
-		return imageDocument;
 	}
 
 	@Override

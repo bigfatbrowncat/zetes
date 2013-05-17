@@ -54,8 +54,13 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocume
 	@Override
 	public GLDocument loadFromFile(String fileName)
 	{
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean needsAtLeastOneView()
+	{
+		return true;
 	}
 
 }

@@ -1,6 +1,8 @@
 package crossbase.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -8,12 +10,38 @@ import org.eclipse.swt.widgets.Display;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowsManagerListener;
 
 public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWindow<TD>>
 {
-	private ArrayList<TVW> windows = new ArrayList<TVW>();
+	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
 	private MenuConstructor<TD, TVW> menuConstructor;
 
+	private HashSet<ViewWindowsManagerListener> listeners = new HashSet<ViewWindowsManagerListener>();
+	
+	private void addWindowForDocument(TD document, TVW window)
+	{
+		if (!views.containsKey(document))
+		{
+			views.put(document, new ArrayList<TVW>());
+		}
+		
+		System.out.println("adding window: " + window + " document: " + document);
+		views.get(document).add(window);
+	}
+	
+	private void findAndRemoveWindow(TVW window)
+	{
+		TD doc = window.getDocument();
+		System.out.println("removing window: " + window + " document: " + doc);
+		views.get(doc).remove(window);
+		
+		if (views.get(doc).size() == 0)
+		{
+			views.remove(doc);
+		}
+	}
+	
 	/**
 	 * Closes the window. If no windows remain opened 
 	 * and we are not in OS X, terminates the application.
@@ -21,15 +49,23 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 */
 	public void closeWindow(TVW viewWindow)
 	{
-		windows.remove(viewWindow);
+		findAndRemoveWindow(viewWindow);
 		
-		if (!SWT.getPlatform().equals("cocoa"))
+		if (views.size() == 0)
 		{
-			if (windows.size() == 0 && Display.getDefault() != null && !Display.getDefault().isDisposed())
-			{
-				Display.getDefault().dispose();
-			}
+			callListenersLastWindowClosed();
 		}
+		
+	}
+	
+	public void closeAllWindowsForDocument(TD document)
+	{
+		for (TVW view : views.get(document))
+		{
+			closeWindow(view);
+		}
+		
+		views.remove(document);
 	}
 	
 	/**
@@ -37,11 +73,15 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 * if we are not in OS X, terminates the application.
 	 * @param viewWindow The window to close
 	 */
+	@SuppressWarnings("unchecked")
 	public void closeAllWindows()
 	{
-		while (windows.size() > 0)
+		Object[] docs = views.keySet().toArray();
+		for (int i = 0; i < docs.length; i++)
 		{
-			closeWindow(windows.get(0));
+			System.out.println("closing " + docs[i]);
+			System.out.flush();
+			closeAllWindowsForDocument((TD)docs[i]);
 		}
 	}
 	
@@ -60,9 +100,10 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 		
 		if (document != null)
 		{
-			newWindow.loadDocument(document);
+			newWindow.setDocument(document);
 		}
-		windows.add(newWindow);
+		
+		addWindowForDocument(document, newWindow);
 		return newWindow;
 	}
 	
@@ -75,14 +116,25 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	public TVW openViewForDocument(TD document)
 	{
 		if (document == null) throw new IllegalArgumentException("file name shouldn't be null");
-		
+
 		// Searching for an empty window
-		for (TVW vw : windows)
+		if (views.containsKey(null))
 		{
-			if (!vw.documentIsLoaded())
+			if (views.get(null).size() > 0)
 			{
-				vw.loadDocument(document);
-				return vw;
+				// Loading the document to the found empty window
+				TVW vw = views.get(null).get(0);
+				
+				// Removing the window from empty windows list
+				findAndRemoveWindow(vw);
+
+				// Loading the new document for the window
+				vw.setDocument(document);
+
+				// Adding the window to the document windows list
+				addWindowForDocument(document, vw);
+				
+				return vw; 
 			}
 		}
 		
@@ -107,7 +159,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 */
 	public void ensureThereIsOpenedWindow()
 	{
-		if (windows.size() == 0)
+		if (views.size() == 0)
 		{
 			openNewWindow(null);
 		}
@@ -121,5 +173,23 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	public void setMenuConstructor(MenuConstructor<TD, TVW> menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
+	}
+	
+	protected void callListenersLastWindowClosed()
+	{
+		for (ViewWindowsManagerListener listener : listeners)
+		{
+			listener.lastWindowClosed();
+		}
+	}
+	
+	public void addListener(ViewWindowsManagerListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void removeListener(ViewWindowsManagerListener listener)
+	{
+		listeners.remove(listener);
 	}
 }

@@ -13,7 +13,8 @@ using namespace std;
 #include "gl3.h"
 #include "glu.h"
 #else
-#include <GL/gl.h>
+//#include <GL/gl.h>
+#include "GL3/gl3w.h"
 #include <GL/glu.h>
 #endif
 
@@ -160,8 +161,8 @@ void drawScene(double angle)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
+	//glMatrixMode(GL_MODELVIEW);
+	//glPushMatrix();
 	{
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -184,12 +185,17 @@ void drawScene(double angle)
 		glDisableVertexAttribArray(0);
 	}
 
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 
 void init()
 {
+	if (gl3wInit())
+	{
+		printf("Problem initializing OpenGL\n");
+	}
+
 	// Creating a VAO (Vertex Array Object0
 	glGenVertexArrays(1, &VertexArrayID);
 

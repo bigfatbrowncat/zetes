@@ -16,13 +16,13 @@ static void close_libgl(void)
 	FreeLibrary(libgl);
 }
 
-static void *get_proc(const char *proc)
+static void *get_proc(LPCSTR procn)
 {
 	void *res;
 
-	res = wglGetProcAddress(proc);
+	res = (void*)wglGetProcAddress(procn);
 	if (!res)
-		res = GetProcAddress(libgl, proc);
+		res = (void*)GetProcAddress(libgl, procn);
 	return res;
 }
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
@@ -98,7 +98,7 @@ static int parse_version(void)
 
 	if (version.major < 3)
 		return -1;
-	printf("version: %d\n", version.major);
+
 	return 0;
 }
 

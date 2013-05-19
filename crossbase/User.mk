@@ -2,6 +2,7 @@ UNAME := $(shell uname)
 ARCH := $(shell uname -m)
 
 SRC = src
+INCLUDE = include
 BIN = bin
 OBJ = obj
 
@@ -101,7 +102,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(CROSSBASE_PATH)/bin/java
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...
 	mkdir -p $(OBJECTS_PATH)
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
+	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $< -o $@
 
 $(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	@echo Linking $@...

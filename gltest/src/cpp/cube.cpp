@@ -1,99 +1,241 @@
+#include <stddef.h>
+
+#include <algorithm>
+#include <string>
+#include <vector>
+
+using namespace std;
+
 #include <jni.h>
 
 #ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
+#include "gl.h"
+#include "gl3.h"
+#include "glu.h"
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
 
-GLfloat light_diffuse[] = {1.0, 0.0, 0.0, 1.0};  /* Red diffuse light. */
-GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};  /* Infinite light location. */
-GLfloat n[6][3] = {  /* Normals for the 6 faces of a cube. */
-  {-1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {1.0, 0.0, 0.0},
-  {0.0, -1.0, 0.0}, {0.0, 0.0, 1.0}, {0.0, 0.0, -1.0} };
-GLint faces[6][4] = {  /* Vertex indices for the 6 faces of a cube. */
-  {0, 1, 2, 3}, {3, 2, 6, 7}, {7, 6, 5, 4},
-  {4, 5, 1, 0}, {5, 6, 2, 1}, {7, 4, 0, 3} };
-GLfloat v[8][3];  /* Will be filled in with X,Y,Z vertexes. */
+static GLuint VertexArrayID;
+// This will identify our vertex buffer
+static GLuint vertexbuffer;
 
-void
-drawBox(double angle)
+static GLuint programID;
+
+// An array of 3 vectors which represents 3 vertices
+static const GLfloat g_vertex_buffer_data[] = {
+   -1.0f, -1.0f, 0.0f,
+   1.0f, -1.0f, 0.0f,
+   0.0f,  1.0f, 0.0f,
+};
+
+void getGlVersion(int *major, int *minor)
 {
-	int i;
+    const char *verstr = (const char *) glGetString(GL_VERSION);
+    if ((verstr == NULL) || (sscanf(verstr,"%d.%d", major, minor) != 2))
+    {
+        *major = *minor = 0;
+        fprintf(stderr, "Invalid GL_VERSION format!!!\n");
+    }
+}
+
+void getGlslVersion(int *major, int *minor)
+{
+    int gl_major, gl_minor;
+    getGlVersion(&gl_major, &gl_minor);
+
+    *major = *minor = 0;
+    if(gl_major == 1)
+    {
+        /* GL v1.x can only provide GLSL v1.00 as an extension */
+        const char *extstr = (const char *) glGetString(GL_EXTENSIONS);
+        if ((extstr != NULL) &&
+            (strstr(extstr, "GL_ARB_shading_language_100") != NULL))
+        {
+            *major = 1;
+            *minor = 0;
+        }
+    }
+    else if (gl_major >= 2)
+    {
+        /* GL v2.0 and greater must parse the version string */
+        const char *verstr =
+            (const char *) glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+        if((verstr == NULL) ||
+            (sscanf(verstr, "%d.%d", major, minor) != 2))
+        {
+            *major = *minor = 0;
+            fprintf(stderr,
+                "Invalid GL_SHADING_LANGUAGE_VERSION format!!!\n");
+        }
+    }
+}
+
+GLuint LoadShaders()
+{
+    // Read the Vertex Shader code from the file
+    std::string VertexShaderCode = string() +
+    		"#version 150"                                         + "\n" +
+    		"in vec3 vertexPosition_modelspace;"                        + "\n" +
+    		"void main()"                                               + "\n" +
+    		"{"                                                         + "\n" +
+    		"    gl_Position.xyz = vertexPosition_modelspace;"          + "\n" +
+    		"    gl_Position.w = 1.0;"                                  + "\n" +
+            "}\n";
+
+    // Read the Fragment Shader code from the file
+    std::string FragmentShaderCode = string() +
+			"#version 150"                                         + "\n" +
+			"out vec3 color;"                                           + "\n" +
+			"void main()"                                               + "\n" +
+			"{"                                                         + "\n" +
+			"    color = vec3(1,0,0);"                                  + "\n" +
+			"}\n";
+
+
+    // Create the shaders
+    GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+    GLint result = GL_FALSE;
+    int infoLogMaxLength = 1024;
+    int infoLogRealLength;
+
+    // Compiling Vertex Shader
+    printf("Compiling vertex shader\n");
+    char const * VertexSourcePointer = VertexShaderCode.c_str();
+    glShaderSource(vertexShaderID, 1, &VertexSourcePointer, NULL);
+    glCompileShader(vertexShaderID);
+
+    // Checking Vertex Shader
+    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &result);
+    printf("Compilation %s\n", (result == GL_TRUE) ? "succeeded" : "failed");
+
+    // Getting the log
+    glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
+    char VertexShaderErrorMessage[infoLogMaxLength];
+    glGetShaderInfoLog(vertexShaderID, infoLogMaxLength, &infoLogRealLength, VertexShaderErrorMessage);
+    fprintf(stdout, "%s\n", VertexShaderErrorMessage);
+
+
+    // Compiling Fragment Shader
+    printf("Compiling fragment shader\n");
+    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+    glShaderSource(fragmentShaderID, 1, &FragmentSourcePointer , NULL);
+    glCompileShader(fragmentShaderID);
+
+    // Checking Fragment Shader
+    glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &result);
+    printf("Compilation %s\n", (result == GL_TRUE) ? "succeeded" : "failed");
+
+    // Getting the log
+    glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
+    char FragmentShaderErrorMessage[infoLogMaxLength];
+    glGetShaderInfoLog(fragmentShaderID, infoLogMaxLength, &infoLogRealLength, FragmentShaderErrorMessage);
+    fprintf(stdout, "%s\n", FragmentShaderErrorMessage);
+
+    // Link the program
+    fprintf(stdout, "Linking program\n");
+    GLuint ProgramID = glCreateProgram();
+    glAttachShader(ProgramID, vertexShaderID);
+    glAttachShader(ProgramID, fragmentShaderID);
+    glLinkProgram(ProgramID);
+
+    // Check the program
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &result);
+    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
+    char ProgramErrorMessage[infoLogMaxLength];
+    glGetProgramInfoLog(ProgramID, infoLogMaxLength, &infoLogRealLength, ProgramErrorMessage);
+    fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
+
+    glDeleteShader(vertexShaderID);
+    glDeleteShader(fragmentShaderID);
+
+    return ProgramID;
+}
+
+void drawScene(double angle)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
-
 	glPushMatrix();
 	{
-		glTranslatef(0.0, 0.0, -1.0);
-		glRotatef(60 * (1 + angle), 1.0, 0.0, 0.0);
-		glRotatef(-20 * (1 + angle), 0.0, 0.0, 1.0);
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+		   0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		   3,                  // size
+		   GL_FLOAT,           // type
+		   GL_FALSE,           // normalized?
+		   0,                  // stride
+		   (void*)0            // array buffer offset
+		);
 
-		for (i = 0; i < 6; i++)
-		{
-			glBegin(GL_QUADS);
-			glNormal3fv(&n[i][0]);
-			glVertex3fv(&v[faces[i][0]][0]);
-			glVertex3fv(&v[faces[i][1]][0]);
-			glVertex3fv(&v[faces[i][2]][0]);
-			glVertex3fv(&v[faces[i][3]][0]);
-			glEnd();
-		}
+		// Use our shader
+		glUseProgram(programID);
+
+		// Draw the triangle !
+		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+		glDisableVertexAttribArray(0);
 	}
 
 	glPopMatrix();
 }
 
-void init(int width, int height)
+
+void init()
 {
-	/* Setup cube vertex data. */
-	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -1;
-	v[4][0] = v[5][0] = v[6][0] = v[7][0] = 1;
-	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -1;
-	v[2][1] = v[3][1] = v[6][1] = v[7][1] = 1;
-	v[0][2] = v[3][2] = v[4][2] = v[7][2] = 1;
-	v[1][2] = v[2][2] = v[5][2] = v[6][2] = -1;
+	// Creating a VAO (Vertex Array Object0
+	glGenVertexArrays(1, &VertexArrayID);
 
-	/* Enable a single OpenGL light. */
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHTING);
+	// Binding the VAO
+	glBindVertexArray(VertexArrayID);
 
-	/* Use depth buffering for hidden surface elimination. */
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	// Generate 1 buffer, put the resulting identifier in vertexbuffer
+	glGenBuffers(1, &vertexbuffer);
 
-	/* Setup the view of the cube. */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective( /* field of view in degree */ 40.0,
-	/* aspect ratio */ (double)width / height,
-	/* Z near */ 1.0, /* Z far */ 10.0);
+	// The following commands will talk about our 'vertexbuffer' buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 5.0,  /* eye is at (0,0,5) */
-	0.0, 0.0, 0.0,      /* center is at (0,0,0) */
-	0.0, 1.0, 0.);      /* up is in positive Y direction */
+	// Give our vertices to OpenGL.
+	glBufferData(GL_ARRAY_BUFFER, (long)sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
+	int maj, min, slmaj, slmin;
+	getGlVersion(&maj, &min);
+	getGlslVersion(&slmaj, &slmin);
+
+	printf("OpenGL version: %d.%d\n", maj, min);
+	printf("GLSL version: %d.%d\n", slmaj, slmin);
+
+	programID = LoadShaders();
 }
+
+void resize(int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
 
 extern "C"
 {
-	JNIEXPORT void JNICALL Java_gltest_GLViewWindow_initScene(JNIEnv * env, jclass appClass, int width, int height)
+	JNIEXPORT void JNICALL Java_gltest_GLViewWindow_initScene(JNIEnv * env, jclass appClass)
 	{
-		init(width, height);
+		init();
 	}
 
-	JNIEXPORT void JNICALL Java_gltest_GLViewWindow_redrawCube(JNIEnv * env, jclass appClass, jdouble angle)
+	JNIEXPORT void JNICALL Java_gltest_GLViewWindow_resizeView(JNIEnv * env, jclass appClass, int width, int height)
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		resize(width, height);
+	}
 
-		drawBox(angle);
+	JNIEXPORT void JNICALL Java_gltest_GLViewWindow_drawScene(JNIEnv * env, jclass appClass, jdouble angle)
+	{
+		drawScene(angle);
 	}
 
 }

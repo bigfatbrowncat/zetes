@@ -31,7 +31,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 		DefaultAboutBox res = new DefaultAboutBox(parent);
 		res.setApplicationName(getTitle());
 		res.setIconResourceName("/crossbase/icon.png");
-		res.setDescriptionText("A simple image file viewer.\nThis application demonstrates the power of Avian + SWT");
+		res.setDescriptionText("A simple image file viewer.\nThis application shows the power of Avian + SWT");
 		res.setCopyrightText("Copyright \u00a9 2013, Ilya Mizus");
 		res.setWindowSize(new Point(370, 180));
 		return res;

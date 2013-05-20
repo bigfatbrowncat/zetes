@@ -35,23 +35,6 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		super(applicationTitle, windowsManager, menuConstructor);
 	}
 	
-/*	private static void updateCanvas(MyGLCanvas canvas, boolean initSceneAnyway)
-	{
-		boolean initScene = initSceneAnyway;
-		if (!canvas.isCurrent()) 
-		{
-			canvas.setCurrent();
-			initScene = true;
-		}
-		
-		if (initScene)
-		{
-			Point size = canvas.getSize();
-			System.out.println(size.x + "; " + size.y);
-			initScene(size.x, size.y);
-		}
-	}*/
-	
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -63,6 +46,14 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		Point clientSize = new Point(shell.getClientArea().width, shell.getClientArea().height);
 		
 		shell.setSize(size.x - clientSize.x + 640, size.y - clientSize.y + 480);
+		if (SWT.getPlatform().equals("win32"))
+		{
+			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/gltest16.png"));
+		}
+		else
+		{
+			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/gltest64.png"));
+		}
 		
 		shell.setLayout(new FillLayout());
 		Composite comp = new Composite(shell, SWT.NONE);

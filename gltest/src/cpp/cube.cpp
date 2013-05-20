@@ -149,7 +149,7 @@ GLuint LoadShaders()
     glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
     char ProgramErrorMessage[infoLogMaxLength];
     glGetProgramInfoLog(ProgramID, infoLogMaxLength, &infoLogRealLength, ProgramErrorMessage);
-    fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
+    fprintf(stdout, "%s\n", ProgramErrorMessage);
 
     glDeleteShader(vertexShaderID);
     glDeleteShader(fragmentShaderID);

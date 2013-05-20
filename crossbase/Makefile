@@ -51,6 +51,7 @@ else ifeq ($(OS), Windows_NT)	# Windows
 endif
 
 JAVA_SOURCE_PATH = $(SRC)/java
+JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
 JAVA_CLASSPATH = $(BIN)/java/classes
 CPP_SOURCE_PATH = $(SRC)/cpp
 BINARY_PATH = $(BIN)/$(PLATFORM_TAG)
@@ -59,7 +60,10 @@ OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
 LIBRARY_NAME = libcrossbase.a
 
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
+JAVA_PLATFORM_SPECIFIC_FILES = $(shell cd $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH); find . -name \*.java | awk '{ sub(/.\//,"") }; 1')
+
 JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+JAVA_PLATFORM_SPECIFIC_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_PLATFORM_SPECIFIC_FILES))))
 
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
@@ -73,6 +77,11 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
 	@echo Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
+
+$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES)
+	@echo Compiling platform specific $<...
+	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...
@@ -97,7 +106,7 @@ $(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
 	
 	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libavian/*.o
 
-$(BIN)/java/crossbase.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(SWT_CLASSES)
+$(BIN)/java/crossbase.jar: lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo Constructing $@...
 	mkdir -p $(BINARY_PATH);
 

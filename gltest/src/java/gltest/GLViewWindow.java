@@ -15,9 +15,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.opengl.GLCanvas;
+import org.eclipse.swt.opengl.CrossBaseGLCanvas;
 import org.eclipse.swt.opengl.GLData;
-import org.eclipse.swt.opengl.OSXGLCanvas;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 public class GLViewWindow extends ViewWindowBase<GLDocument>
@@ -71,113 +70,56 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		GLData data = new GLData ();
 		data.doubleBuffer = true;
 		
-		if (SWT.getPlatform().equals("cocoa"))
-		{
+		final CrossBaseGLCanvas canvas = new CrossBaseGLCanvas(comp, SWT.NO_BACKGROUND, data);
 		
-			final OSXGLCanvas canvas = new OSXGLCanvas(comp, SWT.NO_BACKGROUND, data);
-	
-			if (!canvas.isCurrent()) canvas.setCurrent();
-			initScene();
-			
-			canvas.addControlListener(new ControlListener()
-			{
-				
-				@Override
-				public void controlResized(ControlEvent arg0)
-				{
-					if (!canvas.isCurrent()) canvas.setCurrent();
-					Point size = canvas.getSize();
-					resizeView(size.x, size.y);
-				}
-				
-				@Override
-				public void controlMoved(ControlEvent arg0)
-				{
-					// TODO Auto-generated method stub
-					
-				}
-			});
-			
-			canvas.addPaintListener(new PaintListener()
-			{
-				@Override
-				public void paintControl(PaintEvent arg0)
-				{
-					if (!canvas.isCurrent()) canvas.setCurrent();
-					drawScene(angle);
-					canvas.swapBuffers();
-				}
-			});
-			
-			Runnable timerUpdateRunnable = new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					if (canvas != null && !canvas.isDisposed())
-					{
-						canvas.redraw();
-						angle += 0.01;
-						Display.getCurrent().timerExec(20, this);
-					}
-				}
-			};
-			
-			timerUpdateRunnable.run();
-		}
-		else
+		if (!canvas.isCurrent()) canvas.setCurrent();
+		initScene();
+		
+		canvas.addControlListener(new ControlListener()
 		{
-			final GLCanvas canvas = new GLCanvas(comp, SWT.NO_BACKGROUND, data);
 			
-			if (!canvas.isCurrent()) canvas.setCurrent();
-			initScene();
-			
-			canvas.addControlListener(new ControlListener()
+			@Override
+			public void controlResized(ControlEvent arg0)
 			{
+				if (!canvas.isCurrent()) canvas.setCurrent();
+				Point size = canvas.getSize();
+				resizeView(size.x, size.y);
+			}
+			
+			@Override
+			public void controlMoved(ControlEvent arg0)
+			{
+				// TODO Auto-generated method stub
 				
-				@Override
-				public void controlResized(ControlEvent arg0)
-				{
-					if (!canvas.isCurrent()) canvas.setCurrent();
-					Point size = canvas.getSize();
-					resizeView(size.x, size.y);
-				}
-				
-				@Override
-				public void controlMoved(ControlEvent arg0)
-				{
-					// TODO Auto-generated method stub
-					
-				}
-			});
-			
-			canvas.addPaintListener(new PaintListener()
+			}
+		});
+		
+		canvas.addPaintListener(new PaintListener()
+		{
+			@Override
+			public void paintControl(PaintEvent arg0)
 			{
-				@Override
-				public void paintControl(PaintEvent arg0)
-				{
-					if (!canvas.isCurrent()) canvas.setCurrent();
-					drawScene(angle);
-					canvas.swapBuffers();
-				}
-			});
-			
-			Runnable timerUpdateRunnable = new Runnable()
+				if (!canvas.isCurrent()) canvas.setCurrent();
+				drawScene(angle);
+				canvas.swapBuffers();
+			}
+		});
+		
+		Runnable timerUpdateRunnable = new Runnable()
+		{
+			@Override
+			public void run()
 			{
-				@Override
-				public void run()
+				if (canvas != null && !canvas.isDisposed())
 				{
-					if (canvas != null && !canvas.isDisposed())
-					{
-						canvas.redraw();
-						angle += 0.01;
-						Display.getCurrent().timerExec(20, this);
-					}
+					canvas.redraw();
+					angle += 0.01;
+					Display.getCurrent().timerExec(20, this);
 				}
-			};
-			
-			timerUpdateRunnable.run();			
-		}
+			}
+		};
+		
+		timerUpdateRunnable.run();			
 
 		return shell;
 	}

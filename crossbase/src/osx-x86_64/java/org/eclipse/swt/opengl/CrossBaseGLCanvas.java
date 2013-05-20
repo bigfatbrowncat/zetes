@@ -6,16 +6,11 @@ import org.eclipse.swt.internal.cocoa.*;
 import org.eclipse.swt.opengl.GLData;
 
 /**
- * OSXGLCanvas is a widget capable of displaying OpenGL content. It's based on default SWT GLCanvas, but improved a bit
- * 
- * @see GLData
- * @see <a href="http://www.eclipse.org/swt/snippets/#opengl">OpenGL snippets</a>
- * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
- *
- * @since 3.2
+ * CrossBaseGLCanvas is a widget capable of displaying OpenGL content.
+ * This is the OS X x86_64 version of the widget
  */
 
-public class OSXGLCanvas extends Canvas {
+public class CrossBaseGLCanvas extends Canvas {
 	NSOpenGLContext context;
 	NSOpenGLPixelFormat pixelFormat;
 	
@@ -35,7 +30,7 @@ public class OSXGLCanvas extends Canvas {
  *     <li>ERROR_UNSUPPORTED_DEPTH when the requested attributes cannot be provided</ul> 
  * </ul>
  */
-public OSXGLCanvas (Composite parent, int style, GLData data) {
+public CrossBaseGLCanvas (Composite parent, int style, GLData data) {
 	super (parent, style);
 	if (data == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	int attrib [] = new int [MAX_ATTRIBUTES];

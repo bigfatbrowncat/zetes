@@ -8,14 +8,7 @@ using namespace std;
 
 #include <jni.h>
 
-#ifdef __APPLE__
-#include "gl.h"
-#include "gl3.h"
-#include "glu.h"
-#else
 #include "GL3/gl3w.h"
-#include <GL/glu.h>
-#endif
 
 #include "cubex/ShaderProgram.h"
 

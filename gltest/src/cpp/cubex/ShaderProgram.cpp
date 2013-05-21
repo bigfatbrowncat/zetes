@@ -44,6 +44,7 @@ namespace cubex
 	    // Getting the log
 	    glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
 	    char vertexShaderErrorMessage[infoLogMaxLength];
+	    vertexShaderErrorMessage[0] = 0;
 	    glGetShaderInfoLog(vertexShaderID, infoLogMaxLength, &infoLogRealLength, vertexShaderErrorMessage);
 	    if (strlen(vertexShaderErrorMessage) > 0)
 	    {
@@ -64,6 +65,7 @@ namespace cubex
 	    // Getting the log
 	    glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
 	    char fragmentShaderErrorMessage[infoLogMaxLength];
+	    fragmentShaderErrorMessage[0] = 0;
 	    glGetShaderInfoLog(fragmentShaderID, infoLogMaxLength, &infoLogRealLength, fragmentShaderErrorMessage);
 	    if (strlen(fragmentShaderErrorMessage) > 0)
 	    {

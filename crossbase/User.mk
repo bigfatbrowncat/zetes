@@ -147,4 +147,4 @@ clean:
 	rm -rf $(BIN)
 
 .PHONY: all
-#.SILENT:
+.SILENT:

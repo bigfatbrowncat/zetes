@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -86,7 +88,8 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type 
 		((MenuConstructor)menuConstructor).addWindow(this);		
-		
+		menuConstructor.updateMenus();
+
 		shell.layout();
 		shell.open();
 	}

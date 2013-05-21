@@ -86,7 +86,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CL
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...
 	mkdir -p $(OBJECTS_PATH)
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) $< -o $@
+	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
 $(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
 	@echo Constructing $@...

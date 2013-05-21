@@ -45,7 +45,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		Point size = shell.getSize();
 		Point clientSize = new Point(shell.getClientArea().width, shell.getClientArea().height);
 		
-		shell.setSize(size.x - clientSize.x + 640, size.y - clientSize.y + 480);
+		shell.setSize(size.x - clientSize.x + 800, size.y - clientSize.y + 600);
 		if (SWT.getPlatform().equals("win32"))
 		{
 			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/gltest16.png"));

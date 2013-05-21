@@ -13,16 +13,19 @@ using namespace std;
 #include "gl3.h"
 #include "glu.h"
 #else
-//#include <GL/gl.h>
 #include "GL3/gl3w.h"
 #include <GL/glu.h>
 #endif
+
+#include "cubex/ShaderProgram.h"
+
+using namespace cubex;
 
 static GLuint VertexArrayID;
 // This will identify our vertex buffer
 static GLuint vertexbuffer;
 
-static GLuint programID;
+static ShaderProgram* program;
 
 // An array of 3 vectors which represents 3 vertices
 static const GLfloat g_vertex_buffer_data[] = {
@@ -74,89 +77,6 @@ void getGlslVersion(int *major, int *minor)
     }
 }
 
-GLuint LoadShaders()
-{
-    // Read the Vertex Shader code from the file
-    std::string VertexShaderCode = string() +
-    		"#version 150"                                         + "\n" +
-    		"in vec3 vertexPosition_modelspace;"                        + "\n" +
-    		"void main()"                                               + "\n" +
-    		"{"                                                         + "\n" +
-    		"    gl_Position.xyz = vertexPosition_modelspace;"          + "\n" +
-    		"    gl_Position.w = 1.0;"                                  + "\n" +
-            "}\n";
-
-    // Read the Fragment Shader code from the file
-    std::string FragmentShaderCode = string() +
-			"#version 150"                                         + "\n" +
-			"out vec3 color;"                                           + "\n" +
-			"void main()"                                               + "\n" +
-			"{"                                                         + "\n" +
-			"    color = vec3(1,0,0);"                                  + "\n" +
-			"}\n";
-
-
-    // Create the shaders
-    GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-    GLint result = GL_FALSE;
-    int infoLogMaxLength = 1024;
-    int infoLogRealLength;
-
-    // Compiling Vertex Shader
-    printf("Compiling vertex shader\n");
-    char const * VertexSourcePointer = VertexShaderCode.c_str();
-    glShaderSource(vertexShaderID, 1, &VertexSourcePointer, NULL);
-    glCompileShader(vertexShaderID);
-
-    // Checking Vertex Shader
-    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &result);
-    printf("Compilation %s\n", (result == GL_TRUE) ? "succeeded" : "failed");
-
-    // Getting the log
-    glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
-    char VertexShaderErrorMessage[infoLogMaxLength];
-    glGetShaderInfoLog(vertexShaderID, infoLogMaxLength, &infoLogRealLength, VertexShaderErrorMessage);
-    fprintf(stdout, "%s\n", VertexShaderErrorMessage);
-
-
-    // Compiling Fragment Shader
-    printf("Compiling fragment shader\n");
-    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
-    glShaderSource(fragmentShaderID, 1, &FragmentSourcePointer , NULL);
-    glCompileShader(fragmentShaderID);
-
-    // Checking Fragment Shader
-    glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &result);
-    printf("Compilation %s\n", (result == GL_TRUE) ? "succeeded" : "failed");
-
-    // Getting the log
-    glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
-    char FragmentShaderErrorMessage[infoLogMaxLength];
-    glGetShaderInfoLog(fragmentShaderID, infoLogMaxLength, &infoLogRealLength, FragmentShaderErrorMessage);
-    fprintf(stdout, "%s\n", FragmentShaderErrorMessage);
-
-    // Link the program
-    fprintf(stdout, "Linking program\n");
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, vertexShaderID);
-    glAttachShader(ProgramID, fragmentShaderID);
-    glLinkProgram(ProgramID);
-
-    // Check the program
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &result);
-    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &infoLogMaxLength);
-    char ProgramErrorMessage[infoLogMaxLength];
-    glGetProgramInfoLog(ProgramID, infoLogMaxLength, &infoLogRealLength, ProgramErrorMessage);
-    fprintf(stdout, "%s\n", ProgramErrorMessage);
-
-    glDeleteShader(vertexShaderID);
-    glDeleteShader(fragmentShaderID);
-
-    return ProgramID;
-}
-
 void drawScene(double angle)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -177,7 +97,7 @@ void drawScene(double angle)
 		);
 
 		// Use our shader
-		glUseProgram(programID);
+		program->use();
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
@@ -218,7 +138,27 @@ void init()
 	printf("OpenGL version: %d.%d\n", maj, min);
 	printf("GLSL version: %d.%d\n", slmaj, slmin);
 
-	programID = LoadShaders();
+
+    // Read the Vertex Shader code from the file
+    std::string VertexShaderCode = string() +
+    		"#version 150"                                              + "\n" +
+    		"in vec3 vertexPosition_modelspace;"                        + "\n" +
+    		"void main()"                                               + "\n" +
+    		"{"                                                         + "\n" +
+    		"    gl_Position.xyz = vertexPosition_modelspace;"          + "\n" +
+    		"    gl_Position.w = 1.0;"                                  + "\n" +
+            "}\n";
+
+    // Read the Fragment Shader code from the file
+    std::string FragmentShaderCode = string() +
+			"#version 150"                                              + "\n" +
+			"out vec3 color;"                                           + "\n" +
+			"void main()"                                               + "\n" +
+			"{"                                                         + "\n" +
+			"    color = vec3(1,0,0);"                                  + "\n" +
+			"}\n";
+
+    program = new ShaderProgram(VertexShaderCode, FragmentShaderCode);
 }
 
 void resize(int width, int height)

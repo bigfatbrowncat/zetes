@@ -101,7 +101,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(CROSSBASE_PATH)/bin/java
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...
-	mkdir -p $(OBJECTS_PATH)
+	mkdir -p $(dir $@)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $< -o $@
 
 $(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)

@@ -20,6 +20,7 @@ namespace cubex
 		GLuint programID;
 	public:
 		ShaderProgram(const string& vertexShaderCode, const string& fragmentShaderCode);
+		int getAttribLocation(const string& attribName);
 		void use() { glUseProgram(programID); }
 		virtual ~ShaderProgram();
 	};

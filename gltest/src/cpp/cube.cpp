@@ -16,15 +16,21 @@ using namespace cubex;
 
 static GLuint VertexArrayID;
 // This will identify our vertex buffer
-static GLuint vertexbuffer;
+static GLuint vertexBufferObject;
 
 static ShaderProgram* program;
 
+static int vertexCoordinatesAttrib;
+static int textureCoordinatesAttrib;
+static int diffuseColorAttrib;
+
 // An array of 3 vectors which represents 3 vertices
-static const GLfloat g_vertex_buffer_data[] = {
-   -1.0f, -1.0f, 0.0f,
-   1.0f, -1.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
+static const GLfloat vertices[] =
+{
+	// vertex: (X Y Z), diffuse color: (R G B), tex. coords: (U V)
+  -1.0f, -1.0f, 0.0f,		1.0f, 0.0f, 0.0f, 			0.0f, 0.0f,
+   1.0f, -1.0f, 0.0f,		0.0f, 1.0f, 0.0f, 			1.0f, 1.0f,
+   0.0f,  1.0f, 0.0f,		0.0f, 0.0f, 1.0f, 			0.0f, 1.0f,
 };
 
 void getGlVersion(int *major, int *minor)
@@ -70,37 +76,6 @@ void getGlslVersion(int *major, int *minor)
     }
 }
 
-void drawScene(double angle)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//glMatrixMode(GL_MODELVIEW);
-	//glPushMatrix();
-	{
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-		   0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-		   3,                  // size
-		   GL_FLOAT,           // type
-		   GL_FALSE,           // normalized?
-		   0,                  // stride
-		   (void*)0            // array buffer offset
-		);
-
-		// Use our shader
-		program->use();
-
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-
-		glDisableVertexAttribArray(0);
-	}
-
-	//glPopMatrix();
-}
-
 
 void init()
 {
@@ -116,13 +91,16 @@ void init()
 	glBindVertexArray(VertexArrayID);
 
 	// Generate 1 buffer, put the resulting identifier in vertexbuffer
-	glGenBuffers(1, &vertexbuffer);
+	glGenBuffers(1, &vertexBufferObject);
 
 	// The following commands will talk about our 'vertexbuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 
 	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, (long)sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (long)sizeof(GLfloat) * 8 * 3, vertices, GL_STATIC_DRAW);
+
+	// Give our texture coords to OpenGL
+	//glBufferData(GL_ARRAY_BUFFER, (long)sizeof(GLfloat) * 2 * 3, textureCoords, GL_STATIC_DRAW);
 
 	int maj, min, slmaj, slmin;
 	getGlVersion(&maj, &min);
@@ -135,23 +113,90 @@ void init()
     // Read the Vertex Shader code from the file
     std::string VertexShaderCode = string() +
     		"#version 150"                                              + "\n" +
-    		"in vec3 vertexPosition_modelspace;"                        + "\n" +
+    		"in vec3 in_vertexPosition;"                                + "\n" +
+    		"in vec2 in_textureCoords;"                                 + "\n" +
+    		"in vec3 in_diffuseColor;"                                  + "\n" +
+
+    		"out vec3 diffuseColor;"                                   + "\n" +
+
     		"void main()"                                               + "\n" +
     		"{"                                                         + "\n" +
-    		"    gl_Position.xyz = vertexPosition_modelspace;"          + "\n" +
+    		"    gl_Position.xyz = in_vertexPosition;"                  + "\n" +
     		"    gl_Position.w = 1.0;"                                  + "\n" +
+    		"    diffuseColor = in_diffuseColor;"                                  + "\n" +
             "}\n";
 
     // Read the Fragment Shader code from the file
     std::string FragmentShaderCode = string() +
 			"#version 150"                                              + "\n" +
-			"out vec3 color;"                                           + "\n" +
-			"void main()"                                               + "\n" +
+    		"in vec3 diffuseColor;"                                  + "\n" +
+
+    		"out vec3 color;"                                           + "\n" +
+
+    		"void main()"                                               + "\n" +
 			"{"                                                         + "\n" +
-			"    color = vec3(1,0,0);"                                  + "\n" +
+			"    color = diffuseColor;"                              + "\n" +
 			"}\n";
 
     program = new ShaderProgram(VertexShaderCode, FragmentShaderCode);
+
+    vertexCoordinatesAttrib = program->getAttribLocation("in_vertexPosition");
+    textureCoordinatesAttrib = program->getAttribLocation("in_textureCoords");
+    diffuseColorAttrib = program->getAttribLocation("in_diffuseColor");
+}
+
+void drawScene(double angle)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Binding the VBO
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+
+	// 1st attribute buffer : vertices
+	glEnableVertexAttribArray(vertexCoordinatesAttrib);
+	// 2nd attribute buffer : texture coords
+	glEnableVertexAttribArray(textureCoordinatesAttrib);
+	// 2nd attribute buffer : texture coords
+	glEnableVertexAttribArray(diffuseColorAttrib);
+
+	// Setting vertex data
+	glVertexAttribPointer(
+	   vertexCoordinatesAttrib,                  // first "in" in shader
+	   3,                  	// size
+	   GL_FLOAT,           // type
+	   GL_FALSE,           // normalized?
+	   sizeof(GLfloat) * 8,                    // stride
+	   (void*)0                                    // array buffer offset
+	);
+	// Setting diffuse color data
+	glVertexAttribPointer(
+	   diffuseColorAttrib,                  // second "in" in shader
+	   3,                  // size
+	   GL_FLOAT,           // type
+	   GL_FALSE,           // normalized?
+	   sizeof(GLfloat) * 8,                    // stride
+	   (void*)(sizeof(GLfloat) * 3)            // array buffer offset
+	);
+	// Setting texture coordinates data
+	glVertexAttribPointer(
+	   textureCoordinatesAttrib,                  // second "in" in shader
+	   2,                  // size
+	   GL_FLOAT,           // type
+	   GL_FALSE,           // normalized?
+	   sizeof(GLfloat) * 8,                    // stride
+	   (void*)(sizeof(GLfloat) * 6)            // array buffer offset
+	);
+
+
+	// Use our shader
+	program->use();
+
+	// Draw the triangle !
+	glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+	glDisableVertexAttribArray(vertexCoordinatesAttrib);
+	glDisableVertexAttribArray(textureCoordinatesAttrib);
+
 }
 
 void resize(int width, int height)

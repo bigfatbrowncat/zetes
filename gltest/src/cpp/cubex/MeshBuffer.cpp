@@ -109,6 +109,8 @@ void MeshBuffer::draw()
 
 MeshBuffer::~MeshBuffer()
 {
+	glDeleteBuffers(1, &vertexBufferObject);
+	glDeleteVertexArrays(1, &VertexArrayID);
 	delete [] buffer;
 }
 

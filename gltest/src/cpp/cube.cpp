@@ -16,12 +16,9 @@ using namespace std;
 #include <GL3/gl3w.h>
 
 #include "cubex/ShaderProgram.h"
+#include "cubex/MeshObjLoader.h"
 
 using namespace cubex;
-
-static GLuint VertexArrayID;
-// This will identify our vertex buffer
-static GLuint vertexBufferObject;
 
 static ShaderProgram* program;
 
@@ -33,7 +30,7 @@ static int textureID;
 // An array of 3 vectors which represents 3 vertices
 static const GLfloat vertices[] =
 {
-	// vertex: (X Y Z), diffuse color: (R G B), tex. coords: (U V)
+	// vertex: (X Y Z), normal: (X Y Z),   tex. coords: (U V)
   -1.0f, -1.0f, 0.0f,		1.0f, 0.0f, 0.0f, 			0.0f, 0.0f,
    1.0f, -1.0f, 0.0f,		0.0f, 1.0f, 0.0f, 			1.0f, 1.0f,
    0.0f,  1.0f, 0.0f,		0.0f, 0.0f, 1.0f, 			0.0f, 1.0f,
@@ -223,23 +220,9 @@ void init()
 		printf("Problem initializing OpenGL\n");
 	}
 
-	// Creating a VAO (Vertex Array Object0
-	glGenVertexArrays(1, &VertexArrayID);
+	MeshObjLoader objLoader;
+	Mesh m = objLoader.createMeshFromFile("/Users/il/cube-uvw-normal.obj");
 
-	// Binding the VAO
-	glBindVertexArray(VertexArrayID);
-
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
-	glGenBuffers(1, &vertexBufferObject);
-
-	// The following commands will talk about our 'vertexbuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-
-	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, (long)sizeof(GLfloat) * 8 * 3, vertices, GL_STATIC_DRAW);
-
-	// Give our texture coords to OpenGL
-	//glBufferData(GL_ARRAY_BUFFER, (long)sizeof(GLfloat) * 2 * 3, textureCoords, GL_STATIC_DRAW);
 
 	int maj, min, slmaj, slmin;
 	getGlVersion(&maj, &min);
@@ -256,13 +239,13 @@ void init()
     		"in vec2 in_textureCoords;"                                 + "\n" +
     		"in vec3 in_diffuseColor;"                                  + "\n" +
 
-    		"out vec3 diffuseColor;"                                   + "\n" +
+    		"out vec3 diffuseColor;"                                    + "\n" +
 
     		"void main()"                                               + "\n" +
     		"{"                                                         + "\n" +
     		"    gl_Position.xyz = in_vertexPosition;"                  + "\n" +
     		"    gl_Position.w = 1.0;"                                  + "\n" +
-    		"    diffuseColor = in_diffuseColor;"                                  + "\n" +
+    		"    diffuseColor = in_diffuseColor;"                       + "\n" +
             "}\n";
 
     // Read the Fragment Shader code from the file
@@ -293,7 +276,7 @@ void drawScene(double angle)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Binding the VBO
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+//	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 
 	// 1st attribute buffer : vertices
 	glEnableVertexAttribArray(vertexCoordinatesAttrib);

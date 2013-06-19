@@ -97,11 +97,11 @@ extern "C"
 		}
 		else if (model == MODEL_MONKEY_SIMPLE)
 		{
-			objFileLocation = WinLinMacApi::locateResource("data", "monkeysimple-tri-uv-normal.obj");
+			objFileLocation = WinLinMacApi::locateResource("data", "monkeysimple-tri-normal.obj");
 		}
 		else if (model == MODEL_MONKEY_SUBDIVIDED)
 		{
-			objFileLocation = WinLinMacApi::locateResource("data", "monkeysubdiv-tri-uv-normal.obj");
+			objFileLocation = WinLinMacApi::locateResource("data", "monkeysubdiv-tri-normal.obj");
 		}
 		else
 		{

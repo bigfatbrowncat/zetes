@@ -8,20 +8,24 @@
 #ifndef MESHBUFFER_H_
 #define MESHBUFFER_H_
 
-#include "MeshObjLoader.h"
+#include "Mesh.h"
 
-namespace cubex {
+namespace cubex
+{
 
-class MeshBuffer {
-private:
-	GLuint VertexArrayID;
-	GLuint vertexBufferObject;
-	float* buffer;
-public:
-	MeshBuffer(const Mesh &mesh);
-	virtual ~MeshBuffer();
-	void bind();
-};
+	class MeshBuffer
+	{
+	private:
+		GLuint VertexArrayID;
+		GLuint vertexBufferObject;
+		float* buffer;
+		int verticesCount;
+	public:
+		MeshBuffer(const Mesh &mesh);
+		virtual ~MeshBuffer();
+		void draw();
+	};
 
-} /* namespace cubex */
-#endif /* MESHBUFFER_H_ */
+}
+
+#endif

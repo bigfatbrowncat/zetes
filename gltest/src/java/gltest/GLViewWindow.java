@@ -11,6 +11,8 @@ import crossbase.ui.ViewWindowsManager;
 
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -21,9 +23,16 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 public class GLViewWindow extends ViewWindowBase<GLDocument>
 {
-	private static native void initScene();
-	private static native void resizeView(int width, int height);
-	private static native void drawScene(double angle);
+	// Model constants
+	private static final int MODEL_CUBE = 0;
+	private static final int MODEL_MONKEY_SIMPLE = 1;
+	private static final int MODEL_MONKEY_SUBDIVIDED = 2;
+	
+	private static native boolean globalInit();
+	private static native boolean createScene(int model, int width, int height);
+	private static native boolean destroyScene();
+	private static native boolean resizeView(int width, int height);
+	private static native boolean drawScene(double angle);
 	
 	private double angle = 0;
 	
@@ -64,7 +73,41 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		final CrossBaseGLCanvas canvas = new CrossBaseGLCanvas(comp, SWT.NO_BACKGROUND, data);
 		
 		if (!canvas.isCurrent()) canvas.setCurrent();
-		initScene();
+		globalInit();
+		
+		Point csize = canvas.getSize();
+		createScene(MODEL_CUBE, csize.x, csize.y);
+		
+		canvas.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0)
+			{
+				Point size = canvas.getSize();
+				
+				if (arg0.character == '1')
+				{
+					destroyScene();
+					createScene(MODEL_CUBE, size.x, size.y);
+				}
+				else if (arg0.character == '2')
+				{
+					destroyScene();
+					createScene(MODEL_MONKEY_SIMPLE, size.x, size.y);
+				}
+				else if (arg0.character == '3')
+				{
+					destroyScene();
+					createScene(MODEL_MONKEY_SUBDIVIDED, size.x, size.y);
+				}
+			}
+		});
 		
 		canvas.addControlListener(new ControlListener()
 		{
@@ -104,8 +147,8 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 				if (canvas != null && !canvas.isDisposed())
 				{
 					canvas.redraw();
-					angle += 0.01;
-					Display.getCurrent().timerExec(20, this);
+					angle += 0.002;
+					Display.getCurrent().timerExec(10, this);
 				}
 			}
 		};

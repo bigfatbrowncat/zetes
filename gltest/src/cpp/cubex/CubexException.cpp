@@ -13,7 +13,6 @@ namespace cubex
 	CubexException::CubexException(const string& message)
 	{
 		this->message = message;
-
 	}
 
 	CubexException::~CubexException()

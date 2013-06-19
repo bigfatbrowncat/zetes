@@ -21,6 +21,8 @@ namespace cubex
 	public:
 		ShaderProgram(const string& vertexShaderCode, const string& fragmentShaderCode);
 		int getAttribLocation(const string& attribName);
+		int getUniformLocation(const string& uniformName);
+
 		void use() { glUseProgram(programID); }
 		virtual ~ShaderProgram();
 	};

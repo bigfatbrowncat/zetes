@@ -10,17 +10,15 @@
 #include <string>
 #include <vector>
 
-#include "MeshObjLoader.h"
+#include "ObjMeshLoader.h"
 
 using namespace std;
 
 namespace cubex
 {
 
-	MeshObjLoader::MeshObjLoader()
+	ObjMeshLoader::ObjMeshLoader()
 	{
-		// TODO Auto-generated constructor stub
-
 	}
 
 	string readLine(FILE* file)
@@ -114,9 +112,14 @@ namespace cubex
 		return res;
 	}
 
-	Mesh MeshObjLoader::createMeshFromFile(const string& fileName)
+	Mesh ObjMeshLoader::createMeshFromFile(const string& fileName)
 	{
 		FILE* f = fopen(fileName.c_str(), "r");
+		if (f == NULL)
+		{
+			throw CubexException(string("Can't open the file ") + fileName);
+		}
+
 		Mesh res;
 
 		bool error = false;
@@ -443,7 +446,7 @@ namespace cubex
 		return res;
 	}
 
-	MeshObjLoader::~MeshObjLoader()
+	ObjMeshLoader::~ObjMeshLoader()
 	{
 		// TODO Auto-generated destructor stub
 	}

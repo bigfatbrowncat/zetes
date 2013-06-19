@@ -21,7 +21,7 @@ namespace cubex
 		string message;
 	public:
 		CubexException(const string& message);
-		const string& getMessage() { return message; }
+		const string& getMessage() const { return message; }
 		virtual ~CubexException();
 	};
 

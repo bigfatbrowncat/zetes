@@ -93,6 +93,11 @@ namespace cubex
 		return glGetAttribLocation(this->programID, attribName.c_str());
 	}
 
+	int ShaderProgram::getUniformLocation(const string& uniformName)
+	{
+		return glGetUniformLocation(this->programID, uniformName.c_str());
+	}
+
 	ShaderProgram::~ShaderProgram()
 	{
 		glDeleteProgram(programID);

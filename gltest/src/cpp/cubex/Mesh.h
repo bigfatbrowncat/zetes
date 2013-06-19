@@ -1,14 +1,15 @@
 /*
- * ObjLoader.h
+ * Mesh.h
  *
- *  Created on: 17.06.2013
- *      Author: il
+ *  Created on: Jun 19, 2013
+ *      Author: imizus
  */
 
-#ifndef MESHOBJLOADER_H_
-#define MESHOBJLOADER_H_
+#ifndef MESH_H_
+#define MESH_H_
 
 #include <vector>
+
 #include <glm/glm.hpp>
 
 #include "CubexException.h"
@@ -48,7 +49,7 @@ namespace cubex
 		}
 
 		static Face3 fromVerticesAndNormals(unsigned int vi1, unsigned int vi2, unsigned int vi3,
-		                                    unsigned int vni1, unsigned int vni2, unsigned int vni3)
+											unsigned int vni1, unsigned int vni2, unsigned int vni3)
 		{
 			Face3 res;
 
@@ -68,8 +69,8 @@ namespace cubex
 		}
 
 		static Face3 fromVerticesAndTextureCoordsAndNormals(unsigned int vi1, unsigned int vi2, unsigned int vi3,
-                                                            unsigned int vti1, unsigned int vti2, unsigned int vti3,
-		                                                    unsigned int vni1, unsigned int vni2, unsigned int vni3)
+															unsigned int vti1, unsigned int vti2, unsigned int vti3,
+															unsigned int vni1, unsigned int vni2, unsigned int vni3)
 		{
 			Face3 res;
 
@@ -93,7 +94,7 @@ namespace cubex
 		}
 
 		static Face3 fromVerticesAndTextureCoords(unsigned int vi1, unsigned int vi2, unsigned int vi3,
-                                                  unsigned int vti1, unsigned int vti2, unsigned int vti3)
+												  unsigned int vti1, unsigned int vti2, unsigned int vti3)
 		{
 			Face3 res;
 
@@ -166,7 +167,7 @@ namespace cubex
 		}
 
 		static Face4 fromVerticesAndNormals(unsigned int vi1, unsigned int vi2, unsigned int vi3, unsigned int vi4,
-		                                    unsigned int vni1, unsigned int vni2, unsigned int vni3, unsigned int vni4)
+											unsigned int vni1, unsigned int vni2, unsigned int vni3, unsigned int vni4)
 		{
 			Face4 res;
 
@@ -188,8 +189,8 @@ namespace cubex
 		}
 
 		static Face4 fromVerticesAndTextureCoordsAndNormals(unsigned int vi1, unsigned int vi2, unsigned int vi3, unsigned int vi4,
-                                                            unsigned int vti1, unsigned int vti2, unsigned int vti3, unsigned int vti4,
-		                                                    unsigned int vni1, unsigned int vni2, unsigned int vni3, unsigned int vni4)
+															unsigned int vti1, unsigned int vti2, unsigned int vti3, unsigned int vti4,
+															unsigned int vni1, unsigned int vni2, unsigned int vni3, unsigned int vni4)
 		{
 			Face4 res;
 
@@ -216,7 +217,7 @@ namespace cubex
 		}
 
 		static Face4 fromVerticesAndTextureCoords(unsigned int vi1, unsigned int vi2, unsigned int vi3, unsigned int vi4,
-                                                  unsigned int vti1, unsigned int vti2, unsigned int vti3, unsigned int vti4)
+												  unsigned int vti1, unsigned int vti2, unsigned int vti3, unsigned int vti4)
 		{
 			Face4 res;
 
@@ -260,6 +261,7 @@ namespace cubex
 		}
 	};
 
+
 	class Mesh
 	{
 	private:
@@ -275,107 +277,18 @@ namespace cubex
 		const vector<Face3> getFaces3() const { return faces3; }
 		const vector<Face4> getFaces4() const { return faces4; }
 
-		void addVertex(glm::vec3 vertex)
-		{
-			vertices.push_back(vertex);
-		}
-		void addNormal(glm::vec3 normal)
-		{
-			normals.push_back(normal);
-		}
-		void addTextureCoords(glm::vec2 texCoord)
-		{
-			textureCoords.push_back(texCoord);
-		}
+		void addVertex(glm::vec3 vertex);
+		void addNormal(glm::vec3 normal);
+		void addTextureCoords(glm::vec2 texCoord);
 
-		bool checkFace3(const Face3& face)
-		{
-			unsigned int verticesCount = vertices.size();
+		bool checkFace3(const Face3& face);
 
+		bool checkFace4(const Face4& face);
 
-			if (face.vertexIndex1 >= verticesCount)	return false;
-			if (face.vertexIndex2 >= verticesCount)	return false;
-			if (face.vertexIndex3 >= verticesCount)	return false;
-
-			if (face.containsNormals)
-			{
-				unsigned int normalsCount = normals.size();
-
-				if (face.normalIndex1 >= normalsCount)	return false;
-				if (face.normalIndex2 >= normalsCount)	return false;
-				if (face.normalIndex3 >= normalsCount)	return false;
-			}
-
-			if (face.containsTextureCoords)
-			{
-				unsigned int textureCoordsCount = textureCoords.size();
-
-				if (face.textureCoordIndex1 >= textureCoordsCount)	return false;
-				if (face.textureCoordIndex2 >= textureCoordsCount)	return false;
-				if (face.textureCoordIndex3 >= textureCoordsCount)	return false;
-			}
-
-			return true;
-		}
-
-		bool checkFace4(const Face4& face)
-		{
-			unsigned int verticesCount = vertices.size();
-
-			if (face.vertexIndex1 >= verticesCount)	return false;
-			if (face.vertexIndex2 >= verticesCount)	return false;
-			if (face.vertexIndex3 >= verticesCount)	return false;
-			if (face.vertexIndex4 >= verticesCount)	return false;
-
-			if (face.containsNormals)
-			{
-				unsigned int normalsCount = normals.size();
-
-				if (face.normalIndex1 >= normalsCount)	return false;
-				if (face.normalIndex2 >= normalsCount)	return false;
-				if (face.normalIndex3 >= normalsCount)	return false;
-				if (face.normalIndex4 >= normalsCount)	return false;
-			}
-
-			if (face.containsTextureCoords)
-			{
-				unsigned int textureCoordsCount = textureCoords.size();
-
-				if (face.textureCoordIndex1 >= textureCoordsCount)	return false;
-				if (face.textureCoordIndex2 >= textureCoordsCount)	return false;
-				if (face.textureCoordIndex3 >= textureCoordsCount)	return false;
-				if (face.textureCoordIndex4 >= textureCoordsCount)	return false;
-			}
-
-			return true;
-		}
-
-		void addFace3(Face3 face)
-		{
-			if (!checkFace3(face))
-			{
-				throw CubexException("Incorrect Face3 data");
-			}
-			faces3.push_back(face);
-		}
-		void addFace4(Face4 face)
-		{
-
-			if (!checkFace4(face))
-			{
-				throw CubexException("Incorrect Face4 data");
-			}
-			faces4.push_back(face);
-		}
+		void addFace3(Face3 face);
+		void addFace4(Face4 face);
 	};
 
-	class MeshObjLoader
-	{
-	public:
-		MeshObjLoader();
-		Mesh createMeshFromFile(const string& fileName);
-		virtual ~MeshObjLoader();
-	};
 
 } /* namespace cubex */
-#endif /* MESHOBJLOADER_H_ */
+#endif /* MESH_H_ */

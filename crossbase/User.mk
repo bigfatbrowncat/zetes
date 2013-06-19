@@ -8,7 +8,7 @@ OBJ = obj
 
 PWD = $(shell pwd)
 
-DEBUG_OPTIMIZE = -O3 #-O0 -g
+DEBUG_OPTIMIZE = -O3 # -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
@@ -74,6 +74,8 @@ CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILE
 CROSSBASE_JNI_LIBS = $(shell cd $(CROSSBASE_PATH)/bin/$(PLATFORM_TAG); find . -name \*$(JNILIB_EXT) | awk '{ sub(/.\//,"") }; 1')
 CROSSBASE_JNI_LIBS_TARGET = $(addprefix $(BINARY_PATH)/,$(addsuffix $(JNILIB_EXT),$(basename $(CROSSBASE_JNI_LIBS))))
 
+CROSSBASE_INCLUDE = $(CROSSBASE_PATH)/include
+
 ifeq ($(UNAME), Darwin)	# OS X
 all: $(BINARY_PATH)/$(APPLICATION_NAME).app
 
@@ -102,7 +104,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(CROSSBASE_PATH)/bin/java
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp
 	@echo Compiling $<...
 	mkdir -p $(dir $@)
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $< -o $@
+	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) -I$(CROSSBASE_INCLUDE) $< -o $@
 
 $(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	@echo Linking $@...

@@ -15,21 +15,27 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 {
 	// Creating the buffer data for tri faces
 
+	printf("Extracting data...\n");fflush(stdout);
 	verticesCount = 3 * mesh.getFaces3().size();
 
 	buffer = new float[8 * 3 * mesh.getFaces3().size()];
 	int index = 0;
+
+	const glm::vec3* vertices = &(mesh.getVertices()[0]);
+	const glm::vec3* normals = &(mesh.getNormals()[0]);
+	const glm::vec2* textureCoords = &(mesh.getTextureCoords()[0]);
+
 	for (int k = 0; k < mesh.getFaces3().size(); k++)
 	{
 		Face3 face = mesh.getFaces3()[k];
 
-		glm::vec3 vertex1 = mesh.getVertices()[face.vertexIndex1];
-		glm::vec3 vertex2 = mesh.getVertices()[face.vertexIndex2];
-		glm::vec3 vertex3 = mesh.getVertices()[face.vertexIndex3];
+		glm::vec3 vertex1 = vertices[face.vertexIndex1];
+		glm::vec3 vertex2 = vertices[face.vertexIndex2];
+		glm::vec3 vertex3 = vertices[face.vertexIndex3];
 
-		glm::vec3 normal1 = mesh.getNormals()[face.normalIndex1];
-		glm::vec3 normal2 = mesh.getNormals()[face.normalIndex2];
-		glm::vec3 normal3 = mesh.getNormals()[face.normalIndex3];
+		glm::vec3 normal1 = normals[face.normalIndex1];
+		glm::vec3 normal2 = normals[face.normalIndex2];
+		glm::vec3 normal3 = normals[face.normalIndex3];
 
 		glm::vec2 textureCoord1 = glm::vec2(0.0f);
 		glm::vec2 textureCoord2 = glm::vec2(0.0f);
@@ -37,9 +43,9 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 
 		if (face.containsTextureCoords)
 		{
-			textureCoord1 = mesh.getTextureCoords()[face.textureCoordIndex1];
-			textureCoord2 = mesh.getTextureCoords()[face.textureCoordIndex2];
-			textureCoord3 = mesh.getTextureCoords()[face.textureCoordIndex3];
+			textureCoord1 = textureCoords[face.textureCoordIndex1];
+			textureCoord2 = textureCoords[face.textureCoordIndex2];
+			textureCoord3 = textureCoords[face.textureCoordIndex3];
 		}
 
 		// First vertex
@@ -83,6 +89,7 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 
 	}
 
+	printf("Loading data into video memory...\n");fflush(stdout);
 
 	// Creating a VAO (Vertex Array Object)
 	glGenVertexArrays(1, &VertexArrayID);
@@ -98,6 +105,8 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 
 	// Give our vertices to OpenGL.
 	glBufferData(GL_ARRAY_BUFFER, (long)sizeof(GLfloat) * 8 * verticesCount, buffer, GL_STATIC_DRAW);
+
+	printf("Loaded\n");fflush(stdout);
 
 }
 

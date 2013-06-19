@@ -10,6 +10,7 @@
 #include "GL3/gl3w.h"
 
 #include "ShaderProgram.h"
+#include "CubexException.h"
 
 namespace cubex
 {
@@ -87,6 +88,48 @@ namespace cubex
 	    glDeleteShader(fragmentShaderID);
 
 	}
+
+	ShaderProgram* ShaderProgram::fromFiles(const string& vertexShaderFileName, const string& fragmentShaderFileName)
+	{
+		bool error = false;
+
+		FILE* vf = fopen(vertexShaderFileName.c_str(), "r");
+		if (vf == NULL)
+		{
+			error = true;
+			throw CubexException(string("Can't load vertex shader from file ") + vertexShaderFileName);
+		}
+
+		FILE* ff = fopen(fragmentShaderFileName.c_str(), "r");
+		if (ff == NULL)
+		{
+			error = true;
+			fclose(vf);
+			throw CubexException(string("Can't load fragment shader from file ") + fragmentShaderFileName);
+		}
+
+		string vc;
+		while (!feof(vf))
+		{
+			char buf[65536];
+			size_t readnum = fread(buf, 1, 65535, vf);
+			buf[readnum] = 0;
+			vc += buf;
+		}
+		fclose(vf);
+
+		string fc;
+		while (!feof(ff))
+		{
+			char buf[65536];
+			size_t readnum = fread(buf, 1, 65535, ff);
+			buf[readnum] = 0;
+			fc += buf;
+		}
+		fclose(ff);
+
+		return new ShaderProgram(vc, fc);
+}
 
 	int ShaderProgram::getAttribLocation(const string& attribName)
 	{

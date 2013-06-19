@@ -170,7 +170,7 @@ namespace cubex
 		printf("Mesh buffer generated\n"); fflush(stdout);
 
 	    // Read the Vertex Shader code from the file
-	    std::string VertexShaderCode = string() +
+	    /*std::string VertexShaderCode = string() +
 	    		"#version 150"                                              + "\n" +
 
 	    		"uniform mat4 matrix;"                                + "\n" +
@@ -201,8 +201,8 @@ namespace cubex
 				"{"                                                         + "\n" +
 				"    color = diffuseColor;"                              + "\n" +
 				"}\n";
-
-	    program = new ShaderProgram(VertexShaderCode, FragmentShaderCode);
+*/
+	    program = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName); //new ShaderProgram(VertexShaderCode, FragmentShaderCode);
 
 	    vertexCoordinatesAttrib = program->getAttribLocation("in_vertexPosition");
 	    textureCoordinatesAttrib = program->getAttribLocation("in_textureCoords");

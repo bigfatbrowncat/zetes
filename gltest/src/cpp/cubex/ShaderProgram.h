@@ -20,6 +20,8 @@ namespace cubex
 		GLuint programID;
 	public:
 		ShaderProgram(const string& vertexShaderCode, const string& fragmentShaderCode);
+		static ShaderProgram* fromFiles(const string& vertexShaderFileName, const string& fragmentShaderFileName);
+
 		int getAttribLocation(const string& attribName);
 		int getUniformLocation(const string& uniformName);
 

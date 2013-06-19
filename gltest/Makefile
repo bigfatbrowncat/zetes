@@ -14,4 +14,6 @@ else ifeq ($(OS), Windows_NT)	# Windows
   CUSTOM_LIBS = -lopengl32 -lglu32 lib/$(PLATFORM_TAG)/libpng16.a
 endif
 
+all: executable
+
 include $(CROSSBASE_PATH)/User.mk

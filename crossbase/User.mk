@@ -77,7 +77,7 @@ CROSSBASE_JNI_LIBS_TARGET = $(addprefix $(BINARY_PATH)/,$(addsuffix $(JNILIB_EXT
 CROSSBASE_INCLUDE = $(CROSSBASE_PATH)/include
 
 ifeq ($(UNAME), Darwin)	# OS X
-all: $(BINARY_PATH)/$(APPLICATION_NAME).app
+executable: $(BINARY_PATH)/$(APPLICATION_NAME).app
 
 $(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(CROSSBASE_JNI_LIBS_TARGET)
 	@echo Building OS X bundle...
@@ -89,7 +89,7 @@ $(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_
 	hdiutil create $(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg -srcfolder $(BINARY_PATH)/$(APPLICATION_NAME) -ov
 
 else
-all: $(BINARY_PATH)/$(BINARY_NAME) $(CROSSBASE_JNI_LIBS_TARGET)
+executable: $(BINARY_PATH)/$(BINARY_NAME) $(CROSSBASE_JNI_LIBS_TARGET)
 endif
 
 $(CROSSBASE_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(CROSSBASE_PATH)/bin/$(PLATFORM_TAG)/%
@@ -148,5 +148,5 @@ clean:
 	rm -rf $(OBJ)
 	rm -rf $(BIN)
 
-.PHONY: all
+.PHONY: executable
 .SILENT:

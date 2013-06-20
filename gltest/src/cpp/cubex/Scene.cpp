@@ -299,7 +299,7 @@ namespace cubex
 
 	Scene::~Scene()
 	{
-
+		delete meshBuffer;
 	}
 
 }

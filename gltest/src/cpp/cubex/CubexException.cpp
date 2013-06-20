@@ -17,7 +17,7 @@ namespace cubex
 
 	CubexException::~CubexException()
 	{
-		// TODO Auto-generated destructor stub
+
 	}
 
-} /* namespace cubex */
+}

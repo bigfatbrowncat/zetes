@@ -96,7 +96,7 @@ extern "C"
 
 		if (model == MODEL_CUBE)
 		{
-			objFileLocation = WinLinMacApi::locateResource("data", "cube-tri-uv-normal.obj");
+			objFileLocation = WinLinMacApi::locateResource("data", "cube-uv.obj");
 		}
 		else if (model == MODEL_MONKEY_SIMPLE)
 		{

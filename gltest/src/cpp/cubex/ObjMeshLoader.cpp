@@ -302,9 +302,10 @@ namespace cubex
 					}
 					else if (tokens.size() == 5)
 					{
-						// Quad face
+						// Quad face (loaded as 2 triangle faces)
 
-						Face4 face;
+						Face3 face1;
+						Face3 face2;
 
 						vector<string> indices[4];
 						indices[0] = parseSlashed(tokens[1].c_str());
@@ -318,15 +319,18 @@ namespace cubex
 
 							if (indices[1].size() == 1 && indices[2].size() == 1 && indices[3].size() == 1)
 							{
-								face.containsNormals = false;
-								face.containsTextureCoords = false;
+								face1.containsNormals = false;
+								face1.containsTextureCoords = false;
+								face2.containsNormals = false;
+								face2.containsTextureCoords = false;
 
 								int v1 = atoi(indices[0][0].c_str()) - 1;
 								int v2 = atoi(indices[1][0].c_str()) - 1;
 								int v3 = atoi(indices[2][0].c_str()) - 1;
 								int v4 = atoi(indices[3][0].c_str()) - 1;
 
-								face = Face4::fromVertices(v1, v2, v3, v4);
+								face1 = Face3::fromVertices(v1, v2, v3);
+								face2 = Face3::fromVertices(v3, v4, v1);
 							}
 							else
 							{
@@ -338,6 +342,9 @@ namespace cubex
 						else if (indices[0].size() == 2)
 						{
 							// Texture coords only
+
+							face1.containsNormals = false;
+							face2.containsNormals = false;
 
 							if (indices[1].size() == 2 && indices[2].size() == 2 && indices[3].size() == 2)
 							{
@@ -351,7 +358,8 @@ namespace cubex
 								int vt3 = atoi(indices[2][1].c_str()) - 1;
 								int vt4 = atoi(indices[3][1].c_str()) - 1;
 
-								face = Face4::fromVerticesAndTextureCoords(v1, v2, v3, v4, vt1, vt2, vt3, vt4);
+								face1 = Face3::fromVerticesAndTextureCoords(v1, v2, v3, vt1, vt2, vt3);
+								face2 = Face3::fromVerticesAndTextureCoords(v3, v4, v1, vt3, vt4, vt1);
 							}
 							else
 							{
@@ -367,6 +375,8 @@ namespace cubex
 								if (indices[0][1] == "" && indices[1][1] == "" && indices[2][1] == "" && indices[3][1] == "")
 								{
 									// Normals only (no texture coordinates)
+									face1.containsTextureCoords = false;
+									face2.containsTextureCoords = false;
 
 									int v1 = atoi(indices[0][0].c_str()) - 1;
 									int v2 = atoi(indices[1][0].c_str()) - 1;
@@ -378,7 +388,8 @@ namespace cubex
 									int vn3 = atoi(indices[2][2].c_str()) - 1;
 									int vn4 = atoi(indices[3][2].c_str()) - 1;
 
-									face = Face4::fromVerticesAndNormals(v1, v2, v3, v4, vn1, vn2, vn3, vn4);
+									face1 = Face3::fromVerticesAndNormals(v1, v2, v3, vn1, vn2, vn3);
+									face2 = Face3::fromVerticesAndNormals(v3, v4, v1, vn3, vn4, vn1);
 								}
 								else if (indices[0][1] != "" && indices[1][1] != "" && indices[2][1] != "")
 								{
@@ -399,8 +410,8 @@ namespace cubex
 									int vn3 = atoi(indices[2][2].c_str()) - 1;
 									int vn4 = atoi(indices[3][2].c_str()) - 1;
 
-
-									face = Face4::fromVerticesAndTextureCoordsAndNormals(v1, v2, v3, v4, vt1, vt2, vt3, vt4, vn1, vn2, vn3, vn4);
+									face1 = Face3::fromVerticesAndTextureCoordsAndNormals(v1, v2, v3, vt1, vt2, vt3, vn1, vn2, vn3);
+									face2 = Face3::fromVerticesAndTextureCoordsAndNormals(v3, v4, v1, vt3, vt4, vt1, vn3, vn4, vn1);
 								}
 								else
 								{
@@ -418,7 +429,8 @@ namespace cubex
 							}
 						}
 
-						res.addFace4(face);
+						res.addFace3(face1);
+						res.addFace3(face2);
 					}
 					else
 					{

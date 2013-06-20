@@ -100,7 +100,7 @@ public class SingleAppInstanceDocumentHandler
 	{
 		this.fileHandler = fileHandler;
 
-		if (isLocked("crossbasemutex"))
+		if (isLocked("crossbase_mutex"))
 		{
 			isServer = false;
 			

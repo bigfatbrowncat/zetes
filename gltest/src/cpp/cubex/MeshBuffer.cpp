@@ -18,24 +18,44 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 	printf("Extracting data...\n");fflush(stdout);
 	verticesCount = 3 * mesh.getFaces3().size();
 
+	printf("A");fflush(stdout);
 	buffer = new float[8 * 3 * mesh.getFaces3().size()];
 	int index = 0;
 
+	printf("B");fflush(stdout);
 	const glm::vec3* vertices = &(mesh.getVertices()[0]);
 	const glm::vec3* normals = &(mesh.getNormals()[0]);
 	const glm::vec2* textureCoords = &(mesh.getTextureCoords()[0]);
 
+	printf("C");fflush(stdout);
+
 	for (int k = 0; k < mesh.getFaces3().size(); k++)
 	{
 		Face3 face = mesh.getFaces3()[k];
+		printf("D");fflush(stdout);
 
 		glm::vec3 vertex1 = vertices[face.vertexIndex1];
 		glm::vec3 vertex2 = vertices[face.vertexIndex2];
 		glm::vec3 vertex3 = vertices[face.vertexIndex3];
 
-		glm::vec3 normal1 = normals[face.normalIndex1];
-		glm::vec3 normal2 = normals[face.normalIndex2];
-		glm::vec3 normal3 = normals[face.normalIndex3];
+		glm::vec3 normal1 = glm::vec3(0.0f);
+		glm::vec3 normal2 = glm::vec3(0.0f);
+		glm::vec3 normal3 = glm::vec3(0.0f);
+
+		if (face.containsNormals)
+		{
+			normal1 = normals[face.normalIndex1];
+			normal2 = normals[face.normalIndex2];
+			normal3 = normals[face.normalIndex3];
+		}
+		else
+		{
+			// Calculating normals. NOT SMOOTH.
+
+			normal1 = glm::normalize(glm::cross(vertex2 - vertex1, vertex3 - vertex2));
+			normal2 = normal1;
+			normal3 = normal1;
+		}
 
 		glm::vec2 textureCoord1 = glm::vec2(0.0f);
 		glm::vec2 textureCoord2 = glm::vec2(0.0f);
@@ -87,6 +107,7 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 		buffer[index++] = textureCoord3.x;
 		buffer[index++] = textureCoord3.y;
 
+		printf("*");fflush(stdout);
 	}
 
 	printf("Loading data into video memory...\n");fflush(stdout);

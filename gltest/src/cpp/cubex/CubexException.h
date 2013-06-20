@@ -25,5 +25,5 @@ namespace cubex
 		virtual ~CubexException();
 	};
 
-} /* namespace cubex */
-#endif /* CUBEXEXCEPTION_H_ */
+}
+#endif

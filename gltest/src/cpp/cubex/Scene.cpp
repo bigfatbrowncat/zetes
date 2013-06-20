@@ -170,38 +170,6 @@ namespace cubex
 		printf("Mesh buffer generated\n"); fflush(stdout);
 
 	    // Read the Vertex Shader code from the file
-	    /*std::string VertexShaderCode = string() +
-	    		"#version 150"                                              + "\n" +
-
-	    		"uniform mat4 matrix;"                                + "\n" +
-
-	    		"in vec3 in_vertexPosition;"                                + "\n" +
-	    		"in vec2 in_textureCoords;"                                 + "\n" +
-	    		"in vec3 in_diffuseColor;"                                  + "\n" +
-
-	    		"out vec3 diffuseColor;"                                    + "\n" +
-
-	    		"void main()"                                               + "\n" +
-	    		"{"                                                         + "\n" +
-	    		"    gl_Position = matrix * vec4(in_vertexPosition, 1.0);"                  + "\n" +
-	    		"    gl_Position.w = 1.0;"                                  + "\n" +
-	    		"    diffuseColor.x = abs(in_diffuseColor.x);"                       + "\n" +
-	    		"    diffuseColor.y = abs(in_diffuseColor.y);"                       + "\n" +
-	    		"    diffuseColor.z = abs(in_diffuseColor.z);"                       + "\n" +
-	            "}\n";
-
-	    // Read the Fragment Shader code from the file
-	    std::string FragmentShaderCode = string() +
-				"#version 150"                                              + "\n" +
-	    		"in vec3 diffuseColor;"                                  + "\n" +
-
-	    		"out vec3 color;"                                           + "\n" +
-
-	    		"void main()"                                               + "\n" +
-				"{"                                                         + "\n" +
-				"    color = diffuseColor;"                              + "\n" +
-				"}\n";
-*/
 	    program = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName); //new ShaderProgram(VertexShaderCode, FragmentShaderCode);
 
 	    vertexCoordinatesAttrib = program->getAttribLocation("in_vertexPosition");

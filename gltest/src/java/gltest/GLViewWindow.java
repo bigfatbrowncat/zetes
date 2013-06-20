@@ -69,6 +69,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		comp.setLayout(new FillLayout());
 		GLData data = new GLData ();
 		data.doubleBuffer = true;
+		data.depthSize = 1;
 		
 		final CrossBaseGLCanvas canvas = new CrossBaseGLCanvas(comp, SWT.NO_BACKGROUND, data);
 		

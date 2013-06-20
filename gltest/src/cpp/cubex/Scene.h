@@ -19,8 +19,8 @@ namespace cubex
 	class Scene
 	{
 	private:
-		ShaderProgram* program = NULL;
-		MeshBuffer* meshBuffer = NULL;
+		ShaderProgram* program;
+		MeshBuffer* meshBuffer;
 
 		int vertexCoordinatesAttrib;
 		int textureCoordinatesAttrib;

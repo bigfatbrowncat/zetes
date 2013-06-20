@@ -13,10 +13,12 @@ namespace cubex
 	{
 		vertices.push_back(vertex);
 	}
+
 	void Mesh::addNormal(glm::vec3 normal)
 	{
 		normals.push_back(normal);
 	}
+
 	void Mesh::addTextureCoords(glm::vec2 texCoord)
 	{
 		textureCoords.push_back(texCoord);
@@ -52,7 +54,7 @@ namespace cubex
 		return true;
 	}
 
-	void Mesh::addFace(Face face)
+	void Mesh::addFace(const Face& face)
 	{
 		if (!checkFace(face))
 		{

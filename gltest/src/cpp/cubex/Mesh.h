@@ -19,7 +19,6 @@ using namespace std;
 
 namespace cubex
 {
-
 	class Mesh
 	{
 	private:
@@ -39,9 +38,9 @@ namespace cubex
 
 		bool checkFace(const Face& face);
 
-		void addFace(Face face);
+		void addFace(const Face& face);
 	};
 
 
-} /* namespace cubex */
-#endif /* MESH_H_ */
+}
+#endif

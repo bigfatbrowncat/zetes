@@ -91,12 +91,14 @@ extern "C"
 	JNIEXPORT jboolean JNICALL Java_gltest_GLViewWindow_createScene(JNIEnv * env, jclass appClass, jint model, jint width, jint height)
 	{
 		string objFileLocation;
+		string textureFileLocation;
 		string vertFileLocation = WinLinMacApi::locateResource("data", "default.vert");
 		string fragFileLocation = WinLinMacApi::locateResource("data", "default.frag");
 
 		if (model == MODEL_CUBE)
 		{
 			objFileLocation = WinLinMacApi::locateResource("data", "cube-uv.obj");
+			textureFileLocation = WinLinMacApi::locateResource("data", "cube-tex.png");
 		}
 		else if (model == MODEL_MONKEY_SIMPLE)
 		{
@@ -113,7 +115,7 @@ extern "C"
 
 		try
 		{
-			scene = new Scene(objFileLocation, vertFileLocation, fragFileLocation, width, height);
+			scene = new Scene(objFileLocation, vertFileLocation, fragFileLocation, textureFileLocation, width, height);
 			return true;
 		}
 		catch (CubexException& ex)

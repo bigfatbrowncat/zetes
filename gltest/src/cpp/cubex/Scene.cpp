@@ -152,11 +152,12 @@ namespace cubex
 		free(image_data);
 		free(row_pointers);
 		fclose(fp);
+		printf("texture id: %d, w: %d, h: %d\n", texture, temp_width, temp_height);
 		return texture;
 	}
 
 
-	Scene::Scene(const string& modelFileName, const string& vertexShaderFileName, const string& fragmentShaderFileName, int viewWidth, int viewHeight)
+	Scene::Scene(const string& modelFileName, const string& vertexShaderFileName, const string& fragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight)
 	{
 		this->viewWidth = viewWidth;
 		this->viewHeight = viewHeight;
@@ -177,10 +178,13 @@ namespace cubex
 	    diffuseColorAttrib = program->getAttribLocation("in_diffuseColor");
 
 	    matrixUniform = program->getUniformLocation("matrix");
+	    textureUniform = program->getUniformLocation("texture");
+	    printf("texUni: %d\n", textureUniform);
 
 	    int tw;
 	    int th;
-	    textureID = png_texture_load("PNGTex.png", &tw, &th);
+
+	    textureID = png_texture_load(textureFileName.c_str(), &tw, &th);
 
 	}
 
@@ -223,8 +227,13 @@ namespace cubex
 
 		glm::mat4 MP = Projection * Model;
 
+		// Sending matrix
 		glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(MP));
 
+		// Sending texture
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glUniform1i(textureUniform, 0);
+		glBindTexture(GL_TEXTURE_2D, textureID);
 
 		// Setting vertex data
 		glVertexAttribPointer(

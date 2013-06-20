@@ -25,15 +25,18 @@ namespace cubex
 		int vertexCoordinatesAttrib;
 		int textureCoordinatesAttrib;
 		int diffuseColorAttrib;
-
-		int matrixUniform;
+		int matrixUniform, textureUniform;
 
 		int viewWidth, viewHeight;
 
 		int textureID;
 
 	public:
-		Scene(const string& modelFileName, const string& vertexShaderFileName, const string& fragmentShaderFileName, int viewWidth, int viewHeight);
+		Scene(const string& modelFileName,
+		      const string& vertexShaderFileName,
+		      const string& fragmentShaderFileName,
+		      const string& textureFileName,
+		      int viewWidth, int viewHeight);
 		void resizeViewport(int width, int height);
 		void draw(float angle);
 

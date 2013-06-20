@@ -3,6 +3,6 @@ CROSSBASE_PATH = ../crossbase
 APPLICATION_NAME = Tiny\ Viewer
 BINARY_NAME = tinyview
 
-all: executable
+all: package
 
 include $(CROSSBASE_PATH)/User.mk

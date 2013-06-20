@@ -31,7 +31,7 @@ namespace cubex
 		const vector<glm::vec3>& getVertices() const { return vertices; }
 		const vector<glm::vec3>& getNormals() const { return normals; }
 		const vector<glm::vec2>& getTextureCoords() const { return textureCoords; }
-		const vector<Face> getFaces() const { return faces; }
+		const vector<Face>& getFaces() const { return faces; }
 
 		void addVertex(glm::vec3 vertex);
 		void addNormal(glm::vec3 normal);

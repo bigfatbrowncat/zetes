@@ -16,23 +16,18 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 	// Creating the buffer data for tri faces
 
 	printf("Extracting data...\n");fflush(stdout);
-	verticesCount = 3 * mesh.getFaces3().size();
+	verticesCount = 3 * mesh.getFaces().size();
 
-	printf("A");fflush(stdout);
-	buffer = new float[8 * 3 * mesh.getFaces3().size()];
+	buffer = new float[8 * 3 * mesh.getFaces().size()];
 	int index = 0;
 
-	printf("B");fflush(stdout);
 	const glm::vec3* vertices = &(mesh.getVertices()[0]);
 	const glm::vec3* normals = &(mesh.getNormals()[0]);
 	const glm::vec2* textureCoords = &(mesh.getTextureCoords()[0]);
 
-	printf("C");fflush(stdout);
-
-	for (int k = 0; k < mesh.getFaces3().size(); k++)
+	for (int k = 0; k < mesh.getFaces().size(); k++)
 	{
-		Face3 face = mesh.getFaces3()[k];
-		printf("D");fflush(stdout);
+		Face face = mesh.getFaces()[k];
 
 		glm::vec3 vertex1 = vertices[face.vertexIndex1];
 		glm::vec3 vertex2 = vertices[face.vertexIndex2];
@@ -106,8 +101,6 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 
 		buffer[index++] = textureCoord3.x;
 		buffer[index++] = textureCoord3.y;
-
-		printf("*");fflush(stdout);
 	}
 
 	printf("Loading data into video memory...\n");fflush(stdout);

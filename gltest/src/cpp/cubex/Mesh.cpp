@@ -22,7 +22,7 @@ namespace cubex
 		textureCoords.push_back(texCoord);
 	}
 
-	bool Mesh::checkFace3(const Face3& face)
+	bool Mesh::checkFace(const Face& face)
 	{
 		unsigned int verticesCount = vertices.size();
 
@@ -52,13 +52,13 @@ namespace cubex
 		return true;
 	}
 
-	void Mesh::addFace3(Face3 face)
+	void Mesh::addFace(Face face)
 	{
-		if (!checkFace3(face))
+		if (!checkFace(face))
 		{
-			throw CubexException("Incorrect Face3 data");
+			throw CubexException("Incorrect face data");
 		}
-		faces3.push_back(face);
+		faces.push_back(face);
 	}
 
 }

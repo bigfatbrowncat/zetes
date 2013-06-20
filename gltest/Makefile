@@ -1,6 +1,6 @@
 CROSSBASE_PATH = ../crossbase
 
-APPLICATION_NAME = GL\ Demo
+APPLICATION_NAME = GLDemo
 BINARY_NAME = gltest
 
 UNAME := $(shell uname)

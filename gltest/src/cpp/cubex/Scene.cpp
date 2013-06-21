@@ -218,14 +218,18 @@ namespace cubex
 			Projection = glm::scale(Projection, glm::vec3(aspectRatio, aspectRatio, aspectRatio));
 		}
 
+		// View
+		glm::mat4 view = glm::mat4(1.0);
+		view = glm::lookAt(glm::vec3(-0.6, 0.3, 0.3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
 		//MODEL
 		glm::mat4 Model = glm::mat4(1.0);
 		//Scale by factor 0.5
 		Model = glm::scale(Model, glm::vec3(0.2f));
-		Model = glm::rotate(Model, 30.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		//Model = glm::rotate(Model, 30.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		Model = glm::rotate(Model, (float)(angle * 180), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		glm::mat4 MP = Projection * Model;
+		glm::mat4 MP = Projection * view * Model;
 
 		// Sending matrix
 		glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(MP));

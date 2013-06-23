@@ -12,7 +12,7 @@ out vec2 textureCoords;
 void main()
 {
     gl_Position = matrix * vec4(in_vertexPosition, 1.0);
-    gl_Position.w = 1.0;
+    //gl_Position.w = 1.0;
     
     diffuseColor.x = abs(in_diffuseColor.x);
     diffuseColor.y = abs(in_diffuseColor.y);

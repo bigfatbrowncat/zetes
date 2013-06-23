@@ -140,12 +140,23 @@ namespace cubex
 		png_read_image(png_ptr, row_pointers);
 
 		// Generate the OpenGL texture object
-		GLuint texture;
+/*		GLuint texture;
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, temp_width, temp_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+*/
+
+		GLuint texture;
+		// use trilinear filtering
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri( GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_width, temp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+		// generate mipmaps
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		// clean up
 		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
@@ -212,7 +223,7 @@ namespace cubex
 		//PROJECTION
 		float aspectRatio = (float)viewWidth / viewHeight;
 
-		glm::mat4 Projection = glm::perspective(45.0f, aspectRatio, 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(55.0f, aspectRatio, 0.1f, 10.0f);
 		if (viewWidth < viewHeight)
 		{
 			Projection = glm::scale(Projection, glm::vec3(aspectRatio, aspectRatio, aspectRatio));
@@ -220,15 +231,12 @@ namespace cubex
 
 		// View
 		glm::mat4 view = glm::mat4(1.0);
-		view = glm::lookAt(glm::vec3(-0.6, 0.3, 0.3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		view = glm::lookAt(glm::vec3(-6.0, 1.7, 2.0), glm::vec3(0, -0.2, 0), glm::vec3(0, 1, 0));
 
 		//MODEL
-		glm::mat4 Model = glm::mat4(1.0);
+		glm::mat4 Model = glm::mat4(1.0f);
 		//Scale by factor 0.5
-		Model = glm::scale(Model, glm::vec3(0.2f));
-		//Model = glm::rotate(Model, 30.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		Model = glm::rotate(Model, (float)(angle * 180), glm::vec3(0.0f, 1.0f, 0.0f));
-
+		Model = glm::rotate(Model, 180.0f * angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 MP = Projection * view * Model;
 
 		// Sending matrix

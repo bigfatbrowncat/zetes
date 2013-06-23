@@ -11,6 +11,7 @@ import crossbase.ui.ViewWindowsManager;
 
 public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocument, GLViewWindow, MenuConstructor<GLDocument, GLViewWindow>>
 {
+	private GLViewWindow glViewWindow;
 	/**
 	 * @param args
 	 */
@@ -22,11 +23,17 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocume
 		{
 			public void run()
 			{
-				app.getViewWindowsManager().openViewForDocument(new GLDocument());
+				app.glViewWindow = (GLViewWindow)app.getViewWindowsManager().openViewForDocument(new GLDocument());
 			}
 		});
 	}
 
+	@Override
+	protected void onIdle()
+	{
+		glViewWindow.updateFrame();
+	}
+	
 	@Override
 	public String getTitle()
 	{

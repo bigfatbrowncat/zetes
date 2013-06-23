@@ -103,10 +103,12 @@ extern "C"
 		else if (model == MODEL_MONKEY_SIMPLE)
 		{
 			objFileLocation = WinLinMacApi::locateResource("data", "monkeysimple-tri-normal.obj");
+			textureFileLocation = WinLinMacApi::locateResource("data", "monkey-tex.png");
 		}
 		else if (model == MODEL_MONKEY_SUBDIVIDED)
 		{
 			objFileLocation = WinLinMacApi::locateResource("data", "monkeysubdiv-tri-normal.obj");
+			textureFileLocation = WinLinMacApi::locateResource("data", "monkey-tex.png");
 		}
 		else
 		{

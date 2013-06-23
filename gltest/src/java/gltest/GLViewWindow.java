@@ -1,14 +1,8 @@
 package gltest;
 
+import java.util.Date;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
-import crossbase.abstracts.MenuConstructor;
-import crossbase.ui.ViewWindowBase;
-import crossbase.ui.ViewWindowsManager;
-
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -19,7 +13,13 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.opengl.CrossBaseGLCanvas;
 import org.eclipse.swt.opengl.GLData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import crossbase.abstracts.MenuConstructor;
+import crossbase.ui.ViewWindowBase;
+import crossbase.ui.ViewWindowsManager;
 
 public class GLViewWindow extends ViewWindowBase<GLDocument>
 {
@@ -35,6 +35,9 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	private static native boolean drawScene(double angle);
 	
 	private double angle = 0;
+	private CrossBaseGLCanvas canvas;
+	private Date lastFrameMoment = new Date();
+	private float framesPerSecond = 100;
 	
 	public GLViewWindow(
 			String applicationTitle,
@@ -70,8 +73,10 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		GLData data = new GLData ();
 		data.doubleBuffer = true;
 		data.depthSize = 1;
+		data.samples = 8;
+		data.sampleBuffers = 2;
 		
-		final CrossBaseGLCanvas canvas = new CrossBaseGLCanvas(comp, SWT.NO_BACKGROUND, data);
+		canvas = new CrossBaseGLCanvas(comp, SWT.NO_BACKGROUND, data);
 		
 		if (!canvas.isCurrent()) canvas.setCurrent();
 		globalInit();
@@ -124,8 +129,6 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 			@Override
 			public void controlMoved(ControlEvent arg0)
 			{
-				// TODO Auto-generated method stub
-				
 			}
 		});
 		
@@ -139,24 +142,24 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 				canvas.swapBuffers();
 			}
 		});
-		
-		Runnable timerUpdateRunnable = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (canvas != null && !canvas.isDisposed())
-				{
-					canvas.redraw();
-					angle += 0.002;
-					Display.getCurrent().timerExec(10, this);
-				}
-			}
-		};
-		
-		timerUpdateRunnable.run();			
 
 		return shell;
+	}
+	
+	public void updateFrame()
+	{
+		Date currentMoment = new Date();
+		double deltaTimeSec = 0.001 * (currentMoment.getTime() - lastFrameMoment.getTime());
+		
+		if (deltaTimeSec >= 1.0 / framesPerSecond)
+		{
+			angle += 0.5 * deltaTimeSec;
+			if (canvas != null && !canvas.isDisposed())
+			{
+				canvas.redraw();
+			}
+			lastFrameMoment = currentMoment;
+		}
 	}
 	
 	@Override

@@ -24,8 +24,9 @@ namespace cubex
 
 		int vertexCoordinatesAttrib;
 		int textureCoordinatesAttrib;
-		int diffuseColorAttrib;
-		int matrixUniform, textureUniform;
+		int normalAttrib;
+		int lightPositionUniform;
+		int matrixUniform, normalMatrixUniform, textureUniform;
 
 		int viewWidth, viewHeight;
 

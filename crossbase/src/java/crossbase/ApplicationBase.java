@@ -111,9 +111,18 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 		{
 			if (!display.readAndDispatch())
 			{
-				display.sleep();
+				onIdle();
 			}
 		}
+	}
+	
+	/**
+	 * Override this if you want to do something special in the main loop
+	 */
+	protected void onIdle()
+	{
+		Display display = Display.getDefault();
+		display.sleep();
 	}
 	
 	private SelectionAdapter exitSelectionAdapter = new SelectionAdapter()

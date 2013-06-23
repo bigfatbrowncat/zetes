@@ -186,9 +186,11 @@ namespace cubex
 
 	    vertexCoordinatesAttrib = program->getAttribLocation("in_vertexPosition");
 	    textureCoordinatesAttrib = program->getAttribLocation("in_textureCoords");
-	    diffuseColorAttrib = program->getAttribLocation("in_diffuseColor");
+	    normalAttrib = program->getAttribLocation("in_normal");
 
+	    lightPositionUniform = program->getUniformLocation("in_lightPosition");
 	    matrixUniform = program->getUniformLocation("matrix");
+	    normalMatrixUniform = program->getUniformLocation("normalMatrix");
 	    textureUniform = program->getUniformLocation("texture");
 	    printf("texUni: %d\n", textureUniform);
 
@@ -218,7 +220,7 @@ namespace cubex
 		// 2nd attribute buffer : texture coords
 		glEnableVertexAttribArray(textureCoordinatesAttrib);
 		// 2nd attribute buffer : texture coords
-		glEnableVertexAttribArray(diffuseColorAttrib);
+		glEnableVertexAttribArray(normalAttrib);
 
 		//PROJECTION
 		float aspectRatio = (float)viewWidth / viewHeight;
@@ -238,13 +240,16 @@ namespace cubex
 		//Scale by factor 0.5
 		Model = glm::rotate(Model, 180.0f * angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 MP = Projection * view * Model;
+		glm::mat3 NM = glm::inverse(glm::transpose(glm::mat3(MP)));
 
 		// Sending matrix
 		glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(MP));
+		glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, glm::value_ptr(NM));
 
 		// Sending texture
 		glActiveTexture(GL_TEXTURE0 + 0);
 		glUniform1i(textureUniform, 0);
+		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
 		// Setting vertex data
@@ -258,7 +263,7 @@ namespace cubex
 		);
 		// Setting diffuse color data
 		glVertexAttribPointer(
-		   diffuseColorAttrib,                  // second "in" in shader
+		   normalAttrib,                  // second "in" in shader
 		   3,                  // size
 		   GL_FLOAT,           // type
 		   GL_FALSE,           // normalized?

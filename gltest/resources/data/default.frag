@@ -13,7 +13,7 @@ void main()
 	float brightness = 2.0;
 	float ambientBrightness = 0.5;
 
-    vec4 tex = texture(texture, textureCoords.st);
+    vec4 tex = texture2D(texture, textureCoords.st);
     
     vec4 lightV =  normalize(lightPosition - vertex);
     float ndl = max(dot(normal, lightV.xyz), 0.0);

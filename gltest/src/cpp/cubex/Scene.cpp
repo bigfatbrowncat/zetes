@@ -225,7 +225,7 @@ namespace cubex
 		//PROJECTION
 		float aspectRatio = (float)viewWidth / viewHeight;
 
-		glm::mat4 Projection = glm::perspective(55.0f, aspectRatio, 0.1f, 10.0f);
+		glm::mat4 Projection = glm::perspective(45.0f, aspectRatio, 0.1f, 10.0f);
 		if (viewWidth < viewHeight)
 		{
 			Projection = glm::scale(Projection, glm::vec3(aspectRatio, aspectRatio, aspectRatio));

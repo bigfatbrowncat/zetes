@@ -17,7 +17,7 @@ void main()
 {
     gl_Position = matrix * vec4(in_vertexPosition, 1.0);
 
-    lightPosition = /*matrix */ vec4(in_lightPosition, 1.0);
+    lightPosition = matrix * vec4(in_lightPosition, 1.0);
     vertex = gl_Position;
     normal = normalMatrix * in_normal;
     textureCoords = in_textureCoords;

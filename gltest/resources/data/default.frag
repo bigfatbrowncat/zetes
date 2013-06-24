@@ -1,5 +1,5 @@
 #version 150
-uniform sampler2D texture;
+uniform sampler2D uni_texture;
 
 in vec2 textureCoords;
 in vec4 vertex;
@@ -13,7 +13,7 @@ void main()
 	float brightness = 2.0;
 	float ambientBrightness = 0.5;
 
-    vec4 tex = texture2D(texture, textureCoords.st);
+    vec4 tex = texture(uni_texture, textureCoords.st);
     
     vec4 lightV =  normalize(lightPosition - vertex);
     float ndl = max(dot(normal, lightV.xyz), 0.0);

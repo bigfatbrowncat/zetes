@@ -17,15 +17,20 @@ namespace cubex
 	class ShaderProgram
 	{
 	private:
+		// This class isn't copyable
+		ShaderProgram operator = (const ShaderProgram& other);
+		ShaderProgram(const ShaderProgram& other);
+
+	private:
 		GLuint programID;
 	public:
 		ShaderProgram(const string& vertexShaderCode, const string& fragmentShaderCode);
 		static ShaderProgram* fromFiles(const string& vertexShaderFileName, const string& fragmentShaderFileName);
 
-		int getAttribLocation(const string& attribName);
-		int getUniformLocation(const string& uniformName);
+		GLint getAttribLocation(const string& attribName) const;
+		GLint getUniformLocation(const string& uniformName) const;
 
-		void use() { glUseProgram(programID); }
+		void use() const { glUseProgram(programID); }
 		virtual ~ShaderProgram();
 	};
 }

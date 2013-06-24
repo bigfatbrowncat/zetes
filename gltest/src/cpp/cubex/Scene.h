@@ -10,8 +10,8 @@
 
 #include "ShaderProgram.h"
 #include "MeshBuffer.h"
+#include "Texture.h"
 
-#include "MeshBuffer.h"
 
 namespace cubex
 {
@@ -19,19 +19,22 @@ namespace cubex
 	class Scene
 	{
 	private:
+		// This class isn't copyable
+		Scene operator = (const Scene& other);
+		Scene(const Texture& other);
+
+	private:
 		ShaderProgram* program;
 		MeshBuffer* meshBuffer;
+		Texture* texture;
 
 		int vertexCoordinatesAttrib;
 		int textureCoordinatesAttrib;
 		int normalAttrib;
 		int lightPositionUniform;
-		int matrixUniform, normalMatrixUniform, textureUniform;
+		int matrixUniform, normalMatrixUniform;
 
 		int viewWidth, viewHeight;
-
-		int textureID;
-
 	public:
 		Scene(const string& modelFileName,
 		      const string& vertexShaderFileName,

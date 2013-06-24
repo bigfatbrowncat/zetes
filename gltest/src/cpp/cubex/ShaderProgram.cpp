@@ -131,12 +131,12 @@ namespace cubex
 		return new ShaderProgram(vc, fc);
 }
 
-	int ShaderProgram::getAttribLocation(const string& attribName)
+	GLint ShaderProgram::getAttribLocation(const string& attribName) const
 	{
 		return glGetAttribLocation(this->programID, attribName.c_str());
 	}
 
-	int ShaderProgram::getUniformLocation(const string& uniformName)
+	GLint ShaderProgram::getUniformLocation(const string& uniformName) const
 	{
 		return glGetUniformLocation(this->programID, uniformName.c_str());
 	}

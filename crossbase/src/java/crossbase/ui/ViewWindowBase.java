@@ -19,7 +19,7 @@ import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 
-public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>
+public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, ShellListener, DisposeListener
 {
 	private ViewWindowsManager<TD, ? extends ViewWindowBase<TD>> windowsManager;
 	private MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor;
@@ -143,6 +143,48 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell.setFullScreen(!shell.getFullScreen());
 	}
 	
+	@Override
+	public void shellIconified(ShellEvent arg0)
+	{
+	}
+	
+	@Override
+	public void shellDeiconified(ShellEvent arg0)
+	{
+	}
+	
+	@Override
+	public void shellDeactivated(ShellEvent arg0)
+	{
+		ViewWindowBase.this.menuConstructor.updateMenus();
+	}
+	
+	@Override
+	public void shellActivated(ShellEvent arg0)
+	{
+		ViewWindowBase.this.menuConstructor.updateMenus();
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void shellClosed(ShellEvent arg0)
+	{
+		// If we want this to work, we should guarantee that the generic parameter type TVW of windowsManager equals to our type
+		((ViewWindowsManager)windowsManager).closeWindow(ViewWindowBase.this);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void widgetDisposed(DisposeEvent arg0)
+	{
+		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
+		((MenuConstructor)ViewWindowBase.this.menuConstructor).removeWindow(ViewWindowBase.this);
+		
+		Document doc = getDocument();
+		if (doc != null) 
+		{
+			doc.dispose();
+		}
+	}
 	
 	private void prepareShell()
 	{
@@ -156,59 +198,9 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 			setCocoaFullscreenButton(supportsFullscreen());
 		}
 		
-		shell.addShellListener(new ShellListener()
-		{
-			
-			@Override
-			public void shellIconified(ShellEvent arg0)
-			{
-				ViewWindowBase.this.menuConstructor.updateMenus();
-				// TODO Add custom event
-			}
-			
-			@Override
-			public void shellDeiconified(ShellEvent arg0)
-			{
-				ViewWindowBase.this.menuConstructor.updateMenus();
-				// TODO Add custom event
-			}
-			
-			@Override
-			public void shellDeactivated(ShellEvent arg0)
-			{
-				ViewWindowBase.this.menuConstructor.updateMenus();
-				// TODO Add custom event
-			}
-			
-			@Override
-			public void shellActivated(ShellEvent arg0)
-			{
-				ViewWindowBase.this.menuConstructor.updateMenus();
-				// TODO Add custom event
-			}
-			
-			@Override
-			public void shellClosed(ShellEvent arg0)
-			{
-				// If we want this to work, we should guarantee that the generic parameter type TVW of windowsManager equals to our type
-				((ViewWindowsManager)windowsManager).closeWindow(ViewWindowBase.this);
-			}
-		});
+		shell.addShellListener(this);
 		
-		shell.addDisposeListener(new DisposeListener()
-		{
-			public void widgetDisposed(DisposeEvent arg0)
-			{
-				// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
-				((MenuConstructor)ViewWindowBase.this.menuConstructor).removeWindow(ViewWindowBase.this);
-				
-				Document doc = getDocument();
-				if (doc != null) 
-				{
-					doc.dispose();
-				}
-			}
-		});
+		shell.addDisposeListener(this);
 	}
 
 	public MenuConstructor<TD, ? extends ViewWindowBase<TD>> getMenuConstructor()

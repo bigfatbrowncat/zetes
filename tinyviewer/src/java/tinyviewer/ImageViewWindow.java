@@ -62,7 +62,7 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	@Override
 	protected Shell constructShell()
 	{
-		Shell shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER);
+		Shell shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.NO_BACKGROUND);
 
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		shell.setMinimumSize(new Point(150, 200));
@@ -71,11 +71,11 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL | SWT.DOUBLE_BUFFERED);
+		scrolledComposite = new ScrolledComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NO_BACKGROUND);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
-		imageView = new ImageView(scrolledComposite, SWT.NONE | SWT.DOUBLE_BUFFERED);
+		imageView = new ImageView(scrolledComposite, SWT.NONE);
 		imageView.setBounds(0, 0, 200, 127);
 		imageView.setVisible(false);
 		imageView.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));

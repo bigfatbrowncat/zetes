@@ -6,6 +6,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
@@ -15,7 +16,6 @@ import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.DefaultAboutBox;
-import crossbase.ui.CocoaUIEnhancer;
 import crossbase.ui.ViewWindowsManager;
 
 
@@ -24,6 +24,11 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
                                       TVW extends ViewWindow<TD>, 
                                       TMC extends MenuConstructor<TD, TVW>> implements Application<TAB, TD, TVW, TMC>
 {
+	private final int OSX_SYSTEM_MENU_ABOUT = -1;
+	private final int OSX_SYSTEM_MENU_PREFERENCES = -2;
+	private final int OSX_SYSTEM_MENU_QUIT = -6;
+	
+	
 	private DefaultAboutBox aboutBox = null;
 
 	private TMC menuConstructor;
@@ -91,7 +96,6 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 			{
 				showAbout(null);
 			}
-				
 		}
 	};
 	
@@ -179,9 +183,28 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 			
 			if (SWT.getPlatform().equals("cocoa"))
 			{
+				for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
+				{
+					MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
+					System.out.print(item.getText() + ", id=" + item.getID()  + "\n");
+					
+					switch (item.getID())
+					{
+					case OSX_SYSTEM_MENU_ABOUT:
+						item.addSelectionListener(aboutSelectionAdapter);
+						break;
+					case OSX_SYSTEM_MENU_PREFERENCES:
+						item.addSelectionListener(preferencesSelectionAdapter);
+						break;
+					case OSX_SYSTEM_MENU_QUIT:
+						item.addSelectionListener(exitSelectionAdapter);
+						break;
+					}
+				}
+				
 				// In Cocoa we use a special hook class to handle the default
 				// About, Quit and Preferences items from the system menu.
-				new CocoaUIEnhancer(getTitle()).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
+				//new CocoaUIEnhancer(getTitle()).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
 	
 				// Add listener to OpenDocument event thus user can open documents
 				// with our Cocoa application

@@ -52,7 +52,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	 */
 	protected Shell constructShell()
 	{
-		Shell shell = new Shell(SWT.CLOSE | SWT.MIN | SWT.TITLE | SWT.MAX | SWT.RESIZE);
+		Shell shell = new Shell(SWT.CLOSE | SWT.MIN | SWT.TITLE | SWT.MAX | SWT.RESIZE | SWT.NO_BACKGROUND);
 		
 		Point size = shell.getSize();
 		Point clientSize = new Point(shell.getClientArea().width, shell.getClientArea().height);
@@ -68,7 +68,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 		}
 		
 		shell.setLayout(new FillLayout());
-		Composite comp = new Composite(shell, SWT.NONE);
+		Composite comp = new Composite(shell, SWT.NO_BACKGROUND);
 		comp.setLayout(new FillLayout());
 		GLData data = new GLData ();
 		data.doubleBuffer = true;

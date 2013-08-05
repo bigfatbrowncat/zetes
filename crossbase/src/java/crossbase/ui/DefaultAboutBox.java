@@ -41,7 +41,13 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	{
 		Rectangle shellBounds;
 	
-		if (getParent().isVisible())
+		if (SWT.getPlatform().equals("cocoa"))
+		{
+			// Move the dialog to he center horizontally and 1/4 vertically
+			shellBounds = getParent().getDisplay().getBounds();
+			shellBounds.y -= shellBounds.height / 6;
+		}
+		else if (getParent().isVisible())
 		{
 			// Move the dialog to the center of the parent shell.
 			shellBounds = getParent().getBounds();
@@ -119,7 +125,7 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	
 			aboutBoxShell.layout();
 			aboutBoxShell.open();
-			Display display = getParent().getDisplay();
+			/*Display display = getParent().getDisplay();
 			while (!aboutBoxShell.isDisposed())
 			{
 				if (!display.readAndDispatch())
@@ -127,7 +133,7 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 					display.sleep();
 				}
 			}
-			aboutBoxShell = null;
+			aboutBoxShell = null;*/
 			return true;
 		}
 		else
@@ -219,8 +225,8 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	{
 		
 		aboutBoxShell = new Shell(getParent(), getStyle() | SWT.NO_BACKGROUND);
-		aboutBoxShell.setSize(368, 280);
-		aboutBoxShell.setText("About " + applicationName /*"SWT Application"*/);
+		aboutBoxShell.setSize(300, 280);
+		aboutBoxShell.setText("");						// No title in OS X about box
 		aboutBoxShell.setLayout(new FormLayout());
 		
 
@@ -268,38 +274,6 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 		aboutBoxShell.layout();
 		
 		aboutBoxShell.setSize(windowSize.x, iconLabel.getSize().y + 30 + titleLabel.getSize().y + 30 + descriptionLabel.getSize().y + 30 + copyrightLabel.getSize().y);
-		
-		aboutBoxShell.addShellListener(new ShellListener() {
-			
-			@Override
-			public void shellIconified(ShellEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void shellDeiconified(ShellEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void shellDeactivated(ShellEvent arg0) {
-				aboutBoxShell.close();
-			}
-			
-			@Override
-			public void shellClosed(ShellEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void shellActivated(ShellEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 	}
 
 	

@@ -37,7 +37,8 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	private final int OSX_SYSTEM_MENU_PREFERENCES = -2;
 	private final int OSX_SYSTEM_MENU_QUIT = -6;
 	
-	
+	private boolean dummyShell = false;
+	private Shell shell;
 	private AboutBox aboutBox = null;
 
 	private TMC menuConstructor;
@@ -51,11 +52,23 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	 * @param shell The parent shell for about box window to create.
 	 *              May be null &#151; in that case the about box will be created for the whole display.
 	 */
-	protected final void showAbout(Shell shell)
+	protected final void showAbout(Shell parentShell)
 	{
 		if (aboutBox == null || aboutBox.isDisposed())
 		{
-			boolean dummyShell = false;
+			if (dummyShell)
+			{
+				shell.dispose();
+				shell = null;
+				dummyShell = false;
+			}
+			
+			if (!SWT.getPlatform().equals("cocoa"))
+			{
+				// For OS X ignoring the parent shell. About box should be independent of any window
+				shell = parentShell;
+			}
+			
 			if (shell == null) 
 			{
 				shell = new Shell(Display.getDefault());
@@ -64,11 +77,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			
 			aboutBox = createAboutBox(shell);
 			aboutBox.open();
-
-			if (dummyShell)
-			{
-				shell.dispose();
-			}
 		}		
 	}
 	
@@ -92,10 +100,23 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		}
 	};
 	
+	private Listener applicationCloseListener = new Listener() {
+		
+		@Override
+		public void handleEvent(Event arg0) {
+			// That listener is necessary to handle closing process correctly
+			// If we remove this handler, the system menu will stay
+			// showing our applcation after it's closed
+			arg0.doit = false;
+			terminated = true;
+			
+		}
+	};
+	
 	private SelectionAdapter aboutSelectionAdapter = new SelectionAdapter()
 	{
 		@Override
-		public void widgetSelected(SelectionEvent arg0)
+		public void widgetSelected(final SelectionEvent arg0)
 		{
 			if (arg0.display != null)
 			{
@@ -117,16 +138,26 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		}
 	};
 	
+	boolean terminated = false;
+	
 	private void eventLoop()
 	{
 		Display display = Display.getDefault();
-		while (!display.isDisposed())
+		try
 		{
-			if (!display.readAndDispatch())
+			while (!terminated && !display.isDisposed())
 			{
-				onIdle();
+				if (!display.readAndDispatch())
+				{
+					onIdle();
+				}
 			}
 		}
+		finally
+		{
+			display.dispose();
+		}
+		
 	}
 	
 	/**
@@ -146,7 +177,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			viewWindowsManager.closeAllWindows();
 			if (Display.getDefault() != null && !Display.getDefault().isDisposed())
 			{
-				Display.getDefault().dispose();
+				terminated = true;
 			}
 		}
 	};
@@ -164,7 +195,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			{
 				if (Display.getDefault() != null && !Display.getDefault().isDisposed())
 				{
-					Display.getDefault().dispose();
+					terminated = true;
 				}
 			}
 		}
@@ -189,13 +220,12 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			// Here we guarantee that menuConstructor type is compatible to viewWindowsManager
 			viewWindowsManager.setMenuConstructor(menuConstructor);
 			
-			
+			// Adding OS X system menu handlers
 			if (SWT.getPlatform().equals("cocoa"))
 			{
 				for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
 				{
 					MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
-					System.out.print(item.getText() + ", id=" + item.getID()  + "\n");
 					
 					switch (item.getID())
 					{
@@ -211,14 +241,9 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 					}
 				}
 				
-				// In Cocoa we use a special hook class to handle the default
-				// About, Quit and Preferences items from the system menu.
-				//new CocoaUIEnhancer(getTitle()).hookApplicationMenu(Display.getDefault(), exitSelectionAdapter, aboutSelectionAdapter, preferencesSelectionAdapter);
-	
 				// Add listener to OpenDocument event thus user can open documents
 				// with our Cocoa application
 				Display.getDefault().addListener(SWT.OpenDocument, openDocumentListener);
-				
 			}
 			else
 			{
@@ -237,6 +262,10 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 					return;
 				}
 			}
+			
+			// Adding a proper close listener
+			Display.getDefault().addListener(SWT.Close, applicationCloseListener);
+
 			
 			if (!SWT.getPlatform().equals("cocoa") || needsAtLeastOneView())
 			{

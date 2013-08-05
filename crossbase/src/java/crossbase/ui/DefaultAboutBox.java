@@ -20,7 +20,9 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
-public class DefaultAboutBox extends Dialog
+import crossbase.abstracts.AboutBox;
+
+public class DefaultAboutBox extends Dialog implements AboutBox
 {
 	protected Shell aboutBoxShell;
 	private String applicationName = "", descriptionText = "", copyrightText = "", iconResourceName = "";
@@ -32,7 +34,7 @@ public class DefaultAboutBox extends Dialog
 	 */
 	public DefaultAboutBox(Shell parent)
 	{
-		super(parent, SWT.DIALOG_TRIM | SWT.CENTER | SWT.NO_BACKGROUND);
+		super(parent, SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
 	}
 
 	private void centerWindow()
@@ -137,7 +139,7 @@ public class DefaultAboutBox extends Dialog
 	private void createContents()
 	{
 		
-		aboutBoxShell = new Shell(getParent(), getStyle() | SWT.NO_BACKGROUND);
+		aboutBoxShell = new Shell(getParent(), getStyle());
 		aboutBoxShell.setSize(368, 150);
 		aboutBoxShell.setText("About " + applicationName /*"SWT Application"*/);
 		aboutBoxShell.setLayout(new FormLayout());

@@ -52,7 +52,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	 */
 	protected Shell constructShell()
 	{
-		Shell shell = new Shell(SWT.CLOSE | SWT.MIN | SWT.TITLE | SWT.MAX | SWT.RESIZE | SWT.NO_BACKGROUND);
+		Shell shell = new Shell(SWT.CLOSE | SWT.MIN | SWT.TITLE | SWT.MAX | SWT.RESIZE | SWT.DOUBLE_BUFFERED);
 		
 		Point size = shell.getSize();
 		Point clientSize = new Point(shell.getClientArea().width, shell.getClientArea().height);

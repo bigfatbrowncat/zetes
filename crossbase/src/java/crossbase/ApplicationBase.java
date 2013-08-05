@@ -10,16 +10,16 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
+import crossbase.abstracts.AboutBox;
 import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
-import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.ViewWindowsManager;
 
 
-public abstract class ApplicationBase<TAB extends DefaultAboutBox, 
+public abstract class ApplicationBase<TAB extends AboutBox, 
                                       TD extends Document, 
                                       TVW extends ViewWindow<TD>, 
                                       TMC extends MenuConstructor<TD, TVW>> implements Application<TAB, TD, TVW, TMC>
@@ -29,7 +29,7 @@ public abstract class ApplicationBase<TAB extends DefaultAboutBox,
 	private final int OSX_SYSTEM_MENU_QUIT = -6;
 	
 	
-	private DefaultAboutBox aboutBox = null;
+	private AboutBox aboutBox = null;
 
 	private TMC menuConstructor;
 	private ViewWindowsManager<TD, ? extends ViewWindow<TD>> viewWindowsManager;

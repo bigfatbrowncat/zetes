@@ -68,13 +68,11 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 * if we are not in OS X, terminates the application.
 	 * @param viewWindow The window to close
 	 */
-	@SuppressWarnings("unchecked")
 	public void closeAllWindows()
 	{
-		Object[] docs = views.keySet().toArray();
-		for (int i = 0; i < docs.length; i++)
+		for (TD doc : views.keySet())
 		{
-			closeAllWindowsForDocument((TD)docs[i]);
+			closeAllWindowsForDocument(doc);
 		}
 	}
 	

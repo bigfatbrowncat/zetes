@@ -62,7 +62,7 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	@Override
 	protected Shell constructShell()
 	{
-		Shell shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.NO_BACKGROUND);
+		Shell shell = new Shell(SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.BORDER | SWT.DOUBLE_BUFFERED);
 
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		shell.setMinimumSize(new Point(150, 200));

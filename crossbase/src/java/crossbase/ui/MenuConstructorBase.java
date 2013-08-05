@@ -225,7 +225,6 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		}
 		
 		// Custom items
-		System.out.println("Custom items:");
 		List<MenuItem> customItems = createCustomWindowMenuItems();
 
 		if (customItems != null && customItems.size() > 0) 
@@ -240,11 +239,8 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		boolean anyWindowsToAdd = false;
 		for (TVW viewWindow : viewWindows)
 		{
-			System.out.println("ViewWindow: ");
-
 			if (viewWindow.getDocument() != null)
 			{
-				System.out.println("	Document: " + viewWindow.getDocument().getTitle());
 				anyWindowsToAdd = true;
 				break;
 			}

@@ -1,8 +1,9 @@
 package gltest;
 
+import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 
-public class GLViewWindowsManager extends ViewWindowsManager<GLDocument, GLViewWindow>
+public class GLViewWindowsManager extends ViewWindowsManager<GLDocument, GLViewWindow, MenuConstructorBase<GLDocument, GLViewWindow>>
 {
 	private String applicationTitle;
 

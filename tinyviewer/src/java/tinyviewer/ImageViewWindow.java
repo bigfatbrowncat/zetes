@@ -48,7 +48,7 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	}
 	
 	public ImageViewWindow(String applicationTitle, 
-	                       ViewWindowsManager<ImageDocument, ImageViewWindow> windowsManager, 
+	                       ImageViewWindowsManager windowsManager, 
 	                       TinyViewerMenuConstructor menuConstructor)
 	{
 		super(applicationTitle, windowsManager, menuConstructor);

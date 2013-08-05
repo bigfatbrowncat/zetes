@@ -17,7 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 import crossbase.ApplicationBase;
 import crossbase.ui.DefaultAboutBox;
 
-public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor>
+public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
+                                                             ImageDocument,
+                                                             ImageViewWindow,
+                                                             TinyViewerMenuConstructor,
+                                                             ImageViewWindowsManager>
 {
 	@Override
 	public String getTitle()
@@ -121,7 +125,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 	
 	public static void main(String... args)
 	{
-		new TinyViewerApplication().run(args, null);
+		new TinyViewerApplication().run(args);
 	}
 
 	@Override

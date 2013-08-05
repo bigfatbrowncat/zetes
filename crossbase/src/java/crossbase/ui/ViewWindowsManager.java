@@ -1,18 +1,22 @@
 package crossbase.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 
-public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWindow<TD>>
+public abstract class ViewWindowsManager<TD extends Document,
+                                         TVW extends ViewWindow<TD>,
+                                         TMC extends MenuConstructor<TD, TVW>>
 {
 	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
-	private MenuConstructor<TD, TVW> menuConstructor;
+	private TMC menuConstructor;
 
 	private HashSet<ViewWindowsManagerListener> listeners = new HashSet<ViewWindowsManagerListener>();
 	
@@ -161,7 +165,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 		return menuConstructor;
 	}
 	
-	public void setMenuConstructor(MenuConstructor<TD, TVW> menuConstructor)
+	public void setMenuConstructor(TMC menuConstructor)
 	{
 		this.menuConstructor = menuConstructor;
 	}
@@ -182,5 +186,17 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	public void removeListener(ViewWindowsManagerListener listener)
 	{
 		listeners.remove(listener);
+	}
+	
+	public List<TVW> getViewsForDocument(TD document)
+	{
+		if (views.get(document) != null)
+		{
+			return Collections.unmodifiableList(views.get(document));
+		}
+		else
+		{
+			return Collections.unmodifiableList(new ArrayList<TVW>());
+		}
 	}
 }

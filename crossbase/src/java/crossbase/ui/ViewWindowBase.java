@@ -21,7 +21,7 @@ import crossbase.abstracts.ViewWindow;
 
 public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, ShellListener, DisposeListener
 {
-	private ViewWindowsManager<TD, ? extends ViewWindowBase<TD>> windowsManager;
+	private ViewWindowsManager<TD, ?, ?> windowsManager;
 	private MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor;
 	
 	protected Shell shell;
@@ -66,7 +66,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	}
 
 	public ViewWindowBase(String applicationTitle, 
-	                      ViewWindowsManager<TD, ? extends ViewWindowBase<TD>> windowsManager,
+	                      ViewWindowsManager<TD, ?, ?> windowsManager,
 	                      MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor)
 	{
 		this.applicationTitle = applicationTitle;

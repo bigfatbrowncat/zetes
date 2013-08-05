@@ -41,7 +41,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	
 	public GLViewWindow(
 			String applicationTitle,
-			ViewWindowsManager<GLDocument, ? extends ViewWindowBase<GLDocument>> windowsManager,
+			GLViewWindowsManager windowsManager,
 			MenuConstructor<GLDocument, ? extends ViewWindowBase<GLDocument>> menuConstructor)
 	{
 		super(applicationTitle, windowsManager, menuConstructor);

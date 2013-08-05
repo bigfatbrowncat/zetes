@@ -18,11 +18,20 @@ import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.ViewWindowsManager;
 
-
+//**
+// * <p>This class is the base for Multi Document architecture.</p>
+// * 
+// * <p>You should use it if your application opens more than one document at a time. 
+// * Some native Windows and Linux applications work in a mode of multi-loaded single-document
+// * application style (for example you can open as much Notepad windows as you want and all of them
+// * would become independent different processes). But this model is impossible on OS X where
+// * only one instance of a UI application is possible to be executed at a moment.</p>
+// */
 public abstract class ApplicationBase<TAB extends AboutBox, 
                                       TD extends Document, 
                                       TVW extends ViewWindow<TD>, 
-                                      TMC extends MenuConstructor<TD, TVW>> implements Application<TAB, TD, TVW, TMC>
+                                      TMC extends MenuConstructor<TD, TVW>,
+                                      TVWM extends ViewWindowsManager<TD, TVW, TMC>> implements Application<TAB, TD, TVW, TMC, TVWM>
 {
 	private final int OSX_SYSTEM_MENU_ABOUT = -1;
 	private final int OSX_SYSTEM_MENU_PREFERENCES = -2;
@@ -32,7 +41,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	private AboutBox aboutBox = null;
 
 	private TMC menuConstructor;
-	private ViewWindowsManager<TD, ? extends ViewWindow<TD>> viewWindowsManager;
+	private TVWM viewWindowsManager;
 
 	public abstract String getTitle();
 	
@@ -161,7 +170,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		}
 	};
 	
-	public void run(String[] arguments, Runnable beforeEventLoop)
+	public void run(String[] arguments)
 	{
 		SingleAppInstanceDocumentHandler mdiHelper = null;
 		try
@@ -178,7 +187,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			menuConstructor.updateMenus();
 			
 			// Here we guarantee that menuConstructor type is compatible to viewWindowsManager
-			((ViewWindowsManager)viewWindowsManager).setMenuConstructor(menuConstructor);
+			viewWindowsManager.setMenuConstructor(menuConstructor);
 			
 			
 			if (SWT.getPlatform().equals("cocoa"))
@@ -235,8 +244,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 				viewWindowsManager.ensureThereIsOpenedWindow();
 			}
 			
-			if (beforeEventLoop != null) beforeEventLoop.run();
-					
 			eventLoop();
 			
 			viewWindowsManager.removeListener(viewWindowsManagerListener);
@@ -250,7 +257,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		}		
 	}
 	
-	public ViewWindowsManager<TD, ? extends ViewWindow<TD>> getViewWindowsManager()
+	public TVWM getViewWindowsManager()
 	{
 		return viewWindowsManager;
 	}

@@ -2,16 +2,19 @@ package crossbase.abstracts;
 
 import org.eclipse.swt.widgets.Shell;
 
-import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.ViewWindowsManager;
 
-public interface Application<TAB extends AboutBox, TD extends Document, TVW extends ViewWindow<TD>, TMC extends MenuConstructor<TD, ? extends ViewWindow<TD>>>
+public interface Application<TAB extends AboutBox,
+                             TD extends Document, 
+                             TVW extends ViewWindow<TD>, 
+                             TMC extends MenuConstructor<TD, TVW>,
+                             TVWM extends ViewWindowsManager<TD, TVW, TMC>>
 {
 	String getTitle();
 	
 	TAB createAboutBox(Shell parent);
 	
-	ViewWindowsManager<TD, TVW> createViewWindowsManager();
+	TVWM createViewWindowsManager();
 	
 	TMC createMenuConstructor();
 	

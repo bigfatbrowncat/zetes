@@ -4,12 +4,14 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.ApplicationBase;
-import crossbase.abstracts.MenuConstructor;
 import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.MenuConstructorBase;
-import crossbase.ui.ViewWindowsManager;
 
-public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocument, GLViewWindow, MenuConstructor<GLDocument, GLViewWindow>>
+public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
+                                                         GLDocument, 
+                                                         GLViewWindow, 
+                                                         MenuConstructorBase<GLDocument, GLViewWindow>,
+                                                         GLViewWindowsManager>
 {
 	private GLViewWindow glViewWindow;
 	/**
@@ -19,18 +21,24 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocume
 	{
 		final GLTestApplication app = new GLTestApplication();
 		
-		app.run(args, new Runnable()
-		{
-			public void run()
-			{
-				app.glViewWindow = (GLViewWindow)app.getViewWindowsManager().openViewForDocument(new GLDocument());
-			}
-		});
+		app.run(args);
 	}
 
+	public void setViewWindow(GLViewWindow window)
+	{
+		this.glViewWindow = window;
+	}
+	
 	@Override
 	protected void onIdle()
 	{
+		if (glViewWindow == null)
+		{
+			if (getViewWindowsManager().getViewsForDocument(null).size() > 0)
+			{
+				glViewWindow = getViewWindowsManager().getViewsForDocument(null).get(0);
+			}
+		}
 		glViewWindow.updateFrame();
 	}
 	
@@ -54,13 +62,13 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox, GLDocume
 	}
 
 	@Override
-	public ViewWindowsManager<GLDocument, GLViewWindow> createViewWindowsManager()
+	public GLViewWindowsManager createViewWindowsManager()
 	{
 		return new GLViewWindowsManager(getTitle());
 	}
 
 	@Override
-	public MenuConstructor<GLDocument, GLViewWindow> createMenuConstructor()
+	public MenuConstructorBase<GLDocument, GLViewWindow> createMenuConstructor()
 	{
 		return new MenuConstructorBase<GLDocument, GLViewWindow>();
 	}

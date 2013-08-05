@@ -4,7 +4,7 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 
 import crossbase.ui.ViewWindowsManager;
 
-public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, ImageViewWindow>
+public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, ImageViewWindow, TinyViewerMenuConstructor>
 {
 	private String applicationTitle;
 	private DropTargetAdapter viewWindowDropTargetAdapter;

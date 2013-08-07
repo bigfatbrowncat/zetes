@@ -58,7 +58,7 @@ namespace cubex
 	{
 		if (!checkFace(face))
 		{
-			throw CubexException("Incorrect face data");
+			throw CubexException(__FILE__, __LINE__, "Incorrect face data");
 		}
 		faces.push_back(face);
 	}

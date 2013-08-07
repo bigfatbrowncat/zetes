@@ -117,13 +117,14 @@ namespace cubex
 		FILE* f = fopen(fileName.c_str(), "r");
 		if (f == NULL)
 		{
-			throw CubexException(string("Can't open the file ") + fileName);
+			throw CubexException(__FILE__, __LINE__, string("Can't open the file ") + fileName);
 		}
 
 		Mesh res;
 
 		bool error = false;
 		string errorMessage;
+
 
 		int lineNumber = 1;
 
@@ -430,7 +431,7 @@ namespace cubex
 
 		if (error)
 		{
-			throw CubexException(errorMessage);
+			throw CubexException(__FILE__, __LINE__, errorMessage);
 		}
 
 		return res;

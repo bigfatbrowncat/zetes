@@ -122,7 +122,7 @@ extern "C"
 		}
 		catch (CubexException& ex)
 		{
-			printf("\nException occured: %s", ex.getMessage().c_str());
+			printf("[ERROR] %s", ex.getReport().c_str());
 			fflush(stdout);
 			return false;
 		}

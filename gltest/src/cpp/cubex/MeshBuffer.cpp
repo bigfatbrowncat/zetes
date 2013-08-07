@@ -5,15 +5,19 @@
  *      Author: il
  */
 
+#include <string>
+
 #include <GL3/gl3w.h>
 
 #include "MeshBuffer.h"
+
+using namespace std;
 
 namespace cubex {
 
 MeshBuffer::MeshBuffer(const Mesh &mesh)
 {
-	// Creating the buffer data for tri faces
+	// Creating the buffer data for faces
 
 	printf("Extracting data...\n");fflush(stdout);
 	verticesCount = 3 * mesh.getFaces().size();
@@ -124,10 +128,80 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 
 }
 
+void MeshBuffer::connectToShaderProgram(const ShaderProgram* shaderProgram,
+                            const string& vertexVec3ShaderVariableName,
+                            const string& normalVec3ShaderVariableName,
+                            const string& textureVec2ShaderVariableName)
+{
+	this->shaderProgram = shaderProgram;
+	this->vertexVec3ShaderVariableName = vertexVec3ShaderVariableName;
+	this->normalVec3ShaderVariableName = normalVec3ShaderVariableName;
+	this->textureVec2ShaderVariableName = textureVec2ShaderVariableName;
+
+	if (shaderProgram != NULL)
+	{
+		if (vertexVec3ShaderVariableName != "")
+			vertexVec3ShaderVariableAttrib = shaderProgram->getAttribLocation(vertexVec3ShaderVariableName.c_str());
+		if (normalVec3ShaderVariableName != "")
+			normalVec3ShaderVariableAttrib = shaderProgram->getAttribLocation(normalVec3ShaderVariableName.c_str());
+		if (textureVec2ShaderVariableName != "")
+			textureVec2ShaderVariableAttrib = shaderProgram->getAttribLocation(textureVec2ShaderVariableName.c_str());
+	}
+}
+
 void MeshBuffer::draw()
 {
+	if (shaderProgram != NULL)
+	{
+		shaderProgram->use();
+	}
+	else
+	{
+		throw CubexException(__FILE__, __LINE__, "Shader program shouldn't be null");
+	}
+
+	if (vertexVec3ShaderVariableAttrib)
+	glEnableVertexAttribArray(vertexVec3ShaderVariableAttrib);
+	glEnableVertexAttribArray(normalVec3ShaderVariableAttrib);
+	glEnableVertexAttribArray(textureVec2ShaderVariableAttrib);
+
+	// Setting vertex data
+	glVertexAttribPointer(
+		vertexVec3ShaderVariableAttrib,					// vertex shader variable
+		3,                  							// length of vec3 (XYZ)
+		GL_FLOAT,										// type
+		GL_FALSE,										// normalized?
+		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
+		(void*)0										// array buffer offset (we use first 3 of 8)
+	);
+
+	// Setting normal data
+	glVertexAttribPointer(
+		normalVec3ShaderVariableAttrib,					// normal shader variable
+		3,												// length of vec3 (XYZ)
+		GL_FLOAT,										// type
+		GL_FALSE,										// normalized?
+		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
+		(void*)(sizeof(GLfloat) * 3)					// array buffer offset (we use 3rd, 4th, 5th)
+	);
+
+	// Setting texture coordinates data
+	glVertexAttribPointer(
+		textureVec2ShaderVariableAttrib,				// texture coordinates shader variable
+		2,												// size of vec2 (UV)
+		GL_FLOAT,										// type
+		GL_FALSE,										// normalized?
+		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
+		(void*)(sizeof(GLfloat) * 6)					// array buffer offset (we use 6th and 7th)
+	);
+
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 	glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+
+	glDisableVertexAttribArray(vertexVec3ShaderVariableAttrib);
+	glDisableVertexAttribArray(normalVec3ShaderVariableAttrib);
+	glDisableVertexAttribArray(textureVec2ShaderVariableAttrib);
 }
 
 MeshBuffer::~MeshBuffer()

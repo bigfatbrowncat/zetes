@@ -97,7 +97,7 @@ namespace cubex
 		if (vf == NULL)
 		{
 			error = true;
-			throw CubexException(string("Can't load vertex shader from file ") + vertexShaderFileName);
+			throw CubexException(__FILE__, __LINE__, string("Can't load vertex shader from file ") + vertexShaderFileName);
 		}
 
 		FILE* ff = fopen(fragmentShaderFileName.c_str(), "r");
@@ -105,7 +105,7 @@ namespace cubex
 		{
 			error = true;
 			fclose(vf);
-			throw CubexException(string("Can't load fragment shader from file ") + fragmentShaderFileName);
+			throw CubexException(__FILE__, __LINE__, string("Can't load fragment shader from file ") + fragmentShaderFileName);
 		}
 
 		string vc;
@@ -133,12 +133,28 @@ namespace cubex
 
 	GLint ShaderProgram::getAttribLocation(const string& attribName) const
 	{
-		return glGetAttribLocation(this->programID, attribName.c_str());
+		GLint res = glGetAttribLocation(this->programID, attribName.c_str());
+		if (glGetError() == GL_NO_ERROR)
+		{
+			return res;
+		}
+		else
+		{
+			throw CubexException(__FILE__, __LINE__, "Some problem with shader program object. It's undefined or not linked");
+		}
 	}
 
 	GLint ShaderProgram::getUniformLocation(const string& uniformName) const
 	{
-		return glGetUniformLocation(this->programID, uniformName.c_str());
+		GLint res = glGetUniformLocation(this->programID, uniformName.c_str());
+		if (glGetError() == GL_NO_ERROR)
+		{
+			return res;
+		}
+		else
+		{
+			throw CubexException(__FILE__, __LINE__, "Some problem with shader program object. It's undefined or not linked");
+		}
 	}
 
 	ShaderProgram::~ShaderProgram()

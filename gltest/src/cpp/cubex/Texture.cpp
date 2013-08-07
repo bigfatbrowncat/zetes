@@ -178,7 +178,7 @@ namespace cubex
 	{
 		// Instance operations
 		textureId = loadPNGToTexture(fileName.c_str(), &width, &height);
-	    if (textureId == 0) throw CubexException(string("Can't load the texture ") + textureNameInShaderProgram + " from file " + fileName);
+	    if (textureId == 0) throw CubexException(__FILE__, __LINE__, string("Can't load the texture ") + textureNameInShaderProgram + " from file " + fileName);
 
 	    textureUniform = program.getUniformLocation(textureNameInShaderProgram);
 

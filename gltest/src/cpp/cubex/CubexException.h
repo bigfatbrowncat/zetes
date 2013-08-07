@@ -18,10 +18,12 @@ namespace cubex
 	class CubexException
 	{
 	private:
+		string fileName;
+		int lineNumber;
 		string message;
 	public:
-		CubexException(const string& message);
-		const string& getMessage() const { return message; }
+		CubexException(const string& fileName, int lineNumber, const string& message);
+		const string& getReport() const;
 		virtual ~CubexException();
 	};
 

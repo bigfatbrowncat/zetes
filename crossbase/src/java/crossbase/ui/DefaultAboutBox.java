@@ -145,7 +145,7 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	private void createContents()
 	{
 		
-		aboutBoxShell = new Shell(getParent(), getStyle());
+		aboutBoxShell = new Shell(getParent(), getStyle() | SWT.SYSTEM_MODAL);
 		aboutBoxShell.setSize(368, 150);
 		aboutBoxShell.setText("About " + applicationName /*"SWT Application"*/);
 		aboutBoxShell.setLayout(new FormLayout());

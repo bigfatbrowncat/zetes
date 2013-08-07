@@ -30,11 +30,9 @@ namespace cubex
 		printf("Mesh buffer generated\n"); fflush(stdout);
 
 	    // Read the Vertex Shader code from the file
-	    program = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName); //new ShaderProgram(VertexShaderCode, FragmentShaderCode);
+	    program = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName);
 
-	    vertexCoordinatesAttrib = program->getAttribLocation("in_vertexPosition");
-	    textureCoordinatesAttrib = program->getAttribLocation("in_textureCoords");
-	    normalAttrib = program->getAttribLocation("in_normal");
+	    meshBuffer->connectToShaderProgram(program, "in_vertexPosition", "in_normal", "in_textureCoords");
 
 	    lightPositionUniform = program->getUniformLocation("uni_lightPosition");
 	    matrixUniform = program->getUniformLocation("uni_matrix");
@@ -61,12 +59,6 @@ namespace cubex
 
 		glEnable(GL_DEPTH_TEST);
 
-		// 1st attribute buffer : vertices
-		glEnableVertexAttribArray(vertexCoordinatesAttrib);
-		// 2nd attribute buffer : texture coords
-		glEnableVertexAttribArray(textureCoordinatesAttrib);
-		// 2nd attribute buffer : texture coords
-		glEnableVertexAttribArray(normalAttrib);
 
 		//PROJECTION
 		float aspectRatio = (float)viewWidth / viewHeight;
@@ -95,42 +87,7 @@ namespace cubex
 		// Sending light position
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 
-		// Setting vertex data
-		glVertexAttribPointer(
-		   vertexCoordinatesAttrib,                  // first "in" in shader
-		   3,                  	// size
-		   GL_FLOAT,           // type
-		   GL_FALSE,           // normalized?
-		   sizeof(GLfloat) * 8,                    // stride
-		   (void*)0                                    // array buffer offset
-		);
-		// Setting diffuse color data
-		glVertexAttribPointer(
-		   normalAttrib,                  // second "in" in shader
-		   3,                  // size
-		   GL_FLOAT,           // type
-		   GL_FALSE,           // normalized?
-		   sizeof(GLfloat) * 8,                    // stride
-		   (void*)(sizeof(GLfloat) * 3)            // array buffer offset
-		);
-		// Setting texture coordinates data
-		glVertexAttribPointer(
-		   textureCoordinatesAttrib,                  // second "in" in shader
-		   2,                  // size
-		   GL_FLOAT,           // type
-		   GL_FALSE,           // normalized?
-		   sizeof(GLfloat) * 8,                    // stride
-		   (void*)(sizeof(GLfloat) * 6)            // array buffer offset
-		);
-
-
-		// Use our shader
-		program->use();
-
 		meshBuffer->draw();
-
-		glDisableVertexAttribArray(vertexCoordinatesAttrib);
-		glDisableVertexAttribArray(textureCoordinatesAttrib);
 
 	}
 

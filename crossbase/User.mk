@@ -9,7 +9,7 @@ RESOURCES = resources
 
 PWD = $(shell pwd)
 
-DEBUG_OPTIMIZE = -O3 # -g
+DEBUG_OPTIMIZE = -O0  -g
 
 
 

@@ -23,7 +23,7 @@ namespace cubex
 		string message;
 	public:
 		CubexException(const string& fileName, int lineNumber, const string& message);
-		const string& getReport() const;
+		const string getReport() const;
 		virtual ~CubexException();
 	};
 

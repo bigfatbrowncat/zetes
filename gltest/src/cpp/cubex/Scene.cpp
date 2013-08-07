@@ -12,6 +12,7 @@
 
 #include "ObjMeshLoader.h"
 
+#include "FrameBuffer.h"
 #include "Scene.h"
 
 namespace cubex
@@ -38,10 +39,8 @@ namespace cubex
 	    matrixUniform = program->getUniformLocation("uni_matrix");
 	    normalMatrixUniform = program->getUniformLocation("uni_normalMatrix");
 
-	    texture = new Texture(textureFileName, *program, "uni_texture");
-
-	    // Binding the texture
-		texture->bind();
+	    texture = new Texture(textureFileName);
+	    texture->connectToShaderProgram(*program, "uni_texture");
 
 	}
 
@@ -87,8 +86,25 @@ namespace cubex
 		// Sending light position
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 
+		Texture* frameImage = new Texture(viewWidth, viewHeight, Texture::tRGB, 1);
+		Texture* depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 1);
+
+		FrameBuffer fbo;
+		fbo.connectToImage(*frameImage, *depthImage);
+		fbo.bind();
+
+		//texture->connectToShaderProgram(*program, "uni_texture");
+		texture->bind();
 		meshBuffer->draw();
 
+		fbo.unbind();
+
+		//frameImage->connectToShaderProgram(*program, "uni_texture");
+		frameImage->bind();
+		meshBuffer->draw();
+
+		delete frameImage;
+		delete depthImage;
 	}
 
 	Scene::~Scene()

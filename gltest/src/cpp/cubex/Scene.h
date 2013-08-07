@@ -28,9 +28,6 @@ namespace cubex
 		MeshBuffer* meshBuffer;
 		Texture* texture;
 
-		/*int vertexCoordinatesAttrib;
-		int textureCoordinatesAttrib;
-		int normalAttrib;*/
 		int lightPositionUniform;
 		int matrixUniform, normalMatrixUniform;
 

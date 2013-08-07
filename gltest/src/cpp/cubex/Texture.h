@@ -20,6 +20,13 @@ namespace cubex
 {
 	class Texture
 	{
+		friend class FrameBuffer;
+	public:
+		enum Type
+		{
+			tRGB, tRGBA, tDepth
+		};
+
 	private:
 		// This class isn't copyable
 		Texture operator = (const Texture& other);
@@ -33,13 +40,32 @@ namespace cubex
 	private:
 		GLuint textureId;
 		int boundToIndex;
-		GLint textureUniform;
 		int width, height;
-		static GLuint loadPNGToTexture(const char * file_name, int * width, int * height);
+		int samples;
+		Type type;
+
+		GLint textureUniform;
+		string textureSampler2DShaderVariableName;
+		const ShaderProgram* shaderProgram;
+
+		void loadPNGToTexture(const char * file_name, int * width, int * height);
+
+		void globalCountersInit();
+	protected:
+		int getTextureId() const { return textureId; }
+
 	public:
-		Texture(const string& fileName, const ShaderProgram& program, const string& textureNameInShaderProgram);
+		Texture(const string& fileName);
+		Texture(int width, int height, Type type, int samples = 1);
+
+		void connectToShaderProgram(const ShaderProgram& program, const string& textureSampler2DShaderVariableName);
+
 		bool bind();
 		void unbind();
+
+		int getSamples() const { return samples; }
+		Type getType() const { return type; }
+
 		virtual ~Texture();
 	};
 }

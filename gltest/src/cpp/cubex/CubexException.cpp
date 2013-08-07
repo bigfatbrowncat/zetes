@@ -20,7 +20,7 @@ namespace cubex
 
 	}
 
-	const string& CubexException::getReport() const
+	const string CubexException::getReport() const
 	{
 		stringstream ss;
 		ss << "Cubex exception occured in file " << fileName << " at line " << lineNumber << ": " << message;

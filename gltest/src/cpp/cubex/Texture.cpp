@@ -25,7 +25,7 @@ namespace cubex
 	int Texture::imageUnitsCount = 0;
 	int Texture::textureObjectsCount = 0;
 
-	GLuint Texture::loadPNGToTexture(const char * file_name, int * width, int * height)
+	void Texture::loadPNGToTexture(const char * file_name, int * width, int * height)
 	{
 		png_byte header[8];
 
@@ -33,7 +33,8 @@ namespace cubex
 		if (fp == 0)
 		{
 			perror(file_name);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// read the header
@@ -43,7 +44,8 @@ namespace cubex
 		{
 			fprintf(stderr, "error: %s is not a PNG.\n", file_name);
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -51,7 +53,8 @@ namespace cubex
 		{
 			fprintf(stderr, "error: png_create_read_struct returned 0.\n");
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// create png info struct
@@ -61,7 +64,8 @@ namespace cubex
 			fprintf(stderr, "error: png_create_info_struct returned 0.\n");
 			png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// create png info struct
@@ -71,7 +75,8 @@ namespace cubex
 			fprintf(stderr, "error: png_create_info_struct returned 0.\n");
 			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// the code in this if statement gets called if libpng encounters an error
@@ -79,7 +84,8 @@ namespace cubex
 			fprintf(stderr, "error from libpng\n");
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// init png reading
@@ -119,7 +125,8 @@ namespace cubex
 			fprintf(stderr, "error: could not allocate memory for PNG image data\n");
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// row_pointers is for pointing to image_data for reading the png with libpng
@@ -130,7 +137,8 @@ namespace cubex
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			free(image_data);
 			fclose(fp);
-			return 0;
+			textureId = 0;
+			return;
 		}
 
 		// set the individual row_pointers to point at the correct offsets of image_data
@@ -143,45 +151,35 @@ namespace cubex
 		// read the png into image_data through row_pointers
 		png_read_image(png_ptr, row_pointers);
 
-		// Generate the OpenGL texture object
-		GLuint texture;
 
 		// Using trilinear filtering
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glGenTextures(1, &textureId);
+		glBindTexture(GL_TEXTURE_2D, textureId);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		if (info_ptr->channels == 4)
 		{
+			type = tRGBA;
 			printf("RGBA PNG texture detected\n");
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_width, temp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 		}
 		else if (info_ptr->channels == 3)
 		{
+			type = tRGB;
 			printf("RGB PNG texture detected\n");
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, temp_width, temp_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
 		}
-
-		// generate mipmaps
-		glGenerateMipmap(GL_TEXTURE_2D);
 
 		// clean up
 		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 		free(image_data);
 		free(row_pointers);
 		fclose(fp);
-		printf("Texture loaded. ID: %d, width: %d, height: %d\n", texture, temp_width, temp_height);
-		return texture;
+		printf("Texture loaded. ID: %d, width: %d, height: %d\n", textureId, temp_width, temp_height);
 	}
 
-	Texture::Texture(const string& fileName, const ShaderProgram& program, const string& textureNameInShaderProgram)
+	void Texture::globalCountersInit()
 	{
-		// Instance operations
-		textureId = loadPNGToTexture(fileName.c_str(), &width, &height);
-	    if (textureId == 0) throw CubexException(__FILE__, __LINE__, string("Can't load the texture ") + textureNameInShaderProgram + " from file " + fileName);
-
-	    textureUniform = program.getUniformLocation(textureNameInShaderProgram);
-
 	    // Global operations
 		if (textureObjectsCount == 0)
 		{
@@ -200,6 +198,71 @@ namespace cubex
 		printf("Texture object loaded. Now there are %d of them.\n", textureObjectsCount);
 	}
 
+	Texture::Texture(int width, int height, Type type, int samples) : samples(samples), type(type), boundToIndex(-1)
+	{
+		glGenTextures(1, &textureId);
+
+		GLint format;
+		string tp;
+		switch (type)
+		{
+		case tRGBA:
+			format = GL_RGBA;
+			tp = "RGBA";
+			break;
+		case tRGB:
+			format = GL_RGB;
+			tp = "RGB";
+			break;
+		case tDepth:
+			format = GL_DEPTH_COMPONENT;
+			tp = "Depth";
+			break;
+		default:
+			throw CubexException(__FILE__, __LINE__, "Strange type value");
+		}
+
+		if (samples == 1)
+		{
+			printf("texture created (%s)\n", tp.c_str());
+
+			glBindTexture(GL_TEXTURE_2D, textureId);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, NULL);
+		}
+		else
+		{
+			printf("RGBA multisample texture created\n");
+
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, false);
+		}
+
+		globalCountersInit();
+	}
+
+	Texture::Texture(const string& fileName) : samples(1), boundToIndex(-1)
+	{
+		// Instance operations
+		loadPNGToTexture(fileName.c_str(), &width, &height);
+	    if (textureId == 0) throw CubexException(__FILE__, __LINE__, string("Can't load the texture from file ") + fileName);
+
+		globalCountersInit();
+	}
+
+	void Texture::connectToShaderProgram(const ShaderProgram& shaderProgram, const string& textureSampler2DShaderVariableName)
+	{
+		this->shaderProgram = &shaderProgram;
+		this->textureSampler2DShaderVariableName = textureSampler2DShaderVariableName;
+
+	    textureUniform = this->shaderProgram->getUniformLocation(textureSampler2DShaderVariableName);
+	}
+
 	bool Texture::bind()
 	{
 		for (int i = 0; i < imageUnitsCount; i++)
@@ -208,7 +271,18 @@ namespace cubex
 			{
 				// Binding the texture
 				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(GL_TEXTURE_2D, textureId);
+
+				if (samples == 1)
+				{
+					glBindTexture(GL_TEXTURE_2D, textureId);
+					// generate mipmaps
+					glGenerateMipmap(GL_TEXTURE_2D);
+				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+				}
+
 
 				// Sending the index to which the texture is bound to the shader program
 				glUniform1i(textureUniform, i);
@@ -226,12 +300,15 @@ namespace cubex
 
 	void Texture::unbind()
 	{
-		if (imageUnits[boundToIndex])
+		if (boundToIndex > -1)
 		{
-			// Unbinding the texture
-			glActiveTexture(GL_TEXTURE0 + boundToIndex);
-			glBindTexture(GL_TEXTURE_2D, 0);
-			printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
+			if (imageUnits[boundToIndex])
+			{
+				// Unbinding the texture
+				glActiveTexture(GL_TEXTURE0 + boundToIndex);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
+			}
 		}
 	}
 

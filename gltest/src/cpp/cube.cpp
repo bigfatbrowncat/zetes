@@ -122,7 +122,7 @@ extern "C"
 		}
 		catch (CubexException& ex)
 		{
-			printf("[ERROR] %s", ex.getReport().c_str());
+			printf("[ERROR] %s\n", ex.getReport().c_str());
 			fflush(stdout);
 			return false;
 		}
@@ -157,13 +157,22 @@ extern "C"
 
 	JNIEXPORT jboolean JNICALL Java_gltest_GLViewWindow_drawScene(JNIEnv * env, jclass appClass, jdouble angle)
 	{
-		if (scene != NULL)
+		try
 		{
-			scene->draw(angle);
-			return true;
+			if (scene != NULL)
+			{
+				scene->draw(angle);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
-		else
+		catch (CubexException& ex)
 		{
+			printf("[ERROR] %s\n", ex.getReport().c_str());
+			fflush(stdout);
 			return false;
 		}
 	}

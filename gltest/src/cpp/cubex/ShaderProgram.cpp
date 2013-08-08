@@ -7,10 +7,14 @@
 
 #include <string.h>
 
+#include <sstream>
+
 #include "GL3/gl3w.h"
 
 #include "ShaderProgram.h"
 #include "CubexException.h"
+
+using namespace std;
 
 namespace cubex
 {
@@ -147,14 +151,19 @@ namespace cubex
 	GLint ShaderProgram::getUniformLocation(const string& uniformName) const
 	{
 		GLint res = glGetUniformLocation(this->programID, uniformName.c_str());
-		if (glGetError() == GL_NO_ERROR)
+		int err = glGetError();
+
+		if (err == GL_NO_ERROR)
 		{
 			return res;
 		}
 		else
 		{
-			throw CubexException(__FILE__, __LINE__, "Some problem with shader program object. It's undefined or not linked");
+			stringstream ss;
+			ss << "Some problem with shader program object. It's undefined or not linked. GL error code: " << err;
+			throw CubexException(__FILE__, __LINE__, ss.str());
 		}
+		return res;
 	}
 
 	ShaderProgram::~ShaderProgram()

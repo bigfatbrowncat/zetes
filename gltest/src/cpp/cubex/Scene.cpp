@@ -53,10 +53,13 @@ namespace cubex
 	void Scene::draw(float angle)
 	{
 		glViewport(0, 0, viewWidth, viewHeight);
+		checkForError(__FILE__, __LINE__);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		checkForError(__FILE__, __LINE__);
 
 		glEnable(GL_DEPTH_TEST);
+		checkForError(__FILE__, __LINE__);
 
 
 		//PROJECTION
@@ -79,28 +82,36 @@ namespace cubex
 		glm::mat4 MP = Projection * view * Model;
 		glm::mat3 NM = glm::inverse(glm::transpose(glm::mat3(MP)));
 
+		program->use();
+
 		// Sending matrix
 		glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(MP));
+		checkForError(__FILE__, __LINE__);
 		glUniformMatrix3fv(normalMatrixUniform, 1, GL_FALSE, glm::value_ptr(NM));
+		checkForError(__FILE__, __LINE__);
 
 		// Sending light position
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
+		checkForError(__FILE__, __LINE__);
 
-		Texture* frameImage = new Texture(viewWidth, viewHeight, Texture::tRGB, 1);
-		Texture* depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 1);
+		Texture* frameImage = new Texture(viewWidth, viewHeight, Texture::tRGB, 4);
+		Texture* depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 4);
 
 		FrameBuffer fbo;
 		fbo.connectToImage(*frameImage, *depthImage);
 		fbo.bind();
 
-		//texture->connectToShaderProgram(*program, "uni_texture");
-		texture->bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		checkForError(__FILE__, __LINE__);
+
+		texture->connectToShaderProgram(*program, "uni_texture");
+		program->use();
 		meshBuffer->draw();
 
 		fbo.unbind();
 
-		//frameImage->connectToShaderProgram(*program, "uni_texture");
-		frameImage->bind();
+		frameImage->connectToShaderProgram(*program, "uni_texture");
+		program->use();
 		meshBuffer->draw();
 
 		delete frameImage;

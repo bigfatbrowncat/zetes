@@ -12,13 +12,14 @@
 
 #include <GL3/gl3w.h>
 
+#include "GLObject.h"
 #include "ShaderProgram.h"
 
 using namespace std;
 
 namespace cubex
 {
-	class Texture
+	class Texture : public GLObject
 	{
 		friend class FrameBuffer;
 	public:

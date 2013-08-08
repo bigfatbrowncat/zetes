@@ -10,11 +10,12 @@
 
 #include <GL3/gl3w.h>
 
+#include "GLObject.h"
 #include "Texture.h"
 
 namespace cubex
 {
-	class FrameBuffer
+	class FrameBuffer : public GLObject
 	{
 	private:
 		GLuint frameBufferId;

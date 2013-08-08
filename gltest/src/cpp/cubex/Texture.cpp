@@ -154,20 +154,27 @@ namespace cubex
 
 		// Using trilinear filtering
 		glGenTextures(1, &textureId);
+		checkForError(__FILE__, __LINE__);
 		glBindTexture(GL_TEXTURE_2D, textureId);
+		checkForError(__FILE__, __LINE__);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		checkForError(__FILE__, __LINE__);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		checkForError(__FILE__, __LINE__);
+
 		if (info_ptr->channels == 4)
 		{
 			type = tRGBA;
 			printf("RGBA PNG texture detected\n");
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_width, temp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+			checkForError(__FILE__, __LINE__);
 		}
 		else if (info_ptr->channels == 3)
 		{
 			type = tRGB;
 			printf("RGB PNG texture detected\n");
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, temp_width, temp_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+			checkForError(__FILE__, __LINE__);
 		}
 
 		// clean up
@@ -185,6 +192,7 @@ namespace cubex
 		{
 			printf("This texture object is the first one.\n");
 			glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &imageUnitsCount);
+			checkForError(__FILE__, __LINE__);
 			printf("This video card supports %d active textures at the same time.\n", imageUnitsCount);
 			imageUnits = new bool[imageUnitsCount];
 			for (int i = 0; i < imageUnitsCount; i++)
@@ -201,6 +209,7 @@ namespace cubex
 	Texture::Texture(int width, int height, Type type, int samples) : samples(samples), type(type), boundToIndex(-1)
 	{
 		glGenTextures(1, &textureId);
+		checkForError(__FILE__, __LINE__);
 
 		GLint format;
 		string tp;
@@ -227,8 +236,11 @@ namespace cubex
 			printf("texture created (%s)\n", tp.c_str());
 
 			glBindTexture(GL_TEXTURE_2D, textureId);
+			checkForError(__FILE__, __LINE__);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			checkForError(__FILE__, __LINE__);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			checkForError(__FILE__, __LINE__);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, NULL);
 		}
@@ -237,10 +249,14 @@ namespace cubex
 			printf("RGBA multisample texture created\n");
 
 			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
-			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			checkForError(__FILE__, __LINE__);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			checkForError(__FILE__, __LINE__);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			checkForError(__FILE__, __LINE__);
 
 			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, false);
+			checkForError(__FILE__, __LINE__);
 		}
 
 		globalCountersInit();
@@ -275,17 +291,21 @@ namespace cubex
 				if (samples == 1)
 				{
 					glBindTexture(GL_TEXTURE_2D, textureId);
+					checkForError(__FILE__, __LINE__);
 					// generate mipmaps
 					glGenerateMipmap(GL_TEXTURE_2D);
+					checkForError(__FILE__, __LINE__);
 				}
 				else
 				{
 					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+					checkForError(__FILE__, __LINE__);
 				}
 
 
 				// Sending the index to which the texture is bound to the shader program
 				glUniform1i(textureUniform, i);
+				checkForError(__FILE__, __LINE__);
 
 				imageUnits[i] = true;
 				boundToIndex = i;
@@ -306,7 +326,9 @@ namespace cubex
 			{
 				// Unbinding the texture
 				glActiveTexture(GL_TEXTURE0 + boundToIndex);
+				checkForError(__FILE__, __LINE__);
 				glBindTexture(GL_TEXTURE_2D, 0);
+				checkForError(__FILE__, __LINE__);
 				printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
 			}
 		}

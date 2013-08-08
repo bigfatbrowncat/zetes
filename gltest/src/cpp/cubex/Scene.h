@@ -11,12 +11,12 @@
 #include "ShaderProgram.h"
 #include "MeshBuffer.h"
 #include "Texture.h"
-
+#include "GLObject.h"
 
 namespace cubex
 {
 
-	class Scene
+	class Scene : public GLObject
 	{
 	private:
 		// This class isn't copyable

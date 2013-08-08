@@ -27,6 +27,8 @@ namespace cubex
 		ShaderProgram* program;
 		MeshBuffer* meshBuffer;
 		Texture* texture;
+		Texture* frameImage;
+		Texture* depthImage;
 
 		int lightPositionUniform;
 		int matrixUniform, normalMatrixUniform;

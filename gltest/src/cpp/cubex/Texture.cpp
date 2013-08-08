@@ -281,40 +281,42 @@ namespace cubex
 
 	bool Texture::bind()
 	{
-		for (int i = 0; i < imageUnitsCount; i++)
+		if (boundToIndex == -1)
 		{
-			if (!imageUnits[i])
+			for (int i = 0; i < imageUnitsCount; i++)
 			{
-				// Binding the texture
-				glActiveTexture(GL_TEXTURE0 + i);
-
-				if (samples == 1)
+				if (!imageUnits[i])
 				{
-					glBindTexture(GL_TEXTURE_2D, textureId);
+					// Binding the texture
+					glActiveTexture(GL_TEXTURE0 + i);
+
+					if (samples == 1)
+					{
+						glBindTexture(GL_TEXTURE_2D, textureId);
+						checkForError(__FILE__, __LINE__);
+						// generate mipmaps
+						glGenerateMipmap(GL_TEXTURE_2D);
+						checkForError(__FILE__, __LINE__);
+					}
+					else
+					{
+						glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+						checkForError(__FILE__, __LINE__);
+					}
+
+
+					// Sending the index to which the texture is bound to the shader program
+					glUniform1i(textureUniform, i);
 					checkForError(__FILE__, __LINE__);
-					// generate mipmaps
-					glGenerateMipmap(GL_TEXTURE_2D);
-					checkForError(__FILE__, __LINE__);
+
+					imageUnits[i] = true;
+					boundToIndex = i;
+					printf("Texture object bound to the image unit #%d.\n", i);
+
+					return true;
 				}
-				else
-				{
-					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
-					checkForError(__FILE__, __LINE__);
-				}
-
-
-				// Sending the index to which the texture is bound to the shader program
-				glUniform1i(textureUniform, i);
-				checkForError(__FILE__, __LINE__);
-
-				imageUnits[i] = true;
-				boundToIndex = i;
-				printf("Texture object bound to the image unit #%d.\n", i);
-
-				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -325,11 +327,14 @@ namespace cubex
 			if (imageUnits[boundToIndex])
 			{
 				// Unbinding the texture
+				imageUnits[boundToIndex] = false;
+
 				glActiveTexture(GL_TEXTURE0 + boundToIndex);
 				checkForError(__FILE__, __LINE__);
 				glBindTexture(GL_TEXTURE_2D, 0);
 				checkForError(__FILE__, __LINE__);
 				printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
+				boundToIndex = -1;
 			}
 		}
 	}

@@ -17,7 +17,8 @@
 
 namespace cubex
 {
-	Scene::Scene(const string& modelFileName, const string& vertexShaderFileName, const string& fragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight)
+	Scene::Scene(const string& modelFileName, const string& vertexShaderFileName, const string& fragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight) :
+			frameImage(NULL), depthImage(NULL)
 	{
 		this->viewWidth = viewWidth;
 		this->viewHeight = viewHeight;
@@ -48,6 +49,17 @@ namespace cubex
 	{
 		this->viewWidth = width;
 		this->viewHeight = height;
+
+		if (frameImage != NULL)
+		{
+			delete frameImage;
+			delete depthImage;
+			frameImage = NULL;
+			depthImage = NULL;
+		}
+
+		frameImage = new Texture(viewWidth, viewHeight, Texture::tRGB, 1);
+		depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 1);
 	}
 
 	void Scene::draw(float angle)
@@ -94,28 +106,28 @@ namespace cubex
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 		checkForError(__FILE__, __LINE__);
 
-		Texture* frameImage = new Texture(viewWidth, viewHeight, Texture::tRGB, 4);
-		Texture* depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 4);
 
 		FrameBuffer fbo;
-		fbo.connectToImage(*frameImage, *depthImage);
+		fbo.connectToImage(*frameImage);
 		fbo.bind();
+		{
+			// Drawing to the framebuffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			checkForError(__FILE__, __LINE__);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		checkForError(__FILE__, __LINE__);
-
-		texture->connectToShaderProgram(*program, "uni_texture");
-		program->use();
-		meshBuffer->draw();
-
+			texture->connectToShaderProgram(*program, "uni_texture");
+			program->use();
+			texture->bind();
+			meshBuffer->draw();
+			texture->unbind();
+		}
 		fbo.unbind();
 
 		frameImage->connectToShaderProgram(*program, "uni_texture");
 		program->use();
+		frameImage->bind();
 		meshBuffer->draw();
-
-		delete frameImage;
-		delete depthImage;
+		frameImage->unbind();
 	}
 
 	Scene::~Scene()

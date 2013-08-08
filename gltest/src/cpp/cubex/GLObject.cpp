@@ -12,7 +12,7 @@
 
 namespace cubex {
 
-void GLObject::checkForError(const string& fileName, int lineNumber)
+void GLObject::checkForError(const string& fileName, int lineNumber) const
 {
 	GLint errCode = glGetError();
 	if (errCode != GL_NO_ERROR)

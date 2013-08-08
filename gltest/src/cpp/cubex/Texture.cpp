@@ -250,11 +250,6 @@ namespace cubex
 
 			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
 			checkForError(__FILE__, __LINE__);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			checkForError(__FILE__, __LINE__);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			checkForError(__FILE__, __LINE__);
-
 			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, false);
 			checkForError(__FILE__, __LINE__);
 		}
@@ -271,15 +266,42 @@ namespace cubex
 		globalCountersInit();
 	}
 
-	void Texture::connectToShaderProgram(const ShaderProgram& shaderProgram, const string& textureSampler2DShaderVariableName)
+	void Texture::connectToShaderVariable(const ShaderProgram& shaderProgram, const string& sampler2DShaderVariableName)
 	{
-		this->shaderProgram = &shaderProgram;
-		this->textureSampler2DShaderVariableName = textureSampler2DShaderVariableName;
+		if (boundToIndex != -1)
+		{
+			// Activating the shader program
+			shaderProgram.use();
 
-	    textureUniform = this->shaderProgram->getUniformLocation(textureSampler2DShaderVariableName);
+			// Binding the texture
+			glActiveTexture(GL_TEXTURE0 + boundToIndex);
+
+			if (samples == 1)
+			{
+				glBindTexture(GL_TEXTURE_2D, textureId);
+				checkForError(__FILE__, __LINE__);
+
+				// generate mipmaps
+				glGenerateMipmap(GL_TEXTURE_2D);
+				checkForError(__FILE__, __LINE__);
+			}
+			else
+			{
+				glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+				checkForError(__FILE__, __LINE__);
+			}
+
+			// Sending the index with which the texture is bound to the shader program
+			glUniform1i(shaderProgram.getUniformLocation(sampler2DShaderVariableName), boundToIndex);
+			checkForError(__FILE__, __LINE__);
+		}
+		else
+		{
+			throw CubexException(__FILE__, __LINE__, string("Can't connect an unbound texture to a shader variable ") + sampler2DShaderVariableName);
+		}
 	}
 
-	bool Texture::bind()
+	void Texture::bindToImageUnit()
 	{
 		if (boundToIndex == -1)
 		{
@@ -287,40 +309,23 @@ namespace cubex
 			{
 				if (!imageUnits[i])
 				{
-					// Binding the texture
-					glActiveTexture(GL_TEXTURE0 + i);
-
-					if (samples == 1)
-					{
-						glBindTexture(GL_TEXTURE_2D, textureId);
-						checkForError(__FILE__, __LINE__);
-						// generate mipmaps
-						glGenerateMipmap(GL_TEXTURE_2D);
-						checkForError(__FILE__, __LINE__);
-					}
-					else
-					{
-						glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
-						checkForError(__FILE__, __LINE__);
-					}
-
-
-					// Sending the index to which the texture is bound to the shader program
-					glUniform1i(textureUniform, i);
-					checkForError(__FILE__, __LINE__);
-
 					imageUnits[i] = true;
 					boundToIndex = i;
 					printf("Texture object bound to the image unit #%d.\n", i);
 
-					return true;
+					return;
 				}
 			}
+
+			throw CubexException(__FILE__, __LINE__, "Can't bind the texture. All image unit slots are occupied");
 		}
-		return false;
+		else
+		{
+			throw CubexException(__FILE__, __LINE__, "Can't bind the texture twice");
+		}
 	}
 
-	void Texture::unbind()
+	void Texture::unbindFromImageUnit()
 	{
 		if (boundToIndex > -1)
 		{
@@ -331,8 +336,17 @@ namespace cubex
 
 				glActiveTexture(GL_TEXTURE0 + boundToIndex);
 				checkForError(__FILE__, __LINE__);
-				glBindTexture(GL_TEXTURE_2D, 0);
-				checkForError(__FILE__, __LINE__);
+
+				if (samples == 1)
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+					checkForError(__FILE__, __LINE__);
+				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+					checkForError(__FILE__, __LINE__);
+				}
 				printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
 				boundToIndex = -1;
 			}
@@ -342,7 +356,7 @@ namespace cubex
 	Texture::~Texture()
 	{
 		// Instance operations
-		unbind();
+		unbindFromImageUnit();
 		glDeleteTextures(1, &textureId);
 
 		// Decrementing global object counter
@@ -352,17 +366,6 @@ namespace cubex
 		// Global operatons
 		if (textureObjectsCount == 0)
 		{
-			// Unbinding all textures
-			for (int i = 0; i < imageUnitsCount; i++)
-			{
-				if (imageUnits[i])
-				{
-					glActiveTexture(GL_TEXTURE0 + i);
-					glBindTexture(GL_TEXTURE_2D, 0);
-					imageUnits[i] = false;
-				}
-			}
-
 			// Freeing the imageUnits array
 			delete [] imageUnits;
 			printf("The last texture object is unloaded.\n");

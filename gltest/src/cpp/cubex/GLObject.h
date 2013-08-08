@@ -16,7 +16,7 @@ namespace cubex {
 
 class GLObject {
 protected:
-	void checkForError(const string& fileName, int lineNumber);
+	void checkForError(const string& fileName, int lineNumber) const;
 public:
 	GLObject();
 	virtual ~GLObject();

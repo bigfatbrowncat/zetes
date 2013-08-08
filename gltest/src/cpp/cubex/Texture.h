@@ -46,8 +46,6 @@ namespace cubex
 		Type type;
 
 		GLint textureUniform;
-		string textureSampler2DShaderVariableName;
-		const ShaderProgram* shaderProgram;
 
 		void loadPNGToTexture(const char * file_name, int * width, int * height);
 
@@ -59,10 +57,9 @@ namespace cubex
 		Texture(const string& fileName);
 		Texture(int width, int height, Type type, int samples = 1);
 
-		void connectToShaderProgram(const ShaderProgram& program, const string& textureSampler2DShaderVariableName);
-
-		bool bind();
-		void unbind();
+		void connectToShaderVariable(const ShaderProgram& shaderProgram, const string& sampler2DShaderVariableName);
+		void bindToImageUnit();
+		void unbindFromImageUnit();
 
 		int getSamples() const { return samples; }
 		Type getType() const { return type; }

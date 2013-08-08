@@ -33,6 +33,7 @@ namespace cubex
 
 	    // Read the Vertex Shader code from the file
 	    program = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName);
+	    program->use();
 
 	    meshBuffer->connectToShaderProgram(program, "in_vertexPosition", "in_normal", "in_textureCoords");
 
@@ -41,7 +42,6 @@ namespace cubex
 	    normalMatrixUniform = program->getUniformLocation("uni_normalMatrix");
 
 	    texture = new Texture(textureFileName);
-	    texture->connectToShaderProgram(*program, "uni_texture");
 
 	}
 
@@ -58,7 +58,7 @@ namespace cubex
 			depthImage = NULL;
 		}
 
-		frameImage = new Texture(viewWidth, viewHeight, Texture::tRGB, 1);
+		frameImage = new Texture(viewWidth, viewHeight, Texture::tRGBA, 1);
 		depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 1);
 	}
 
@@ -73,6 +73,8 @@ namespace cubex
 		glEnable(GL_DEPTH_TEST);
 		checkForError(__FILE__, __LINE__);
 
+		glEnable(GL_MULTISAMPLE);
+		checkForError(__FILE__, __LINE__);
 
 		//PROJECTION
 		float aspectRatio = (float)viewWidth / viewHeight;
@@ -106,6 +108,9 @@ namespace cubex
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 		checkForError(__FILE__, __LINE__);
 
+		program->use();
+		texture->bindToImageUnit();
+		frameImage->bindToImageUnit();
 
 		FrameBuffer fbo;
 		fbo.connectToImage(*frameImage);
@@ -115,19 +120,16 @@ namespace cubex
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			checkForError(__FILE__, __LINE__);
 
-			texture->connectToShaderProgram(*program, "uni_texture");
-			program->use();
-			texture->bind();
+			texture->connectToShaderVariable(*program, "uni_texture");
 			meshBuffer->draw();
-			texture->unbind();
 		}
 		fbo.unbind();
 
-		frameImage->connectToShaderProgram(*program, "uni_texture");
-		program->use();
-		frameImage->bind();
+		frameImage->connectToShaderVariable(*program, "uni_texture");
 		meshBuffer->draw();
-		frameImage->unbind();
+
+		texture->unbindFromImageUnit();
+		frameImage->unbindFromImageUnit();
 	}
 
 	Scene::~Scene()

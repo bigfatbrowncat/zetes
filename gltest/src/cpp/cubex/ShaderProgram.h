@@ -10,11 +10,13 @@
 
 #include <string>
 
+#include "GLObject.h"
+
 using namespace std;
 
 namespace cubex
 {
-	class ShaderProgram
+	class ShaderProgram : public GLObject
 	{
 	private:
 		// This class isn't copyable
@@ -30,7 +32,7 @@ namespace cubex
 		GLint getAttribLocation(const string& attribName) const;
 		GLint getUniformLocation(const string& uniformName) const;
 
-		void use() const { glUseProgram(programID); }
+		void use() const { glUseProgram(programID); checkForError(__FILE__, __LINE__); }
 		virtual ~ShaderProgram();
 	};
 }

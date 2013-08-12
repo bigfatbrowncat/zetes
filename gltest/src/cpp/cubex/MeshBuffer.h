@@ -15,7 +15,7 @@
 namespace cubex
 {
 
-	class MeshBuffer
+	class MeshBuffer : public GLObject
 	{
 	private:
 		GLuint VertexArrayID;

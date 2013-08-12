@@ -24,8 +24,10 @@ namespace cubex
 		Scene(const Texture& other);
 
 	private:
-		ShaderProgram* program;
+		ShaderProgram* shaderProgram;
+		ShaderProgram* screenPlaneShaderProgram;
 		MeshBuffer* meshBuffer;
+		MeshBuffer* screenPlaneMeshBuffer;
 		Texture* texture;
 		Texture* frameImage;
 		Texture* depthImage;
@@ -38,6 +40,8 @@ namespace cubex
 		Scene(const string& modelFileName,
 		      const string& vertexShaderFileName,
 		      const string& fragmentShaderFileName,
+		      const string& screenVertexShaderFileName,
+		      const string& screenFragmentShaderFileName,
 		      const string& textureFileName,
 		      int viewWidth, int viewHeight);
 		void resizeViewport(int width, int height);

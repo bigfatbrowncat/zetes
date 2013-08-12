@@ -160,11 +160,10 @@ void MeshBuffer::draw()
 		throw CubexException(__FILE__, __LINE__, "Shader program shouldn't be null");
 	}
 
-	if (vertexVec3ShaderVariableAttrib)
-	glEnableVertexAttribArray(vertexVec3ShaderVariableAttrib);
-	glEnableVertexAttribArray(normalVec3ShaderVariableAttrib);
-	glEnableVertexAttribArray(textureVec2ShaderVariableAttrib);
 
+
+	glEnableVertexAttribArray(vertexVec3ShaderVariableAttrib);
+	checkForError(__FILE__, __LINE__);
 	// Setting vertex data
 	glVertexAttribPointer(
 		vertexVec3ShaderVariableAttrib,					// vertex shader variable
@@ -174,8 +173,11 @@ void MeshBuffer::draw()
 		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
 		(void*)0										// array buffer offset (we use first 3 of 8)
 	);
+	checkForError(__FILE__, __LINE__);
 
-	// Setting normal data
+
+	glEnableVertexAttribArray(normalVec3ShaderVariableAttrib);
+	checkForError(__FILE__, __LINE__);	// Setting normal data
 	glVertexAttribPointer(
 		normalVec3ShaderVariableAttrib,					// normal shader variable
 		3,												// length of vec3 (XYZ)
@@ -184,7 +186,11 @@ void MeshBuffer::draw()
 		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
 		(void*)(sizeof(GLfloat) * 3)					// array buffer offset (we use 3rd, 4th, 5th)
 	);
+	checkForError(__FILE__, __LINE__);
 
+
+	glEnableVertexAttribArray(textureVec2ShaderVariableAttrib);
+	checkForError(__FILE__, __LINE__);
 	// Setting texture coordinates data
 	glVertexAttribPointer(
 		textureVec2ShaderVariableAttrib,				// texture coordinates shader variable
@@ -194,14 +200,20 @@ void MeshBuffer::draw()
 		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
 		(void*)(sizeof(GLfloat) * 6)					// array buffer offset (we use 6th and 7th)
 	);
+	checkForError(__FILE__, __LINE__);
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+	checkForError(__FILE__, __LINE__);
 	glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+	checkForError(__FILE__, __LINE__);
 
 	glDisableVertexAttribArray(vertexVec3ShaderVariableAttrib);
+	checkForError(__FILE__, __LINE__);
 	glDisableVertexAttribArray(normalVec3ShaderVariableAttrib);
+	checkForError(__FILE__, __LINE__);
 	glDisableVertexAttribArray(textureVec2ShaderVariableAttrib);
+	checkForError(__FILE__, __LINE__);
 }
 
 MeshBuffer::~MeshBuffer()

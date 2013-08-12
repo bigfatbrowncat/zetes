@@ -17,12 +17,15 @@
 
 namespace cubex
 {
-	Scene::Scene(const string& modelFileName, const string& vertexShaderFileName, const string& fragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight) :
+	Scene::Scene(const string& modelFileName,
+	             const string& vertexShaderFileName, const string& fragmentShaderFileName,
+	             const string& screenVertexShaderFileName, const string& screenFragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight) :
 			frameImage(NULL), depthImage(NULL)
 	{
 		this->viewWidth = viewWidth;
 		this->viewHeight = viewHeight;
 
+		// Loading the cube
 		ObjMeshLoader objLoader;
 		printf("Loading mesh from file %s...", modelFileName.c_str()); fflush(stdout);
 		Mesh cube = objLoader.createMeshFromFile(modelFileName);
@@ -31,15 +34,33 @@ namespace cubex
 		meshBuffer = new MeshBuffer(cube);
 		printf("Mesh buffer generated\n"); fflush(stdout);
 
+		// Constructing the screen plane
+		Mesh scrPlane;
+		scrPlane.addVertex(glm::vec3(-1.0, 1.0, 0.5));
+		scrPlane.addVertex(glm::vec3(1.0, 1.0, 0.5));
+		scrPlane.addVertex(glm::vec3(1.0, -1.0, 0.5));
+		scrPlane.addVertex(glm::vec3(-1.0, -1.0, 0.5));
+		scrPlane.addTextureCoords(glm::vec2(-1.0, -1.0));
+		scrPlane.addTextureCoords(glm::vec2(1.0, -1.0));
+		scrPlane.addTextureCoords(glm::vec2(1.0, 1.0));
+		scrPlane.addTextureCoords(glm::vec2(-1.0, 1.0));
+
+		scrPlane.addFace(Face::fromVerticesAndTextureCoords(0, 1, 2, 0, 1, 2));
+		scrPlane.addFace(Face::fromVerticesAndTextureCoords(0, 2, 3, 0, 2, 3));
+		screenPlaneMeshBuffer = new MeshBuffer(scrPlane);
+
 	    // Read the Vertex Shader code from the file
-	    program = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName);
-	    program->use();
+	    shaderProgram = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName);
+	    shaderProgram->use();
 
-	    meshBuffer->connectToShaderProgram(program, "in_vertexPosition", "in_normal", "in_textureCoords");
+	    meshBuffer->connectToShaderProgram(shaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
 
-	    lightPositionUniform = program->getUniformLocation("uni_lightPosition");
-	    matrixUniform = program->getUniformLocation("uni_matrix");
-	    normalMatrixUniform = program->getUniformLocation("uni_normalMatrix");
+	    lightPositionUniform = shaderProgram->getUniformLocation("uni_lightPosition");
+	    matrixUniform = shaderProgram->getUniformLocation("uni_matrix");
+	    normalMatrixUniform = shaderProgram->getUniformLocation("uni_normalMatrix");
+
+	    screenPlaneShaderProgram = ShaderProgram::fromFiles(screenVertexShaderFileName, screenFragmentShaderFileName);
+	    screenPlaneMeshBuffer->connectToShaderProgram(screenPlaneShaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
 
 	    texture = new Texture(textureFileName);
 
@@ -96,7 +117,7 @@ namespace cubex
 		glm::mat4 MP = Projection * view * Model;
 		glm::mat3 NM = glm::inverse(glm::transpose(glm::mat3(MP)));
 
-		program->use();
+		shaderProgram->use();
 
 		// Sending matrix
 		glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(MP));
@@ -108,7 +129,7 @@ namespace cubex
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 		checkForError(__FILE__, __LINE__);
 
-		program->use();
+		shaderProgram->use();
 		texture->bindToImageUnit();
 		frameImage->bindToImageUnit();
 
@@ -120,21 +141,24 @@ namespace cubex
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			checkForError(__FILE__, __LINE__);
 
-			texture->connectToShaderVariable(*program, "uni_texture");
+			texture->connectToShaderVariable(*shaderProgram, "uni_texture");
 			meshBuffer->draw();
 		}
 		fbo.unbind();
 
-		frameImage->connectToShaderVariable(*program, "uni_texture");
-		meshBuffer->draw();
+		screenPlaneShaderProgram->use();
+		frameImage->connectToShaderVariable(*screenPlaneShaderProgram, "uni_texture");
+		screenPlaneMeshBuffer->draw();
 
 		texture->unbindFromImageUnit();
+		checkForError(__FILE__, __LINE__);
 		frameImage->unbindFromImageUnit();
+		checkForError(__FILE__, __LINE__);
 	}
 
 	Scene::~Scene()
 	{
-		delete program;
+		delete shaderProgram;
 		delete meshBuffer;
 		delete texture;
 	}

@@ -333,7 +333,7 @@ namespace cubex
 			{
 				// Unbinding the texture
 				imageUnits[boundToIndex] = false;
-
+				printf("%d\n", boundToIndex);
 				glActiveTexture(GL_TEXTURE0 + boundToIndex);
 				checkForError(__FILE__, __LINE__);
 

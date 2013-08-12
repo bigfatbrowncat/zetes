@@ -94,6 +94,8 @@ extern "C"
 		string textureFileLocation;
 		string vertFileLocation = WinLinMacApi::locateResource("data", "default.vert");
 		string fragFileLocation = WinLinMacApi::locateResource("data", "default.frag");
+		string screenVertFileLocation = WinLinMacApi::locateResource("data", "screen.vert");
+		string screenFragFileLocation = WinLinMacApi::locateResource("data", "screen.frag");
 
 		if (model == MODEL_CUBE)
 		{
@@ -117,7 +119,7 @@ extern "C"
 
 		try
 		{
-			scene = new Scene(objFileLocation, vertFileLocation, fragFileLocation, textureFileLocation, width, height);
+			scene = new Scene(objFileLocation, vertFileLocation, fragFileLocation, screenVertFileLocation, screenFragFileLocation, textureFileLocation, width, height);
 			return true;
 		}
 		catch (CubexException& ex)

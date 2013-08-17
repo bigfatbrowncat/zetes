@@ -32,6 +32,8 @@ namespace cubex
 		Texture* frameImage;
 		Texture* depthImage;
 
+		int antialiasMulti;
+
 		int lightPositionUniform;
 		int matrixUniform, normalMatrixUniform;
 

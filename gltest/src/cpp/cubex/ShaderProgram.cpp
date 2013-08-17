@@ -133,7 +133,7 @@ namespace cubex
 		fclose(ff);
 
 		return new ShaderProgram(vc, fc);
-}
+	}
 
 	GLint ShaderProgram::getAttribLocation(const string& attribName) const
 	{

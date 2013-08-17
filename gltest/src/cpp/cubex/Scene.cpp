@@ -20,7 +20,7 @@ namespace cubex
 	Scene::Scene(const string& modelFileName,
 	             const string& vertexShaderFileName, const string& fragmentShaderFileName,
 	             const string& screenVertexShaderFileName, const string& screenFragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight) :
-			frameImage(NULL), depthImage(NULL)
+			antialiasMulti(2), frameImage(NULL), depthImage(NULL)
 	{
 		this->viewWidth = viewWidth;
 		this->viewHeight = viewHeight;
@@ -36,14 +36,14 @@ namespace cubex
 
 		// Constructing the screen plane
 		Mesh scrPlane;
-		scrPlane.addVertex(glm::vec3(-1.0, 1.0, 0.5));
-		scrPlane.addVertex(glm::vec3(1.0, 1.0, 0.5));
-		scrPlane.addVertex(glm::vec3(1.0, -1.0, 0.5));
-		scrPlane.addVertex(glm::vec3(-1.0, -1.0, 0.5));
-		scrPlane.addTextureCoords(glm::vec2(-1.0, -1.0));
-		scrPlane.addTextureCoords(glm::vec2(1.0, -1.0));
-		scrPlane.addTextureCoords(glm::vec2(1.0, 1.0));
-		scrPlane.addTextureCoords(glm::vec2(-1.0, 1.0));
+		scrPlane.addVertex(glm::vec3(-1.0, 1.0, 0.0));
+		scrPlane.addVertex(glm::vec3(1.0, 1.0, 0.0));
+		scrPlane.addVertex(glm::vec3(1.0, -1.0, 0.0));
+		scrPlane.addVertex(glm::vec3(-1.0, -1.0, 0.0));
+		scrPlane.addTextureCoords(glm::vec2(0.0, antialiasMulti));
+		scrPlane.addTextureCoords(glm::vec2(antialiasMulti, antialiasMulti));
+		scrPlane.addTextureCoords(glm::vec2(antialiasMulti, 0.0));
+		scrPlane.addTextureCoords(glm::vec2(0.0, 0.0));
 
 		scrPlane.addFace(Face::fromVerticesAndTextureCoords(0, 1, 2, 0, 1, 2));
 		scrPlane.addFace(Face::fromVerticesAndTextureCoords(0, 2, 3, 0, 2, 3));
@@ -53,16 +53,18 @@ namespace cubex
 	    shaderProgram = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName);
 	    shaderProgram->use();
 
-	    meshBuffer->connectToShaderProgram(shaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
 
 	    lightPositionUniform = shaderProgram->getUniformLocation("uni_lightPosition");
 	    matrixUniform = shaderProgram->getUniformLocation("uni_matrix");
 	    normalMatrixUniform = shaderProgram->getUniformLocation("uni_normalMatrix");
 
 	    screenPlaneShaderProgram = ShaderProgram::fromFiles(screenVertexShaderFileName, screenFragmentShaderFileName);
+
+	    meshBuffer->connectToShaderProgram(shaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
 	    screenPlaneMeshBuffer->connectToShaderProgram(screenPlaneShaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
 
 	    texture = new Texture(textureFileName);
+		texture->bindToImageUnit();
 
 	}
 
@@ -73,24 +75,22 @@ namespace cubex
 
 		if (frameImage != NULL)
 		{
+			frameImage->unbindFromImageUnit();
+			depthImage->unbindFromImageUnit();
 			delete frameImage;
 			delete depthImage;
 			frameImage = NULL;
 			depthImage = NULL;
 		}
 
-		frameImage = new Texture(viewWidth, viewHeight, Texture::tRGBA, 1);
-		depthImage = new Texture(viewWidth, viewHeight, Texture::tDepth, 1);
+		frameImage = new Texture(viewWidth * antialiasMulti, viewHeight * antialiasMulti, Texture::tRGBA, 1);
+		depthImage = new Texture(viewWidth * antialiasMulti, viewHeight * antialiasMulti, Texture::tDepth, 1);
+		frameImage->bindToImageUnit();
+		depthImage->bindToImageUnit();
 	}
 
 	void Scene::draw(float angle)
 	{
-		glViewport(0, 0, viewWidth, viewHeight);
-		checkForError(__FILE__, __LINE__);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		checkForError(__FILE__, __LINE__);
-
 		glEnable(GL_DEPTH_TEST);
 		checkForError(__FILE__, __LINE__);
 
@@ -129,12 +129,12 @@ namespace cubex
 		glUniform3f(lightPositionUniform, -1.0f, 3.0f, 1.0f);
 		checkForError(__FILE__, __LINE__);
 
-		shaderProgram->use();
-		texture->bindToImageUnit();
-		frameImage->bindToImageUnit();
+
+		glViewport(0, 0, antialiasMulti * viewWidth, antialiasMulti * viewHeight);
+		checkForError(__FILE__, __LINE__);
 
 		FrameBuffer fbo;
-		fbo.connectToImage(*frameImage);
+		fbo.connectToImage(*frameImage, *depthImage);
 		fbo.bind();
 		{
 			// Drawing to the framebuffer
@@ -146,21 +146,27 @@ namespace cubex
 		}
 		fbo.unbind();
 
-		screenPlaneShaderProgram->use();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		checkForError(__FILE__, __LINE__);
 		frameImage->connectToShaderVariable(*screenPlaneShaderProgram, "uni_texture");
 		screenPlaneMeshBuffer->draw();
-
-		texture->unbindFromImageUnit();
-		checkForError(__FILE__, __LINE__);
-		frameImage->unbindFromImageUnit();
-		checkForError(__FILE__, __LINE__);
 	}
 
 	Scene::~Scene()
 	{
 		delete shaderProgram;
 		delete meshBuffer;
+
+		texture->unbindFromImageUnit();
 		delete texture;
+
+		if (frameImage != NULL)
+		{
+			frameImage->unbindFromImageUnit();
+			depthImage->unbindFromImageUnit();
+			delete frameImage;
+			delete depthImage;
+		}
 	}
 
 }

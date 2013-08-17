@@ -311,7 +311,7 @@ namespace cubex
 				{
 					imageUnits[i] = true;
 					boundToIndex = i;
-					printf("Texture object bound to the image unit #%d.\n", i);
+					//printf("Texture object bound to the image unit #%d.\n", i);
 
 					return;
 				}
@@ -333,7 +333,6 @@ namespace cubex
 			{
 				// Unbinding the texture
 				imageUnits[boundToIndex] = false;
-				printf("%d\n", boundToIndex);
 				glActiveTexture(GL_TEXTURE0 + boundToIndex);
 				checkForError(__FILE__, __LINE__);
 
@@ -347,7 +346,7 @@ namespace cubex
 					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 					checkForError(__FILE__, __LINE__);
 				}
-				printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
+				//printf("Texture object unbound from the image unit #%d.\n", boundToIndex);
 				boundToIndex = -1;
 			}
 		}

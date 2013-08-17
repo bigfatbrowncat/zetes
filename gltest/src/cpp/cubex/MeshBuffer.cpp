@@ -160,6 +160,8 @@ void MeshBuffer::draw()
 		throw CubexException(__FILE__, __LINE__, "Shader program shouldn't be null");
 	}
 
+	glBindVertexArray(VertexArrayID);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 
 
 	glEnableVertexAttribArray(vertexVec3ShaderVariableAttrib);

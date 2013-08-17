@@ -20,7 +20,7 @@ namespace cubex
 	Scene::Scene(const string& modelFileName,
 	             const string& vertexShaderFileName, const string& fragmentShaderFileName,
 	             const string& screenVertexShaderFileName, const string& screenFragmentShaderFileName, const string& textureFileName, int viewWidth, int viewHeight) :
-			antialiasMulti(2), frameImage(NULL), depthImage(NULL)
+			antialiasMulti(3), frameImage(NULL), depthImage(NULL)
 	{
 		this->viewWidth = viewWidth;
 		this->viewHeight = viewHeight;

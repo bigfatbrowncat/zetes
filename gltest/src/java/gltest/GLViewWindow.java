@@ -37,7 +37,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	private double angle = 0;
 	private CrossBaseGLCanvas canvas;
 	private Date lastFrameMoment = new Date();
-	private float framesPerSecond = 100;
+	private float framesPerSecond = 50;
 	
 	public GLViewWindow(
 			String applicationTitle,

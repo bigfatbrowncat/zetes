@@ -5,6 +5,7 @@
  *      Author: il
  */
 
+#include <stdlib.h>
 #include <string>
 
 #define PNG_SETJMP_SUPPORTED

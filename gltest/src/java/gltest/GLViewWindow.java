@@ -148,10 +148,22 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	
 	public void updateFrame()
 	{
-		Date currentMoment = new Date();
-		double deltaTimeSec = 0.001 * (currentMoment.getTime() - lastFrameMoment.getTime());
+		Date currentMoment;
+		double deltaTimeSec;
 		
-		if (deltaTimeSec >= 1.0 / framesPerSecond)
+		do
+		{
+			currentMoment = new Date();
+			deltaTimeSec = 0.001 * (currentMoment.getTime() - lastFrameMoment.getTime());
+			try {
+				Thread.sleep(Math.max(1, (long) (1000 / framesPerSecond)));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		while (deltaTimeSec < 1.0 / framesPerSecond);
+			
 		{
 			angle += 0.5 * deltaTimeSec;
 			if (canvas != null && !canvas.isDisposed())

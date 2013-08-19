@@ -177,33 +177,36 @@ void MeshBuffer::draw()
 	);
 	checkForError(__FILE__, __LINE__);
 
+	if (normalVec3ShaderVariableAttrib != -1)
+	{
+		glEnableVertexAttribArray(normalVec3ShaderVariableAttrib);
+		checkForError(__FILE__, __LINE__);	// Setting normal data
+		glVertexAttribPointer(
+			normalVec3ShaderVariableAttrib,					// normal shader variable
+			3,												// length of vec3 (XYZ)
+			GL_FLOAT,										// type
+			GL_FALSE,										// normalized?
+			sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
+			(void*)(sizeof(GLfloat) * 3)					// array buffer offset (we use 3rd, 4th, 5th)
+		);
+		checkForError(__FILE__, __LINE__);
+	}
 
-	glEnableVertexAttribArray(normalVec3ShaderVariableAttrib);
-	checkForError(__FILE__, __LINE__);	// Setting normal data
-	glVertexAttribPointer(
-		normalVec3ShaderVariableAttrib,					// normal shader variable
-		3,												// length of vec3 (XYZ)
-		GL_FLOAT,										// type
-		GL_FALSE,										// normalized?
-		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
-		(void*)(sizeof(GLfloat) * 3)					// array buffer offset (we use 3rd, 4th, 5th)
-	);
-	checkForError(__FILE__, __LINE__);
-
-
-	glEnableVertexAttribArray(textureVec2ShaderVariableAttrib);
-	checkForError(__FILE__, __LINE__);
-	// Setting texture coordinates data
-	glVertexAttribPointer(
-		textureVec2ShaderVariableAttrib,				// texture coordinates shader variable
-		2,												// size of vec2 (UV)
-		GL_FLOAT,										// type
-		GL_FALSE,										// normalized?
-		sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
-		(void*)(sizeof(GLfloat) * 6)					// array buffer offset (we use 6th and 7th)
-	);
-	checkForError(__FILE__, __LINE__);
-
+	if (textureVec2ShaderVariableAttrib != -1)
+	{
+		glEnableVertexAttribArray(textureVec2ShaderVariableAttrib);
+		checkForError(__FILE__, __LINE__);
+		// Setting texture coordinates data
+		glVertexAttribPointer(
+			textureVec2ShaderVariableAttrib,				// texture coordinates shader variable
+			2,												// size of vec2 (UV)
+			GL_FLOAT,										// type
+			GL_FALSE,										// normalized?
+			sizeof(GLfloat) * 8,							// stride (the length of each element in mesh buffer array is 8)
+			(void*)(sizeof(GLfloat) * 6)					// array buffer offset (we use 6th and 7th)
+		);
+		checkForError(__FILE__, __LINE__);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 	checkForError(__FILE__, __LINE__);
@@ -212,10 +215,16 @@ void MeshBuffer::draw()
 
 	glDisableVertexAttribArray(vertexVec3ShaderVariableAttrib);
 	checkForError(__FILE__, __LINE__);
-	glDisableVertexAttribArray(normalVec3ShaderVariableAttrib);
-	checkForError(__FILE__, __LINE__);
-	glDisableVertexAttribArray(textureVec2ShaderVariableAttrib);
-	checkForError(__FILE__, __LINE__);
+	if (normalVec3ShaderVariableAttrib != -1)
+	{
+		glDisableVertexAttribArray(normalVec3ShaderVariableAttrib);
+		checkForError(__FILE__, __LINE__);
+	}
+	if (textureVec2ShaderVariableAttrib != -1)
+	{
+		glDisableVertexAttribArray(textureVec2ShaderVariableAttrib);
+		checkForError(__FILE__, __LINE__);
+	}
 }
 
 MeshBuffer::~MeshBuffer()

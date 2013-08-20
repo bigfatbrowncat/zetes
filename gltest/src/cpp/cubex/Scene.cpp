@@ -155,16 +155,19 @@ namespace cubex
 	Scene::~Scene()
 	{
 		delete shaderProgram;
+		delete screenPlaneShaderProgram;
 		delete meshBuffer;
+		delete screenPlaneMeshBuffer;
 
-		texture->unbindFromImageUnit();
 		delete texture;
 
 		if (frameImage != NULL)
 		{
-			frameImage->unbindFromImageUnit();
-			depthImage->unbindFromImageUnit();
 			delete frameImage;
+		}
+
+		if (depthImage != NULL)
+		{
 			delete depthImage;
 		}
 	}

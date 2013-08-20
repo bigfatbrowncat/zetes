@@ -136,6 +136,7 @@ extern "C"
 		if (scene != NULL)
 		{
 			delete scene;
+			scene = NULL;
 			return true;
 		}
 		else

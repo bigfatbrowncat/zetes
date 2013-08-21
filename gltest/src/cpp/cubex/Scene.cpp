@@ -65,21 +65,20 @@ namespace cubex
 
 	    texture = new Texture(textureFileName);
 		texture->bindToImageUnit();
-
+		renewFramebufferTextures();
 	}
 
-	void Scene::resizeViewport(int width, int height)
+	void Scene::renewFramebufferTextures()
 	{
-		this->viewWidth = width;
-		this->viewHeight = height;
-
 		if (frameImage != NULL)
 		{
-			frameImage->unbindFromImageUnit();
-			depthImage->unbindFromImageUnit();
 			delete frameImage;
-			delete depthImage;
 			frameImage = NULL;
+		}
+
+		if (depthImage != NULL)
+		{
+			delete depthImage;
 			depthImage = NULL;
 		}
 
@@ -87,6 +86,14 @@ namespace cubex
 		depthImage = new Texture(viewWidth * antialiasMulti, viewHeight * antialiasMulti, Texture::tDepth, 1);
 		frameImage->bindToImageUnit();
 		depthImage->bindToImageUnit();
+	}
+
+	void Scene::resizeViewport(int width, int height)
+	{
+		this->viewWidth = width;
+		this->viewHeight = height;
+
+		renewFramebufferTextures();
 	}
 
 	void Scene::draw(float angle)

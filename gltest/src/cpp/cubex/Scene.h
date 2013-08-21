@@ -38,6 +38,9 @@ namespace cubex
 		int matrixUniform, normalMatrixUniform;
 
 		int viewWidth, viewHeight;
+
+		void renewFramebufferTextures();
+
 	public:
 		Scene(const string& modelFileName,
 		      const string& vertexShaderFileName,

@@ -9,10 +9,11 @@
 
 #include <sstream>
 
-#include "GL3/gl3w.h"
+#include <GL3/gl3w.h>
 
 #include "ShaderProgram.h"
 #include "CubexException.h"
+#include "Texture.h"
 
 using namespace std;
 
@@ -166,9 +167,72 @@ namespace cubex
 		return res;
 	}
 
+	void ShaderProgram::linkTexture(Texture& texture, const string& sampler2DShaderVariableName)
+	{
+		linkedTextures.insert(pair<Texture*, string>(&texture, sampler2DShaderVariableName));
+		texture.linkToShaderProgram(*this);
+	}
+	void ShaderProgram::unlinkTexture(Texture& texture)
+	{
+		linkedTextures.erase(&texture);
+		texture.unlinkFromShaderProgram(*this);
+	}
+
+	void ShaderProgram::linkMeshBuffer(MeshBuffer& meshBuffer, const string& meshBufferShaderVariableName)
+	{
+		linkedMeshBuffers.insert(pair<MeshBuffer*, string>(&meshBuffer, meshBufferShaderVariableName));
+	}
+	void ShaderProgram::unlinkMeshBuffer(MeshBuffer& meshBuffer)
+	{
+		linkedMeshBuffers.erase(&meshBuffer);
+	}
+
+	void ShaderProgram::process() const
+	{
+		glUseProgram(programID);
+		checkForError(__FILE__, __LINE__);
+
+		// Loading textures
+		for (map<Texture*, string>::const_iterator iter = linkedTextures.begin(); iter != linkedTextures.end(); iter++)
+		{
+			const Texture& texture = *(*iter).first;
+			const string& sampler2DShaderVariableName = (*iter).second;
+
+			if (texture.isBoundToImageUnit())
+			{
+				texture.activateImageUnit();
+				glUniform1i(getUniformLocation(sampler2DShaderVariableName), texture.getImageUnitIndex());
+				checkForError(__FILE__, __LINE__);
+			}
+			else
+			{
+				throw CubexException(__FILE__, __LINE__, string("Can't connect an unbound texture to a shader variable ") + sampler2DShaderVariableName);
+			}
+		}
+
+		// Loading mesh buffers
+		for (map<MeshBuffer*, string>::const_iterator iter = linkedMeshBuffers.begin(); iter != linkedMeshBuffers.end(); iter++)
+		{
+			const MeshBuffer& meshBuffer = *(*iter).first;
+			const string& meshBufferShaderVariableName = (*iter).second;
+
+			meshBuffer.draw(getAttribLocation(meshBufferShaderVariableName + "_vertexPosition"),
+			                getAttribLocation(meshBufferShaderVariableName + "_normal"),
+			                getAttribLocation(meshBufferShaderVariableName + "_textureCoords"));
+		}
+	}
+
+
 	ShaderProgram::~ShaderProgram()
 	{
 		glDeleteProgram(programID);
+
+		while (linkedTextures.size() > 0)
+		{
+			map<Texture*, string>::const_iterator iter = linkedTextures.begin();
+			unlinkTexture(*(*iter).first);
+		}
+
 	}
 
 }

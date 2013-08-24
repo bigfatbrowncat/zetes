@@ -51,7 +51,7 @@ namespace cubex
 
 	    // Read the Vertex Shader code from the file
 	    shaderProgram = ShaderProgram::fromFiles(vertexShaderFileName, fragmentShaderFileName);
-	    shaderProgram->use();
+	    shaderProgram->process();
 
 
 	    lightPositionUniform = shaderProgram->getUniformLocation("uni_lightPosition");
@@ -60,8 +60,11 @@ namespace cubex
 
 	    screenPlaneShaderProgram = ShaderProgram::fromFiles(screenVertexShaderFileName, screenFragmentShaderFileName);
 
-	    meshBuffer->connectToShaderProgram(shaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
-	    screenPlaneMeshBuffer->connectToShaderProgram(screenPlaneShaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
+	    shaderProgram->linkMeshBuffer(*meshBuffer, "in_mesh");
+	    screenPlaneShaderProgram->linkMeshBuffer(*screenPlaneMeshBuffer, "in_mesh");
+
+	    //meshBuffer->connectToShaderProgram(shaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
+	    //screenPlaneMeshBuffer->connectToShaderProgram(screenPlaneShaderProgram, "in_vertexPosition", "in_normal", "in_textureCoords");
 
 	    texture = new Texture(textureFileName);
 		texture->bindToImageUnit();
@@ -124,7 +127,7 @@ namespace cubex
 		glm::mat4 MP = Projection * view * Model;
 		glm::mat3 NM = glm::inverse(glm::transpose(glm::mat3(MP)));
 
-		shaderProgram->use();
+		shaderProgram->process();
 
 		// Sending matrix
 		glUniformMatrix4fv(matrixUniform, 1, GL_FALSE, glm::value_ptr(MP));
@@ -148,15 +151,20 @@ namespace cubex
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			checkForError(__FILE__, __LINE__);
 
-			texture->connectToShaderVariable(*shaderProgram, "uni_texture");
-			meshBuffer->draw();
+			shaderProgram->linkTexture(*texture, "uni_texture");
+			//texture->connectToShaderVariable(*shaderProgram, "uni_texture");
+			//meshBuffer->draw();
+			shaderProgram->process();
 		}
 		fbo.unbind();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		checkForError(__FILE__, __LINE__);
-		frameImage->connectToShaderVariable(*screenPlaneShaderProgram, "uni_texture");
-		screenPlaneMeshBuffer->draw();
+		screenPlaneShaderProgram->linkTexture(*frameImage, "uni_texture");
+		//frameImage->connectToShaderVariable(*screenPlaneShaderProgram, "uni_texture");
+
+		screenPlaneShaderProgram->process();
+		//screenPlaneMeshBuffer->draw();
 	}
 
 	Scene::~Scene()

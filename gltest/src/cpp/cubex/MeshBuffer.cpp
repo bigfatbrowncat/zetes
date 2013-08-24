@@ -128,38 +128,8 @@ MeshBuffer::MeshBuffer(const Mesh &mesh)
 
 }
 
-void MeshBuffer::connectToShaderProgram(const ShaderProgram* shaderProgram,
-                            const string& vertexVec3ShaderVariableName,
-                            const string& normalVec3ShaderVariableName,
-                            const string& textureVec2ShaderVariableName)
+void MeshBuffer::draw(GLint vertexVec3ShaderVariableAttrib, GLint normalVec3ShaderVariableAttrib, GLint textureVec2ShaderVariableAttrib) const
 {
-	this->shaderProgram = shaderProgram;
-	this->vertexVec3ShaderVariableName = vertexVec3ShaderVariableName;
-	this->normalVec3ShaderVariableName = normalVec3ShaderVariableName;
-	this->textureVec2ShaderVariableName = textureVec2ShaderVariableName;
-
-	if (shaderProgram != NULL)
-	{
-		if (vertexVec3ShaderVariableName != "")
-			vertexVec3ShaderVariableAttrib = shaderProgram->getAttribLocation(vertexVec3ShaderVariableName.c_str());
-		if (normalVec3ShaderVariableName != "")
-			normalVec3ShaderVariableAttrib = shaderProgram->getAttribLocation(normalVec3ShaderVariableName.c_str());
-		if (textureVec2ShaderVariableName != "")
-			textureVec2ShaderVariableAttrib = shaderProgram->getAttribLocation(textureVec2ShaderVariableName.c_str());
-	}
-}
-
-void MeshBuffer::draw()
-{
-	if (shaderProgram != NULL)
-	{
-		shaderProgram->use();
-	}
-	else
-	{
-		throw CubexException(__FILE__, __LINE__, "Shader program shouldn't be null");
-	}
-
 	glBindVertexArray(VertexArrayID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 

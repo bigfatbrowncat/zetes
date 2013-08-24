@@ -258,6 +258,15 @@ namespace cubex
 		globalCountersInit();
 	}
 
+	void Texture::linkToShaderProgram(ShaderProgram& shaderProgram)
+	{
+		linkedShaderPrograms.push_back(&shaderProgram);
+	}
+	void Texture::unlinkFromShaderProgram(ShaderProgram& shaderProgram)
+	{
+		linkedShaderPrograms.remove(&shaderProgram);
+	}
+
 	Texture::Texture(const string& fileName) : samples(1), boundToIndex(-1)
 	{
 		// Instance operations
@@ -267,40 +276,6 @@ namespace cubex
 		globalCountersInit();
 	}
 
-	void Texture::connectToShaderVariable(const ShaderProgram& shaderProgram, const string& sampler2DShaderVariableName)
-	{
-		if (boundToIndex != -1)
-		{
-			// Activating the shader program
-			shaderProgram.use();
-
-			// Binding the texture
-			glActiveTexture(GL_TEXTURE0 + boundToIndex);
-
-			if (samples == 1)
-			{
-				glBindTexture(GL_TEXTURE_2D, textureId);
-				checkForError(__FILE__, __LINE__);
-
-				// generate mipmaps
-				glGenerateMipmap(GL_TEXTURE_2D);
-				checkForError(__FILE__, __LINE__);
-			}
-			else
-			{
-				glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
-				checkForError(__FILE__, __LINE__);
-			}
-
-			// Sending the index with which the texture is bound to the shader program
-			glUniform1i(shaderProgram.getUniformLocation(sampler2DShaderVariableName), boundToIndex);
-			checkForError(__FILE__, __LINE__);
-		}
-		else
-		{
-			throw CubexException(__FILE__, __LINE__, string("Can't connect an unbound texture to a shader variable ") + sampler2DShaderVariableName);
-		}
-	}
 
 	void Texture::bindToImageUnit()
 	{
@@ -353,8 +328,38 @@ namespace cubex
 		}
 	}
 
+	void Texture::activateImageUnit() const
+	{
+		// Binding the texture
+		glActiveTexture(GL_TEXTURE0 + boundToIndex);
+
+		if (samples == 1)
+		{
+			glBindTexture(GL_TEXTURE_2D, textureId);
+			checkForError(__FILE__, __LINE__);
+
+			// generate mipmaps
+			glGenerateMipmap(GL_TEXTURE_2D);
+			checkForError(__FILE__, __LINE__);
+		}
+		else
+		{
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+			printf("%d\n", samples);
+			checkForError(__FILE__, __LINE__);
+		}
+	}
+
+
 	Texture::~Texture()
 	{
+		// Unlinking from shaders
+		while (linkedShaderPrograms.size() > 0)
+		{
+			list<ShaderProgram*>::iterator iter = linkedShaderPrograms.begin();
+			(*iter)->unlinkTexture(*this);
+		}
+
 		// Instance operations
 		unbindFromImageUnit();
 		glDeleteTextures(1, &textureId);

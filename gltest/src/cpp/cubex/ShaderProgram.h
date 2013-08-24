@@ -9,13 +9,17 @@
 #define SHADERPROGRAM_H_
 
 #include <string>
+#include <map>
 
 #include "GLObject.h"
+#include "MeshBuffer.h"
 
 using namespace std;
 
 namespace cubex
 {
+	class Texture;
+
 	class ShaderProgram : public GLObject
 	{
 	private:
@@ -23,6 +27,8 @@ namespace cubex
 		ShaderProgram operator = (const ShaderProgram& other);
 		ShaderProgram(const ShaderProgram& other);
 
+		map<Texture*, string> linkedTextures;
+		map<MeshBuffer*, string> linkedMeshBuffers;
 	private:
 		GLuint programID;
 	public:
@@ -32,7 +38,13 @@ namespace cubex
 		GLint getAttribLocation(const string& attribName) const;
 		GLint getUniformLocation(const string& uniformName) const;
 
-		void use() const { glUseProgram(programID); checkForError(__FILE__, __LINE__); }
+		void linkTexture(Texture& texture, const string& sampler2DShaderVariableName);
+		void unlinkTexture(Texture& texture);
+
+		void linkMeshBuffer(MeshBuffer& meshBuffer, const string& meshBufferShaderVariableName);
+		void unlinkMeshBuffer(MeshBuffer& meshBuffer);
+
+		void process() const;
 		virtual ~ShaderProgram();
 	};
 }

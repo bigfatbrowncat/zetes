@@ -9,6 +9,7 @@
 #define TEXTURE_H_
 
 #include <string>
+#include <list>
 
 #include <GL3/gl3w.h>
 
@@ -21,6 +22,7 @@ namespace cubex
 {
 	class Texture : public GLObject
 	{
+		friend class ShaderProgram;
 		friend class FrameBuffer;
 	public:
 		enum Type
@@ -45,7 +47,7 @@ namespace cubex
 		int samples;
 		Type type;
 
-		GLint textureUniform;
+		list<ShaderProgram*> linkedShaderPrograms;
 
 		void loadPNGToTexture(const char * file_name, int * width, int * height);
 
@@ -53,13 +55,35 @@ namespace cubex
 	protected:
 		int getTextureId() const { return textureId; }
 
+		/**
+		 * This intended to be called from the shader program only.
+		 *
+		 * When texture is linked to a shader program, it reports
+		 * this fact to the texture itself, so when the texture
+		 * is destroyed, it removes itself from all shader programs
+		 * to avoid crushes
+		 */
+		void linkToShaderProgram(ShaderProgram& shaderProgram);
+
+		/**
+		 * This intended to be called from the shader program only.
+		 *
+		 * When texture is unlinked from a shader program, it reports
+		 * this fact to the texture.
+		 */
+		void unlinkFromShaderProgram(ShaderProgram& shaderProgram);
+
 	public:
 		Texture(const string& fileName);
 		Texture(int width, int height, Type type, int samples = 1);
 
-		void connectToShaderVariable(const ShaderProgram& shaderProgram, const string& sampler2DShaderVariableName);
 		void bindToImageUnit();
 		void unbindFromImageUnit();
+
+		bool isBoundToImageUnit() const { return boundToIndex != -1; }
+		int getImageUnitIndex() const { return boundToIndex; }
+
+		void activateImageUnit() const;
 
 		int getSamples() const { return samples; }
 		Type getType() const { return type; }

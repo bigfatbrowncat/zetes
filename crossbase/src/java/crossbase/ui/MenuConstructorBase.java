@@ -1,5 +1,7 @@
 package crossbase.ui;
 
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Display;
@@ -31,17 +33,8 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		
 		Action<TD, TVW> exitItem = new Action<TD, TVW>(ACTION_FILE_EXIT, "E&xit");
 		fileMenu.addItem(exitItem);
-		
-		exitItem.getHandlers().put(null, createExitHandler());
 	}
 
-	private Handler createExitHandler() {
-		Handler exitHandler = new Handler();
-		exitHandler.setEnabled(true);
-		exitHandler.setVisible(true);
-		exitHandler.setListener(exitSelectionAdapter);
-		return exitHandler;
-	}
 	
 	public SelectionAdapter getExitSelectionAdapter()
 	{
@@ -52,6 +45,12 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
 	{
 		this.exitSelectionAdapter = exitSelectionAdapter;
+		Map<TVW, Handler> handlers = actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT).getHandlers();
+		if (handlers.get(null) == null) {
+			handlers.put(null, new Handler());
+		}
+		
+		handlers.get(null).setListener(exitSelectionAdapter);
 	}
 
 	public SelectionAdapter getAboutSelectionAdapter()

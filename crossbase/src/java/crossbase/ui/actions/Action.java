@@ -16,10 +16,16 @@ public class Action<TD extends Document, TVW extends ViewWindow<TD>> implements 
 		private boolean enabled = true;
 		private boolean visible = true;
 		
+		public Handler() {
+			enabled = true;
+			visible = true;
+		}
+		
 		public SelectionAdapter getListener() {
 			return listener;
 		}
 		public void setListener(SelectionAdapter listener) {
+			System.out.println("setting listener to " + listener.toString());
 			this.listener = listener;
 		}
 		public boolean isEnabled() {

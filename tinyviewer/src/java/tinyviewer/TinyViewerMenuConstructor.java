@@ -11,7 +11,7 @@ import crossbase.ui.MenuConstructorBase;
 public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageDocument, ImageViewWindow>
 {
 	private SelectionAdapter fileOpenSelectionAdapter;
-		
+/*		
 	@Override
 	protected void appendCustomFileMenuItems(Menu fileMenu)
 	{
@@ -23,7 +23,7 @@ public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageDocument
 		openMenuItem.setText("&Open...\t" + openHotKey.toString());
 		openMenuItem.setAccelerator(openHotKey.toAccelerator());
 	}
-
+*/
 	public SelectionAdapter getFileOpenSelectionAdapter()
 	{
 		return fileOpenSelectionAdapter;

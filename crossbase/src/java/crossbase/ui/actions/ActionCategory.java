@@ -23,8 +23,8 @@ public class ActionCategory<TD extends Document, TVW extends ViewWindow<TD>> imp
 		items.addLast(item);
 	}
 	
-	public ActionHierarchyMember<TD, TVW> getItem() {
-		return items.get(0);
+	public ActionHierarchyMember<TD, TVW> getItem(int i) {
+		return items.get(i);
 	}
 	
 	public int getItemsCount() {
@@ -56,7 +56,7 @@ public class ActionCategory<TD extends Document, TVW extends ViewWindow<TD>> imp
 		}
 		
 		for (int i = 0; i < inners.size(); i++) {
-			 Action<TD, TVW> res = findActionByIdRecursively(id);
+			 Action<TD, TVW> res = inners.get(i).findActionByIdRecursively(id);
 			 if (res != null) return res;
 		}
 		

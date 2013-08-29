@@ -8,6 +8,8 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Control;
@@ -18,6 +20,8 @@ import org.eclipse.swt.widgets.Shell;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
+import crossbase.ui.actions.Action;
+import crossbase.ui.actions.Action.Handler;
 
 public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, ShellListener, DisposeListener
 {
@@ -86,9 +90,26 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell = constructShell();
 		prepareShell();
 
+		Action<TD, ViewWindowBase<TD>> fullscreenAction = ((MenuConstructor)menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN);
+		if (fullscreenAction != null) {
+			Handler handler = new Handler(); 
+			handler.setEnabled(true);
+			handler.setVisible(true);
+			handler.setListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent arg0) {
+					if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
+					{
+						toggleFullScreen();
+					}
+				}
+			});
+			
+			fullscreenAction.getHandlers().put(this, handler);
+		}
+		
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type 
-		((MenuConstructor)menuConstructor).addWindow(this);		
-		menuConstructor.updateMenus();
+		((MenuConstructor)menuConstructor).updateMenus(this);
 
 		shell.layout();
 		shell.open();
@@ -156,13 +177,13 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	@Override
 	public void shellDeactivated(ShellEvent arg0)
 	{
-		ViewWindowBase.this.menuConstructor.updateMenus();
+		((MenuConstructor)ViewWindowBase.this.menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
 	@Override
 	public void shellActivated(ShellEvent arg0)
 	{
-		ViewWindowBase.this.menuConstructor.updateMenus();
+		((MenuConstructor)ViewWindowBase.this.menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -177,7 +198,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	public void widgetDisposed(DisposeEvent arg0)
 	{
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
-		((MenuConstructor)ViewWindowBase.this.menuConstructor).removeWindow(ViewWindowBase.this);
+		 
+		Action<TD, ViewWindowBase<TD>> fullscreenAction = ((MenuConstructor)ViewWindowBase.this.menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN);
+		if (fullscreenAction != null) {
+			fullscreenAction.getHandlers().remove(this);
+		}
 		
 		Document doc = getDocument();
 		if (doc != null) 

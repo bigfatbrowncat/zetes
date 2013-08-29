@@ -215,7 +215,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			menuConstructor = createMenuConstructor();
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
-			menuConstructor.updateMenus();
+			menuConstructor.updateMenus(null);
 			
 			// Here we guarantee that menuConstructor type is compatible to viewWindowsManager
 			viewWindowsManager.setMenuConstructor(menuConstructor);

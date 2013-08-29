@@ -1,6 +1,10 @@
 package crossbase.ui;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
@@ -11,18 +15,19 @@ import crossbase.ui.actions.ActionCategory;
 
 public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>> implements MenuConstructor<TD, TVW>
 {
-	private final static int ACTION_FILE_EXIT = 101;
+	public final static int ACTION_FILE_EXIT = 101;
+	public final static int ACTION_WINDOW_FULLSCREEN = 301;
 	
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private ActionCategory<TD, TVW> mainMenu = new ActionCategory<>(null); 
+	private ActionCategory<TD, TVW> actionsRoot = new ActionCategory<>(""); 
 	
-	public ActionCategory<TD, TVW> getMainMenu() {
-		return mainMenu;
+	public ActionCategory<TD, TVW> getActionsRoot() {
+		return actionsRoot;
 	}
 	
 	public MenuConstructorBase() {
 		ActionCategory<TD, TVW> fileMenu = new ActionCategory<>("&File");
-		mainMenu.addItem(fileMenu);
+		actionsRoot.addItem(fileMenu);
 		
 		Action<TD, TVW> exitItem = new Action<TD, TVW>(ACTION_FILE_EXIT, "E&xit");
 		fileMenu.addItem(exitItem);
@@ -60,10 +65,64 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		this.aboutSelectionAdapter = aboutSelectionAdapter;
 	}
 
+	private boolean addMenusInsideCategory(TVW window, ActionCategory<TD, TVW> category, Menu categoryMenu) {
+		boolean addedAnyActions = false;
+		
+		for (int i = 0; i < category.getItemsCount(); i++) {
+			if (category.getItem(i) instanceof Action) {
+				Action<TD, TVW> actionItem = (Action<TD, TVW>)category.getItem(i);
+				
+				// If item is globally supported or if it has a specific handler for this window
+				if (actionItem.isGloballySupported() || actionItem.getHandlers().containsKey(window)) {
+					// We get the handler
+					Handler usingHandler = actionItem.getHandlers().get(window) != null ? actionItem.getHandlers().get(window) : actionItem.getHandlers().get(null);
+					
+					// If we have any handler
+					if (usingHandler != null) {
+						MenuItem menuItem = new MenuItem(categoryMenu, SWT.NONE);
+						menuItem.setText(actionItem.getTitle());
+						menuItem.setEnabled(usingHandler.isEnabled());
+						menuItem.addSelectionListener(usingHandler.getListener());
+						addedAnyActions = true;
+					}
+				}
+			} else if (category.getItem(i) instanceof ActionCategory) {
+				ActionCategory<TD, TVW> actionCategoryItem = (ActionCategory<TD, TVW>)category.getItem(i);
+				
+				MenuItem menuItem = new MenuItem(categoryMenu, SWT.CASCADE);
+				menuItem.setText(actionCategoryItem.getTitle());
+				Menu menu = new Menu(menuItem);
+				menuItem.setMenu(menu);
+				
+				if (addMenusInsideCategory(window, actionCategoryItem, menu)) {
+					addedAnyActions = true;
+				} else {
+					menuItem.dispose();
+				}
+			}
+		}
+		return addedAnyActions;
+	}
+	
 	@Override
-	public void updateMenus() {
+	public void updateMenus(TVW window) {
+		Menu windowMenu;
 		
+		if (window != null)
+		{
+			windowMenu = window.getMenu();
+		} else {
+			Display display = Display.getDefault();
+			windowMenu = display.getMenuBar();
+		}
 		
+		if (windowMenu != null) {
+			for (int i = 0; i < windowMenu.getItems().length; i++) {
+				windowMenu.getItems()[i].dispose();
+			}
+			
+			addMenusInsideCategory(window, actionsRoot, windowMenu);
+		}
 	}
 	
 //

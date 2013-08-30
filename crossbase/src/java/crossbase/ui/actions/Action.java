@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.eclipse.swt.events.SelectionAdapter;
 
-import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.HotKey;
 
@@ -30,7 +29,6 @@ public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW
 			return listener;
 		}
 		public void setListener(SelectionAdapter listener) {
-			System.out.println("setting listener to " + listener.toString());
 			this.listener = listener;
 		}
 		public boolean isEnabled() {
@@ -50,6 +48,10 @@ public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW
 	private HotKey hotKey;
 
 	private HashMap<TVW, Handler> handlers = new HashMap<>();
+	
+	public Action(int id) {
+		super(id);
+	}
 	
 	public Action(int id, String title) {
 		super(id, title);

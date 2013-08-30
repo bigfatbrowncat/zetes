@@ -6,7 +6,7 @@ import crossbase.ui.HotKey;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.actions.Action;
 import crossbase.ui.actions.Action.Handler;
-import crossbase.ui.actions.ActionCategory;
+import crossbase.ui.actions.ActionList;
 
 public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWindow>
 {
@@ -18,7 +18,7 @@ public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWind
 	public TinyViewerMenuConstructor() {
 		super();
 		
-		ActionCategory<ImageViewWindow> fileActionCategory = (ActionCategory<ImageViewWindow>)getActionsRoot().findActionByIdRecursively(ACTION_CATEGORY_FILE);
+		ActionList<ImageViewWindow> fileActionCategory = (ActionList<ImageViewWindow>)getActionsRoot().findActionByIdRecursively(ACTION_CATEGORY_FILE);
 
 		openAction = new Action<>(ACTION_FILE_OPEN, "&Open");
 		openAction.setHotKey(new HotKey(HotKey.MOD1, 'O'));

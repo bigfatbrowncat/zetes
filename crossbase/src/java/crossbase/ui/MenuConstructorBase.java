@@ -12,7 +12,7 @@ import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.actions.Action;
 import crossbase.ui.actions.Action.Handler;
-import crossbase.ui.actions.ActionCategory;
+import crossbase.ui.actions.ActionList;
 
 public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConstructor<TVW>
 {
@@ -28,21 +28,21 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	public final static int ACTION_WINDOW_CUSTOM = 3200;
 	
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private ActionCategory<TVW> actionsRoot = new ActionCategory<TVW>(ACTION_CATEGORY_ROOT); 
+	private ActionList<TVW> actionsRoot = new ActionList<TVW>(ACTION_CATEGORY_ROOT); 
 	
-	public ActionCategory<TVW> getActionsRoot() {
+	public ActionList<TVW> getActionsRoot() {
 		return actionsRoot;
 	}
 	
 	public MenuConstructorBase() {
-		ActionCategory<TVW> fileActionCategory = new ActionCategory<>(ACTION_CATEGORY_FILE, "&File");
+		ActionList<TVW> fileActionCategory = new ActionList<>(ACTION_CATEGORY_FILE, "&File");
 		actionsRoot.addLastItem(fileActionCategory);
 
 		Action<TVW> exitAction = new Action<TVW>(ACTION_FILE_EXIT, "E&xit");
 		fileActionCategory.addLastItem(exitAction);
 	
 
-		ActionCategory<TVW> windowActionCategory = new ActionCategory<>(ACTION_CATEGORY_WINDOW, "&Window");
+		ActionList<TVW> windowActionCategory = new ActionList<>(ACTION_CATEGORY_WINDOW, "&Window");
 		actionsRoot.addLastItem(windowActionCategory);
 
 		Action<TVW> fullscreenAction = new Action<TVW>(ACTION_WINDOW_FULLSCREEN, "&Fullscreen");
@@ -56,7 +56,6 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		return exitSelectionAdapter;
 	}
 
-	@Override
 	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
 	{
 		this.exitSelectionAdapter = exitSelectionAdapter;
@@ -73,55 +72,66 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		return aboutSelectionAdapter;
 	}
 
-	@Override
 	public void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter)
 	{
 		this.aboutSelectionAdapter = aboutSelectionAdapter;
 	}
 
-	private boolean addMenusInsideCategory(TVW window, ActionCategory<TVW> category, Menu categoryMenu) {
+	private boolean addMenusForActionList(TVW window, ActionList<TVW> category, Menu currentMenu) {
 		boolean addedAnyActions = false;
 		
 		for (int i = 0; i < category.getItemsCount(); i++) {
 			if (category.getItem(i) instanceof Action) {
+				
 				Action<TVW> actionItem = (Action<TVW>)category.getItem(i);
 				
-				// If item is globally supported or if it has a specific handler for this window
-				if (actionItem.getHandlers().containsKey(null) || actionItem.getHandlers().containsKey(window)) {
-
-					// Getting the handler. A specific one should override the default one
-					Handler usingHandler = actionItem.getHandlers().get(window) != null ? actionItem.getHandlers().get(window) : actionItem.getHandlers().get(null);
+				boolean dontShowItem = false;
+				if (category.getItem(i) instanceof ActionList) {
+					ActionList<TVW> actionCategoryItem = (ActionList<TVW>)category.getItem(i);
 					
-					// If we have any handler
-					if (usingHandler != null && usingHandler.isVisible()) {
-						MenuItem menuItem = new MenuItem(categoryMenu, SWT.NONE);
-						
-						if (actionItem.getHotKey() == null) {
-							menuItem.setText(actionItem.getTitle());
-						} else {
-							menuItem.setText(actionItem.getTitle() + "\t" + actionItem.getHotKey().toString());
-							menuItem.setAccelerator(actionItem.getHotKey().toAccelerator());
-						}
-
-						menuItem.setEnabled(usingHandler.isEnabled());
-						menuItem.addSelectionListener(usingHandler.getListener());
+					Menu menu = currentMenu;
+					MenuItem menuItem = null;
+					
+					if (actionCategoryItem.isSubMenu()) {
+						menuItem = new MenuItem(currentMenu, SWT.CASCADE);
+						menuItem.setText(actionCategoryItem.getTitle());
+						menu = new Menu(menuItem);
+						menuItem.setMenu(menu);
+						dontShowItem = true;
+					}
+					
+					if (addMenusForActionList(window, actionCategoryItem, menu)) {
 						addedAnyActions = true;
+					} else {
+						if (menuItem != null) menuItem.dispose();
+					}
+				}			
+
+				if (!dontShowItem) {
+					// If item is globally supported or if it has a specific handler for this window
+					if (actionItem.getHandlers().containsKey(null) || actionItem.getHandlers().containsKey(window)) {
+	
+						// Getting the handler. A specific one should override the default one
+						Handler usingHandler = actionItem.getHandlers().get(window) != null ? actionItem.getHandlers().get(window) : actionItem.getHandlers().get(null);
+						
+						// If we have any handler
+						if (usingHandler != null && usingHandler.isVisible()) {
+							MenuItem menuItem = new MenuItem(currentMenu, SWT.NONE);
+							
+							if (actionItem.getHotKey() == null) {
+								menuItem.setText(actionItem.getTitle());
+							} else {
+								menuItem.setText(actionItem.getTitle() + "\t" + actionItem.getHotKey().toString());
+								menuItem.setAccelerator(actionItem.getHotKey().toAccelerator());
+							}
+	
+							menuItem.setEnabled(usingHandler.isEnabled());
+							menuItem.addSelectionListener(usingHandler.getListener());
+							addedAnyActions = true;
+						}
 					}
 				}
-			} else if (category.getItem(i) instanceof ActionCategory) {
-				ActionCategory<TVW> actionCategoryItem = (ActionCategory<TVW>)category.getItem(i);
-				
-				MenuItem menuItem = new MenuItem(categoryMenu, SWT.CASCADE);
-				menuItem.setText(actionCategoryItem.getTitle());
-				Menu menu = new Menu(menuItem);
-				menuItem.setMenu(menu);
-				
-				if (addMenusInsideCategory(window, actionCategoryItem, menu)) {
-					addedAnyActions = true;
-				} else {
-					menuItem.dispose();
-				}
-			}
+			} 
 		}
 		return addedAnyActions;
 	}
@@ -143,7 +153,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 				windowMenu.getItems()[0].dispose();
 			}
 			
-			addMenusInsideCategory(window, actionsRoot, windowMenu);
+			addMenusForActionList(window, actionsRoot, windowMenu);
 		}
 	}
 	

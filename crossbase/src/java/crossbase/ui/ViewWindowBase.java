@@ -82,7 +82,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		return shell.getMenuBar();
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public final void open()
 	{
@@ -104,7 +104,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 			fullscreenAction.getHandlers().put(this, handler);
 		}
 		
-		((MenuConstructor<ViewWindow<TD>>)menuConstructor).updateMenus(this);
+		((MenuConstructor)menuConstructor).updateMenus(this);
 
 		shell.layout();
 		shell.open();
@@ -169,18 +169,18 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	{
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void shellDeactivated(ShellEvent arg0)
 	{
-		((MenuConstructor<ViewWindow<TD>>)menuConstructor).updateMenus(ViewWindowBase.this);
+		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void shellActivated(ShellEvent arg0)
 	{
-		((MenuConstructor<ViewWindow<TD>>)menuConstructor).updateMenus(ViewWindowBase.this);
+		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

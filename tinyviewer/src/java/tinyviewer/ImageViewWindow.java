@@ -16,7 +16,10 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowBase;
+import crossbase.ui.actions.Action;
+import crossbase.ui.actions.ActionList;
 
 public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 {
@@ -51,6 +54,10 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	                       TinyViewerMenuConstructor menuConstructor)
 	{
 		super(applicationTitle, windowsManager, menuConstructor);
+		
+		ActionList<ImageViewWindow> windowActionCategory = (ActionList<ImageViewWindow>) menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_CATEGORY_WINDOW);
+		
+		Action<ImageViewWindow> selectWindowAction = new Action<>(MenuConstructorBase.ACTION_WINDOW_LIST_START, applicationTitle);
 	}
 	
 	/**

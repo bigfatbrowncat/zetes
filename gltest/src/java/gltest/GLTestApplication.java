@@ -8,10 +8,10 @@ import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.MenuConstructorBase;
 
 public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
-                                                         GLDocument, 
-                                                         GLViewWindow, 
-                                                         MenuConstructorBase<GLViewWindow>,
-                                                         GLViewWindowsManager>
+                                                       GLDocument, 
+                                                       GLViewWindow, 
+                                                       MenuConstructorBase<GLViewWindow>,
+                                                       GLViewWindowsManager>
 {
 	private GLViewWindow glViewWindow;
 	/**

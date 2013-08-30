@@ -1,16 +1,10 @@
 package crossbase.abstracts;
 
-import org.eclipse.swt.events.SelectionAdapter;
-
-import crossbase.abstracts.ViewWindow;
-import crossbase.ui.actions.ActionCategory;
+import crossbase.ui.actions.ActionList;
 
 public interface MenuConstructor<TVW extends ViewWindow<?>>
 {
-	void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter);
-	void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter);
-
-	public ActionCategory<TVW> getActionsRoot();
+	public ActionList<TVW> getActionsRoot();
 	/**
 	 * This function should update menus for the specified window. 
 	 * If no window is specified, it should update the global menu 

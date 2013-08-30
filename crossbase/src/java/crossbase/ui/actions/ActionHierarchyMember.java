@@ -2,16 +2,16 @@ package crossbase.ui.actions;
 
 import crossbase.abstracts.ViewWindow;
 
-public class ActionHierarchyMember<TVW extends ViewWindow<?>> {
+public abstract class ActionHierarchyMember<TVW extends ViewWindow<?>> {
 	private int id;
 	private String title;
 	
-	ActionHierarchyMember(int id, String title) {
+	public ActionHierarchyMember(int id, String title) {
 		this.id = id;
 		this.title = title;
 	}
 
-	ActionHierarchyMember(int id) {
+	public ActionHierarchyMember(int id) {
 		this.id = id;
 	}
 	

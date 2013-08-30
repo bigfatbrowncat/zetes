@@ -93,32 +93,6 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 		}
 	};
 		
-	private DropTargetAdapter viewWindowDropTargetAdapter = new DropTargetAdapter()
-	{
-		public void drop(DropTargetEvent event) {
-			String fileList[] = null;
-			FileTransfer ft = FileTransfer.getInstance();
-			if (ft.isSupportedType(event.currentDataType)) {
-				fileList = (String[]) event.data;
-				for (int i = 0; i < fileList.length; i++)
-				{
-					ImageDocument document;
-					try
-					{
-						document = new ImageDocument(fileList[i]);
-						getViewWindowsManager().openViewForDocument(document);
-					}
-					catch (IOException e)
-					{
-						// TODO Show a message box here
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	};
-		
-		
 	public TinyViewerApplication()
 	{
 
@@ -132,7 +106,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 	@Override
 	public ImageViewWindowsManager createViewWindowsManager()
 	{
-		return new ImageViewWindowsManager(getTitle(), viewWindowDropTargetAdapter);
+		return new ImageViewWindowsManager(getTitle());
 	}
 
 	@Override

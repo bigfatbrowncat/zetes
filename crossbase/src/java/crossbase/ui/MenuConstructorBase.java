@@ -8,14 +8,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.actions.Action;
 import crossbase.ui.actions.Action.Handler;
 import crossbase.ui.actions.ActionCategory;
 
-public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>> implements MenuConstructor<TD, TVW>
+public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConstructor<TVW>
 {
 	public final static int ACTION_CATEGORY_ROOT = 0;
 
@@ -29,24 +28,24 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 	public final static int ACTION_WINDOW_CUSTOM = 3200;
 	
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private ActionCategory<TD, TVW> actionsRoot = new ActionCategory<TD, TVW>(ACTION_CATEGORY_ROOT); 
+	private ActionCategory<TVW> actionsRoot = new ActionCategory<TVW>(ACTION_CATEGORY_ROOT); 
 	
-	public ActionCategory<TD, TVW> getActionsRoot() {
+	public ActionCategory<TVW> getActionsRoot() {
 		return actionsRoot;
 	}
 	
 	public MenuConstructorBase() {
-		ActionCategory<TD, TVW> fileActionCategory = new ActionCategory<>(ACTION_CATEGORY_FILE, "&File");
+		ActionCategory<TVW> fileActionCategory = new ActionCategory<>(ACTION_CATEGORY_FILE, "&File");
 		actionsRoot.addLastItem(fileActionCategory);
 
-		Action<TD, TVW> exitAction = new Action<TD, TVW>(ACTION_FILE_EXIT, "E&xit");
+		Action<TVW> exitAction = new Action<TVW>(ACTION_FILE_EXIT, "E&xit");
 		fileActionCategory.addLastItem(exitAction);
 	
 
-		ActionCategory<TD, TVW> windowActionCategory = new ActionCategory<>(ACTION_CATEGORY_WINDOW, "&Window");
+		ActionCategory<TVW> windowActionCategory = new ActionCategory<>(ACTION_CATEGORY_WINDOW, "&Window");
 		actionsRoot.addLastItem(windowActionCategory);
 
-		Action<TD, TVW> fullscreenAction = new Action<TD, TVW>(ACTION_WINDOW_FULLSCREEN, "&Fullscreen");
+		Action<TVW> fullscreenAction = new Action<TVW>(ACTION_WINDOW_FULLSCREEN, "&Fullscreen");
 		fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
 		windowActionCategory.addLastItem(fullscreenAction);
 	}
@@ -61,7 +60,7 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
 	{
 		this.exitSelectionAdapter = exitSelectionAdapter;
-		Map<TVW, Handler> handlers = ((Action<TD, TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT)).getHandlers();
+		Map<TVW, Handler> handlers = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT)).getHandlers();
 		if (handlers.get(null) == null) {
 			handlers.put(null, new Handler());
 		}
@@ -80,14 +79,12 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		this.aboutSelectionAdapter = aboutSelectionAdapter;
 	}
 
-	private boolean addMenusInsideCategory(TVW window, ActionCategory<TD, TVW> category, Menu categoryMenu) {
+	private boolean addMenusInsideCategory(TVW window, ActionCategory<TVW> category, Menu categoryMenu) {
 		boolean addedAnyActions = false;
-		
-		System.out.println("adding menus " + category.getTitle());
 		
 		for (int i = 0; i < category.getItemsCount(); i++) {
 			if (category.getItem(i) instanceof Action) {
-				Action<TD, TVW> actionItem = (Action<TD, TVW>)category.getItem(i);
+				Action<TVW> actionItem = (Action<TVW>)category.getItem(i);
 				
 				// If item is globally supported or if it has a specific handler for this window
 				if (actionItem.getHandlers().containsKey(null) || actionItem.getHandlers().containsKey(window)) {
@@ -97,7 +94,6 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 					
 					// If we have any handler
 					if (usingHandler != null && usingHandler.isVisible()) {
-						System.out.println("adding menu " + actionItem.getTitle());
 						MenuItem menuItem = new MenuItem(categoryMenu, SWT.NONE);
 						
 						if (actionItem.getHotKey() == null) {
@@ -113,7 +109,7 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 					}
 				}
 			} else if (category.getItem(i) instanceof ActionCategory) {
-				ActionCategory<TD, TVW> actionCategoryItem = (ActionCategory<TD, TVW>)category.getItem(i);
+				ActionCategory<TVW> actionCategoryItem = (ActionCategory<TVW>)category.getItem(i);
 				
 				MenuItem menuItem = new MenuItem(categoryMenu, SWT.CASCADE);
 				menuItem.setText(actionCategoryItem.getTitle());
@@ -143,8 +139,8 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 		}
 		
 		if (windowMenu != null) {
-			for (int i = 0; i < windowMenu.getItems().length; i++) {
-				windowMenu.getItems()[i].dispose();
+			while (windowMenu.getItems().length > 0) {
+				windowMenu.getItems()[0].dispose();
 			}
 			
 			addMenusInsideCategory(window, actionsRoot, windowMenu);

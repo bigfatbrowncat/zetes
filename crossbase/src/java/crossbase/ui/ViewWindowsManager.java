@@ -13,7 +13,7 @@ import crossbase.abstracts.ViewWindowsManagerListener;
 
 public abstract class ViewWindowsManager<TD extends Document,
                                          TVW extends ViewWindow<TD>,
-                                         TMC extends MenuConstructor<TD, TVW>>
+                                         TMC extends MenuConstructor<TVW>>
 {
 	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
 	private TMC menuConstructor;
@@ -160,7 +160,7 @@ public abstract class ViewWindowsManager<TD extends Document,
 		}
 	}
 	
-	public MenuConstructor<TD, TVW> getMenuConstructor()
+	public MenuConstructor<TVW> getMenuConstructor()
 	{
 		return menuConstructor;
 	}

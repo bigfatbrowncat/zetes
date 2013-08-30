@@ -1,7 +1,6 @@
 package tinyviewer;
 
 import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 
 import crossbase.ui.HotKey;
 import crossbase.ui.MenuConstructorBase;
@@ -9,21 +8,21 @@ import crossbase.ui.actions.Action;
 import crossbase.ui.actions.Action.Handler;
 import crossbase.ui.actions.ActionCategory;
 
-public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageDocument, ImageViewWindow>
+public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWindow>
 {
 	public static final int ACTION_FILE_OPEN = MenuConstructorBase.ACTION_FILE_CUSTOM + 1;
 	
 	private SelectionAdapter fileOpenSelectionAdapter;
-	private Action<ImageDocument, ImageViewWindow> openAction;
+	private Action<ImageViewWindow> openAction;
 	
 	public TinyViewerMenuConstructor() {
 		super();
 		
-		ActionCategory<ImageDocument, ImageViewWindow> fileActionCategory = (ActionCategory<ImageDocument, ImageViewWindow>)getActionsRoot().findActionByIdRecursively(ACTION_CATEGORY_FILE);
+		ActionCategory<ImageViewWindow> fileActionCategory = (ActionCategory<ImageViewWindow>)getActionsRoot().findActionByIdRecursively(ACTION_CATEGORY_FILE);
 
-		openAction = new Action<>(ACTION_FILE_EXIT, "&Open");
+		openAction = new Action<>(ACTION_FILE_OPEN, "&Open");
 		openAction.setHotKey(new HotKey(HotKey.MOD1, 'O'));
-		fileActionCategory.addLastItem(openAction);
+		fileActionCategory.addFirstItem(openAction);
 	}
 	
 /*		

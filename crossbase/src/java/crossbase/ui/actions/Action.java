@@ -9,7 +9,7 @@ import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.HotKey;
 
-public class Action<TD extends Document, TVW extends ViewWindow<TD>> extends ActionHierarchyMember<TD, TVW> {
+public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW> {
 	
 	public static class Handler {
 		private SelectionAdapter listener;
@@ -19,6 +19,11 @@ public class Action<TD extends Document, TVW extends ViewWindow<TD>> extends Act
 		public Handler() {
 			enabled = true;
 			visible = true;
+		}
+		
+		public Handler(SelectionAdapter listener) {
+			this();
+			this.listener = listener;
 		}
 		
 		public SelectionAdapter getListener() {

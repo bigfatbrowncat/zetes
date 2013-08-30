@@ -1,9 +1,8 @@
 package crossbase.ui.actions;
 
-import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
 
-public class ActionHierarchyMember<TD extends Document, TVW extends ViewWindow<TD>> {
+public class ActionHierarchyMember<TVW extends ViewWindow<?>> {
 	private int id;
 	private String title;
 	

@@ -4,8 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,7 +24,7 @@ import crossbase.ui.actions.Action.Handler;
 public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, ShellListener, DisposeListener
 {
 	private ViewWindowsManager<TD, ?, ?> windowsManager;
-	private MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor;
+	private MenuConstructor<? extends ViewWindowBase<TD>> menuConstructor;
 	
 	protected Shell shell;
 	private String applicationTitle;
@@ -71,7 +69,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 
 	public ViewWindowBase(String applicationTitle, 
 	                      ViewWindowsManager<TD, ?, ?> windowsManager,
-	                      MenuConstructor<TD, ? extends ViewWindowBase<TD>> menuConstructor)
+	                      MenuConstructor<? extends ViewWindowBase<TD>> menuConstructor)
 	{
 		this.applicationTitle = applicationTitle;
 		this.windowsManager = windowsManager;
@@ -84,18 +82,16 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		return shell.getMenuBar();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public final void open()
 	{
 		shell = constructShell();
 		prepareShell();
 
-		Action<TD, ViewWindowBase<TD>> fullscreenAction = (Action<TD, ViewWindowBase<TD>>)(((MenuConstructor)menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
+		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
 		if (fullscreenAction != null) {
-			Handler handler = new Handler(); 
-			handler.setEnabled(true);
-			handler.setVisible(true);
-			handler.setListener(new SelectionAdapter() {
+			Handler handler = new Handler(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent arg0) {
 					if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
@@ -108,8 +104,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 			fullscreenAction.getHandlers().put(this, handler);
 		}
 		
-		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type 
-		((MenuConstructor)menuConstructor).updateMenus(this);
+		((MenuConstructor<ViewWindow<TD>>)menuConstructor).updateMenus(this);
 
 		shell.layout();
 		shell.open();
@@ -174,16 +169,18 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	{
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void shellDeactivated(ShellEvent arg0)
 	{
-		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
+		((MenuConstructor<ViewWindow<TD>>)menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void shellActivated(ShellEvent arg0)
 	{
-		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
+		((MenuConstructor<ViewWindow<TD>>)menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -194,12 +191,12 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		((ViewWindowsManager)windowsManager).closeWindow(ViewWindowBase.this);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void widgetDisposed(DisposeEvent arg0)
 	{
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
 		 
-		Action<TD, ViewWindowBase<TD>> fullscreenAction = (Action<TD, ViewWindowBase<TD>>)((MenuConstructor)menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN);
+		@SuppressWarnings("unchecked")
+		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
 		if (fullscreenAction != null) {
 			fullscreenAction.getHandlers().remove(this);
 		}
@@ -228,7 +225,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell.addDisposeListener(this);
 	}
 
-	public MenuConstructor<TD, ? extends ViewWindowBase<TD>> getMenuConstructor()
+	public MenuConstructor<? extends ViewWindowBase<TD>> getMenuConstructor()
 	{
 		return menuConstructor;
 	}

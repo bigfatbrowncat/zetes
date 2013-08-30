@@ -7,9 +7,9 @@ import java.util.List;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
 
-public class ActionCategory<TD extends Document, TVW extends ViewWindow<TD>> extends ActionHierarchyMember<TD, TVW> {
+public class ActionCategory<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW> {
 
-	private LinkedList<ActionHierarchyMember<TD, TVW>> items = new LinkedList<>();
+	private LinkedList<ActionHierarchyMember<TVW>> items = new LinkedList<>();
 	
 	public ActionCategory(int id) {
 		super(id);
@@ -19,19 +19,19 @@ public class ActionCategory<TD extends Document, TVW extends ViewWindow<TD>> ext
 		super(id, title);
 	}
 	
-	public void addLastItem(ActionHierarchyMember<TD, TVW> item) {
+	public void addLastItem(ActionHierarchyMember<TVW> item) {
 		items.addLast(item);
 	}
 	
-	public void addFirstItem(ActionHierarchyMember<TD, TVW> item) {
+	public void addFirstItem(ActionHierarchyMember<TVW> item) {
 		items.addFirst(item);
 	}
 	
-	public void addItem(int i, ActionHierarchyMember<TD, TVW> item) {
+	public void addItem(int i, ActionHierarchyMember<TVW> item) {
 		items.add(i, item);
 	}
 	
-	public ActionHierarchyMember<TD, TVW> getItem(int i) {
+	public ActionHierarchyMember<TVW> getItem(int i) {
 		return items.get(i);
 	}
 	
@@ -39,8 +39,8 @@ public class ActionCategory<TD extends Document, TVW extends ViewWindow<TD>> ext
 		return items.size();
 	}
 	
-	public ActionHierarchyMember<TD, TVW> findActionByIdRecursively(int id) {
-		List<ActionCategory<TD, TVW>> inners = new ArrayList<>();
+	public ActionHierarchyMember<TVW> findActionByIdRecursively(int id) {
+		List<ActionCategory<TVW>> inners = new ArrayList<>();
 
 		for (int i = 0; i < items.size(); i++) {
 			if (items.get(i).getId() == id) {
@@ -48,12 +48,12 @@ public class ActionCategory<TD extends Document, TVW extends ViewWindow<TD>> ext
 			}
 			
 			if (items.get(i) instanceof ActionCategory) {
-				inners.add((ActionCategory<TD, TVW>)items.get(i));
+				inners.add((ActionCategory<TVW>)items.get(i));
 			}
 		}
 		
 		for (int i = 0; i < inners.size(); i++) {
-			ActionHierarchyMember<TD, TVW> res = inners.get(i).findActionByIdRecursively(id);
+			ActionHierarchyMember<TVW> res = inners.get(i).findActionByIdRecursively(id);
 			if (res != null) return res;
 		}
 		

@@ -3,7 +3,7 @@ package gltest;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 
-public class GLViewWindowsManager extends ViewWindowsManager<GLDocument, GLViewWindow, MenuConstructorBase<GLDocument, GLViewWindow>>
+public class GLViewWindowsManager extends ViewWindowsManager<GLDocument, GLViewWindow, MenuConstructorBase<GLViewWindow>>
 {
 	private String applicationTitle;
 

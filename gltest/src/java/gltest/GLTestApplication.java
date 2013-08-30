@@ -10,7 +10,7 @@ import crossbase.ui.MenuConstructorBase;
 public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
                                                          GLDocument, 
                                                          GLViewWindow, 
-                                                         MenuConstructorBase<GLDocument, GLViewWindow>,
+                                                         MenuConstructorBase<GLViewWindow>,
                                                          GLViewWindowsManager>
 {
 	private GLViewWindow glViewWindow;
@@ -69,9 +69,9 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
 	}
 
 	@Override
-	public MenuConstructorBase<GLDocument, GLViewWindow> createMenuConstructor()
+	public MenuConstructorBase<GLViewWindow> createMenuConstructor()
 	{
-		return new MenuConstructorBase<GLDocument, GLViewWindow>();
+		return new MenuConstructorBase<GLViewWindow>();
 	}
 
 	@Override

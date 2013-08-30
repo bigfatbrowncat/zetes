@@ -19,7 +19,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import crossbase.abstracts.MenuConstructor;
 import crossbase.ui.ViewWindowBase;
-import crossbase.ui.ViewWindowsManager;
 
 public class GLViewWindow extends ViewWindowBase<GLDocument>
 {
@@ -42,7 +41,7 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	public GLViewWindow(
 			String applicationTitle,
 			GLViewWindowsManager windowsManager,
-			MenuConstructor<GLDocument, ? extends ViewWindowBase<GLDocument>> menuConstructor)
+			MenuConstructor<GLViewWindow> menuConstructor)
 	{
 		super(applicationTitle, windowsManager, menuConstructor);
 	}

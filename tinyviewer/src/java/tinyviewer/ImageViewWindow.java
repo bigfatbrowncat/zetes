@@ -16,9 +16,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.abstracts.MenuConstructor;
 import crossbase.ui.ViewWindowBase;
-import crossbase.ui.ViewWindowsManager;
 
 public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 {
@@ -141,7 +139,7 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		updateImageViewSize();
 		imageView.setVisible(true);
 		shell.forceActive();
-		((MenuConstructor)getMenuConstructor()).updateMenus(this);
+		getMenuConstructor().updateMenus(this);
 	}
 	
 	public boolean isDisposed()
@@ -159,5 +157,10 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	public boolean supportsMaximizing()
 	{
 		return true;
+	}
+	
+	public TinyViewerMenuConstructor getMenuConstructor()
+	{
+		return (TinyViewerMenuConstructor) super.getMenuConstructor();
 	}
 }

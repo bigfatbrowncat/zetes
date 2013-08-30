@@ -7,7 +7,7 @@ import crossbase.ui.ViewWindowsManager;
 public interface Application<TAB extends AboutBox,
                              TD extends Document, 
                              TVW extends ViewWindow<TD>, 
-                             TMC extends MenuConstructor<TD, TVW>,
+                             TMC extends MenuConstructor<TVW>,
                              TVWM extends ViewWindowsManager<TD, TVW, TMC>>
 {
 	String getTitle();

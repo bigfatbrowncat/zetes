@@ -9,7 +9,7 @@ import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.HotKey;
 
-public class Action<TD extends Document, TVW extends ViewWindow<TD>> implements ActionHierarchyMember<TD, TVW> {
+public class Action<TD extends Document, TVW extends ViewWindow<TD>> extends ActionHierarchyMember<TD, TVW> {
 	
 	public static class Handler {
 		private SelectionAdapter listener;
@@ -42,62 +42,12 @@ public class Action<TD extends Document, TVW extends ViewWindow<TD>> implements 
 		}
 	}
 	
-	private int id;
-	private String title;
 	private HotKey hotKey;
-	private boolean globallySupported;
 
 	private HashMap<TVW, Handler> handlers = new HashMap<>();
 	
 	public Action(int id, String title) {
-		if (title == null) throw new IllegalArgumentException("Action title shouldn't be null");
-		this.id = id;
-		this.title = title;
-	}
-	
-	/**
-	 * <p>If this property is set to true, this {@link Action} will
-	 * be shown for every window. In OS X it will be placed
-	 * to the global menu too.</p>
-	 * <p>For windows that don't provide a special handler for it,
-	 * the default one will be used</p>
-	 * 
-	 * <p>If this property is false, this item will be shown only for windows that provide
-	 * a specific handler for it</p>
-	 * 
-	 * @return globallySupported value
-	 */
-	public boolean isGloballySupported() {
-		return globallySupported;
-	}
-
-	/**
-	 * <p>If this property is set to true, this {@link Action} will
-	 * be shown for every window. In OS X it will be placed
-	 * to the global menu too.</p>
-	 * <p>For windows that don't provide a special handler for it,
-	 * the default one will be used.</p>
-	 * 
-	 * <p>If this property is false, this item will be shown only for windows that provide
-	 * a specific handler for it</p>
-	 * 
-	 * @return globallySupported value
-	 */
-	public void setGloballySupported(boolean value) {
-		globallySupported = value;
-	}
-	
-	public int getId() {
-		return id;
-	}
-	
-	@Override
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		if (title == null) throw new IllegalArgumentException("Action title shouldn't be null");
-		this.title = title;
+		super(id, title);
 	}
 	
 	public HotKey getHotKey() {
@@ -107,10 +57,19 @@ public class Action<TD extends Document, TVW extends ViewWindow<TD>> implements 
 		this.hotKey = hotKey;
 	}
 	
+	
 	/**
-	 * You can set an action handler for every window. If you want to set
-	 * the default handler (which isn't connected to any window), use the key {@code null}.
-	 * @return Map that connects view windows and handlers
+	 * <p>You can set an action handler for every window. If you want to set
+	 * the default handler (which isn't connected to any window), use the key {@code null}.</p>
+	 * 
+	 * <p>If default handler is specified for the {@link Action}, this action is shown for every
+	 * window (and in the case when no windows are present on OS X).</p>
+	 * <p>If a {@link Handler} is specified for the active {@link ViewWindow}, it overrides the
+	 * default one.</p>
+	 * <p>If no default {@link Handler} specified, the action should be shown only for
+	 * windows that provide a specific handler for the {@link Action}</p>
+	 * 
+	 * @return A modifiable {@link Map} that connects view windows and handlers
 	 */
 	public Map<TVW, Handler> getHandlers() {
 		return handlers;

@@ -60,6 +60,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 		@Override
 		public void widgetSelected(SelectionEvent arg0)
 		{
+			System.out.println("Open action running");
 			Shell dummyShell = new Shell(Display.getDefault());
 			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN | SWT.MULTI);
 			fileDialog.setText("Open image");

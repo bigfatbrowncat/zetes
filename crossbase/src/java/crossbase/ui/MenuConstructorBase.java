@@ -17,22 +17,38 @@ import crossbase.ui.actions.ActionCategory;
 
 public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>> implements MenuConstructor<TD, TVW>
 {
-	public final static int ACTION_FILE_EXIT = 101;
-	public final static int ACTION_WINDOW_FULLSCREEN = 301;
+	public final static int ACTION_CATEGORY_ROOT = 0;
+
+	public final static int ACTION_CATEGORY_FILE = 1000;
+	public final static int ACTION_FILE_EXIT = 1001;
+	public final static int ACTION_FILE_CUSTOM = 1100;
+
+	public final static int ACTION_CATEGORY_WINDOW = 3000;
+	public final static int ACTION_WINDOW_FULLSCREEN = 3001;
+	public final static int ACTION_WINDOW_LIST_START = 3100;
+	public final static int ACTION_WINDOW_CUSTOM = 3200;
 	
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private ActionCategory<TD, TVW> actionsRoot = new ActionCategory<>(""); 
+	private ActionCategory<TD, TVW> actionsRoot = new ActionCategory<TD, TVW>(ACTION_CATEGORY_ROOT); 
 	
 	public ActionCategory<TD, TVW> getActionsRoot() {
 		return actionsRoot;
 	}
 	
 	public MenuConstructorBase() {
-		ActionCategory<TD, TVW> fileMenu = new ActionCategory<>("&File");
-		actionsRoot.addItem(fileMenu);
-		
-		Action<TD, TVW> exitItem = new Action<TD, TVW>(ACTION_FILE_EXIT, "E&xit");
-		fileMenu.addItem(exitItem);
+		ActionCategory<TD, TVW> fileActionCategory = new ActionCategory<>(ACTION_CATEGORY_FILE, "&File");
+		actionsRoot.addLastItem(fileActionCategory);
+
+		Action<TD, TVW> exitAction = new Action<TD, TVW>(ACTION_FILE_EXIT, "E&xit");
+		fileActionCategory.addLastItem(exitAction);
+	
+
+		ActionCategory<TD, TVW> windowActionCategory = new ActionCategory<>(ACTION_CATEGORY_WINDOW, "&Window");
+		actionsRoot.addLastItem(windowActionCategory);
+
+		Action<TD, TVW> fullscreenAction = new Action<TD, TVW>(ACTION_WINDOW_FULLSCREEN, "&Fullscreen");
+		fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
+		windowActionCategory.addLastItem(fullscreenAction);
 	}
 
 	
@@ -45,7 +61,7 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
 	{
 		this.exitSelectionAdapter = exitSelectionAdapter;
-		Map<TVW, Handler> handlers = actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT).getHandlers();
+		Map<TVW, Handler> handlers = ((Action<TD, TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT)).getHandlers();
 		if (handlers.get(null) == null) {
 			handlers.put(null, new Handler());
 		}
@@ -67,19 +83,30 @@ public class MenuConstructorBase<TD extends Document, TVW extends ViewWindow<TD>
 	private boolean addMenusInsideCategory(TVW window, ActionCategory<TD, TVW> category, Menu categoryMenu) {
 		boolean addedAnyActions = false;
 		
+		System.out.println("adding menus " + category.getTitle());
+		
 		for (int i = 0; i < category.getItemsCount(); i++) {
 			if (category.getItem(i) instanceof Action) {
 				Action<TD, TVW> actionItem = (Action<TD, TVW>)category.getItem(i);
 				
 				// If item is globally supported or if it has a specific handler for this window
-				if (actionItem.isGloballySupported() || actionItem.getHandlers().containsKey(window)) {
-					// We get the handler
+				if (actionItem.getHandlers().containsKey(null) || actionItem.getHandlers().containsKey(window)) {
+
+					// Getting the handler. A specific one should override the default one
 					Handler usingHandler = actionItem.getHandlers().get(window) != null ? actionItem.getHandlers().get(window) : actionItem.getHandlers().get(null);
 					
 					// If we have any handler
-					if (usingHandler != null) {
+					if (usingHandler != null && usingHandler.isVisible()) {
+						System.out.println("adding menu " + actionItem.getTitle());
 						MenuItem menuItem = new MenuItem(categoryMenu, SWT.NONE);
-						menuItem.setText(actionItem.getTitle());
+						
+						if (actionItem.getHotKey() == null) {
+							menuItem.setText(actionItem.getTitle());
+						} else {
+							menuItem.setText(actionItem.getTitle() + "\t" + actionItem.getHotKey().toString());
+							menuItem.setAccelerator(actionItem.getHotKey().toAccelerator());
+						}
+
 						menuItem.setEnabled(usingHandler.isEnabled());
 						menuItem.addSelectionListener(usingHandler.getListener());
 						addedAnyActions = true;

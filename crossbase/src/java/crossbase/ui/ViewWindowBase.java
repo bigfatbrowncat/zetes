@@ -90,7 +90,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell = constructShell();
 		prepareShell();
 
-		Action<TD, ViewWindowBase<TD>> fullscreenAction = ((MenuConstructor)menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN);
+		Action<TD, ViewWindowBase<TD>> fullscreenAction = (Action<TD, ViewWindowBase<TD>>)(((MenuConstructor)menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
 		if (fullscreenAction != null) {
 			Handler handler = new Handler(); 
 			handler.setEnabled(true);
@@ -177,13 +177,13 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	@Override
 	public void shellDeactivated(ShellEvent arg0)
 	{
-		((MenuConstructor)ViewWindowBase.this.menuConstructor).updateMenus(ViewWindowBase.this);
+		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
 	@Override
 	public void shellActivated(ShellEvent arg0)
 	{
-		((MenuConstructor)ViewWindowBase.this.menuConstructor).updateMenus(ViewWindowBase.this);
+		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -199,7 +199,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	{
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
 		 
-		Action<TD, ViewWindowBase<TD>> fullscreenAction = ((MenuConstructor)ViewWindowBase.this.menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN);
+		Action<TD, ViewWindowBase<TD>> fullscreenAction = (Action<TD, ViewWindowBase<TD>>)((MenuConstructor)menuConstructor).getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN);
 		if (fullscreenAction != null) {
 			fullscreenAction.getHandlers().remove(this);
 		}

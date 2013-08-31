@@ -23,4 +23,5 @@ public interface ViewWindow<TD extends Document>
 	boolean supportsMaximizing();
 	
 	Shell getShell();
+	String getTitle();
 }

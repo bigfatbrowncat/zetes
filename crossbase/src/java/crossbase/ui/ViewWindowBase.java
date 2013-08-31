@@ -40,6 +40,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	}
 	
 	@Override
+	public String getTitle() {
+		return shell.getText();
+	}
+	
+	@Override
 	public void setDocument(TD document)
 	{
 		this.document = document;
@@ -93,7 +98,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell = constructShell();
 		prepareShell();
 
-		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
+		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_VIEW_FULLSCREEN));
 		if (fullscreenAction != null) {
 			Handler<ViewWindowBase<TD>> handler = new Handler<ViewWindowBase<TD>>() {
 
@@ -198,7 +203,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
 		 
 		@SuppressWarnings("unchecked")
-		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
+		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_VIEW_FULLSCREEN));
 		if (fullscreenAction != null) {
 			fullscreenAction.getHandlers().remove(this);
 		}

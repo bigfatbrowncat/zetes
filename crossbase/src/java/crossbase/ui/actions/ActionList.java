@@ -10,6 +10,7 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 
 	private LinkedList<ActionHierarchyMember<TVW>> items = new LinkedList<>();
 	private boolean isSubMenu = true;
+	private boolean isRadioItems;
 	
 	public ActionList(int id) {
 		super(id);
@@ -73,7 +74,15 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 	public void setSubMenu(boolean isSubMenu) {
 		this.isSubMenu = isSubMenu;
 	}
-		
+	
+	public boolean isRadioItems() {
+		return isRadioItems;
+	}
+	
+	public void setRadioItems(boolean radioItems) {
+		this.isRadioItems = radioItems;
+	}
+	
 	public ActionHierarchyMember<TVW> findActionByIdRecursively(int id) {
 		List<ActionList<TVW>> inners = new ArrayList<>();
 

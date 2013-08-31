@@ -36,10 +36,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
                                       TMC extends MenuConstructorBase<TVW>,
                                       TVWM extends ViewWindowsManager<TD, TVW, TMC>> implements Application<TAB, TD, TVW, TMC, TVWM>
 {
-	private final int OSX_SYSTEM_MENU_ABOUT = -1;
-	private final int OSX_SYSTEM_MENU_PREFERENCES = -2;
-	private final int OSX_SYSTEM_MENU_QUIT = -6;
-	
 	private boolean dummyShell = false;
 	private Shell shell;
 	private AboutBox aboutBox = null;
@@ -143,6 +139,11 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			}
 		}
 		
+		@Override
+		public String getTitle() {
+			return "About " + ApplicationBase.this.getTitle();
+		}
+		
 	};
 	
 	private Handler<TVW> preferencesHandler = new Handler<TVW> () {
@@ -237,63 +238,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			// Adding OS X system menu handlers
 			if (SWT.getPlatform().equals("cocoa"))
 			{
-				for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
-				{
-					MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
-					
-					switch (item.getID())
-					{
-					case OSX_SYSTEM_MENU_ABOUT:
-						item.addSelectionListener(new SelectionListener() {
-							
-							@Override
-							public void widgetSelected(SelectionEvent arg0) {
-								aboutHandler.execute(viewWindowsManager.getActiveWindow());
-								
-							}
-							
-							@Override
-							public void widgetDefaultSelected(SelectionEvent arg0) {
-								// TODO Auto-generated method stub
-								
-							}
-						});
-						break;
-					case OSX_SYSTEM_MENU_PREFERENCES:
-						item.addSelectionListener(new SelectionListener() {
-							
-							@Override
-							public void widgetSelected(SelectionEvent arg0) {
-								preferencesHandler.execute(viewWindowsManager.getActiveWindow());
-								
-							}
-							
-							@Override
-							public void widgetDefaultSelected(SelectionEvent arg0) {
-								// TODO Auto-generated method stub
-								
-							}
-						});
-						break;
-					case OSX_SYSTEM_MENU_QUIT:
-						item.addSelectionListener(new SelectionListener() {
-							
-							@Override
-							public void widgetSelected(SelectionEvent arg0) {
-								exitHandler.execute(viewWindowsManager.getActiveWindow());
-								
-							}
-							
-							@Override
-							public void widgetDefaultSelected(SelectionEvent arg0) {
-								// TODO Auto-generated method stub
-								
-							}
-						});
-						break;
-					}
-				}
-				
 				// Add listener to OpenDocument event thus user can open documents
 				// with our Cocoa application
 				Display.getDefault().addListener(SWT.OpenDocument, openDocumentListener);

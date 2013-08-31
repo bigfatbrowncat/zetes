@@ -13,6 +13,10 @@ public abstract class Handler<TVW extends ViewWindow<?>> {
 		return true;
 	}
 	
+	public boolean isChecked() {
+		return false;
+	}
+	
 	/**
 	 * This function should return title for dynamically titled items.
 	 * If it returns <code>null</code>, the default {@link Action} title is used.

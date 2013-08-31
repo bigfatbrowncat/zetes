@@ -26,12 +26,19 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	public final static int ACTION_FILE_EXIT = 1001;
 	public final static int ACTION_FILE_CUSTOM = 1100;
 
-	public final static int ACTION_CATEGORY_WINDOW = 3000;
-	public final static int ACTION_WINDOW_FULLSCREEN = 3001;
-	public final static int ACTION_LIST_WINDOWS_LIST = 3100;
-	public final static int ACTION_WINDOW_CUSTOM = 3200;
+	public final static int ACTION_EDIT_PREFERENCES = 2001;
+
+	public final static int ACTION_CATEGORY_VIEW = 3000;
 	
-	private Handler<TVW> exitHandler, aboutHandler;
+	public final static int ACTION_CATEGORY_WINDOW = 4000;
+	public final static int ACTION_VIEW_FULLSCREEN = 4001;
+	public final static int ACTION_LIST_WINDOWS_LIST = 4100;
+	public final static int ACTION_WINDOW_CUSTOM = 4200;
+
+	public final static int ACTION_CATEGORY_HELP = 5000;
+	public final static int ACTION_HELP_ABOUT = 5001;
+	
+	private Handler<TVW> exitHandler, aboutHandler, preferencesHandler;
 	
 	private ActionList<TVW> actionsRoot = new ActionList<TVW>(ACTION_CATEGORY_ROOT);
 	private ActionList<TVW> windowsListActionList;
@@ -49,7 +56,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		@Override
 		public void windowOpened(final TVW window) {
 			final Action<TVW> thisWindowAction = new Action<>(ActionHierarchyMember.NO_ID);
-			thisWindowAction.setTitle(window.getDocument().getTitle());
+			thisWindowAction.setTitle(window.getTitle());
 			thisWindowAction.getHandlers().put(null, new Handler<TVW>() {
 
 				@Override
@@ -71,6 +78,10 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 						return new HotKey(HotKey.MOD1, (char)('1' + index));
 					}
 					else return null;
+				}
+				
+				public boolean isChecked() {
+					return window.isActive();
 				}
 			});
 			viewWindowSelectionActions.put(window, thisWindowAction);
@@ -105,26 +116,45 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	}
 	
 	public MenuConstructorBase() {
-		
+
 		// File action list
 		ActionList<TVW> fileActionCategory = new ActionList<>(ACTION_CATEGORY_FILE, "&File");
 		actionsRoot.addLastItem(fileActionCategory);
 
-		Action<TVW> exitAction = new Action<TVW>(ACTION_FILE_EXIT, "E&xit");
-		fileActionCategory.addLastItem(exitAction);
-	
+		// Window action list
+		ActionList<TVW> viewActionCategory = new ActionList<>(ACTION_CATEGORY_VIEW, "&View");
+		actionsRoot.addLastItem(viewActionCategory);
+
+		Action<TVW> fullscreenAction = new Action<TVW>(ACTION_VIEW_FULLSCREEN, "&Fullscreen");
+		if (SWT.getPlatform().equals("cocoa")) {
+			fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.CTRL, 'F'));
+		} else {
+			fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
+		}
+		viewActionCategory.addLastItem(fullscreenAction);
+		
 		// Window action list
 		ActionList<TVW> windowActionCategory = new ActionList<>(ACTION_CATEGORY_WINDOW, "&Window");
 		actionsRoot.addLastItem(windowActionCategory);
-
-		Action<TVW> fullscreenAction = new Action<TVW>(ACTION_WINDOW_FULLSCREEN, "&Fullscreen");
-		fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
-		windowActionCategory.addLastItem(fullscreenAction);
-		
 		// Windows list action list
 		windowsListActionList = new ActionList<>(ACTION_LIST_WINDOWS_LIST);
 		windowsListActionList.setSubMenu(false);
+		windowsListActionList.setRadioItems(true);
 		windowActionCategory.addLastItem(windowsListActionList);
+
+		// Help action list
+		ActionList<TVW> helpActionCategory = new ActionList<>(ACTION_CATEGORY_HELP, "&Help");
+		actionsRoot.addLastItem(helpActionCategory);
+
+		
+		if (!SWT.getPlatform().equals("cocoa")) {
+	
+			Action<TVW> exitAction = new Action<TVW>(ACTION_FILE_EXIT, "E&xit");
+			fileActionCategory.addLastItem(exitAction);
+	
+			Action<TVW> aboutAction = new Action<TVW>(ACTION_HELP_ABOUT, "&About");
+			helpActionCategory.addLastItem(aboutAction);
+		}
 	}
 
 	
@@ -137,10 +167,30 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	{
 		this.exitHandler = exitHandler;
 
-		Map<TVW, Handler<TVW>> handlers = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT)).getHandlers();
-		handlers.put(null, exitHandler);
+		Action<TVW> action = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT));
+		if (action != null) {
+			Map<TVW, Handler<TVW>> handlers = action.getHandlers();
+			handlers.put(null, exitHandler);
+		}
 	}
 
+	public Handler<TVW> getPreferencesHandler()
+	{
+		return preferencesHandler;
+	}
+
+	public void setPreferencesHandler(Handler<TVW> exitHandler)
+	{
+		this.preferencesHandler = exitHandler;
+
+		Action<TVW> action = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_EDIT_PREFERENCES));
+		if (action != null) {
+			Map<TVW, Handler<TVW>> handlers = action.getHandlers();
+			handlers.put(null, preferencesHandler);
+		}
+	}
+	
+	
 	public Handler<TVW> getAboutHandler()
 	{
 		return aboutHandler;
@@ -149,7 +199,12 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	public void setAboutHandler(Handler<TVW> aboutHandler)
 	{
 		this.aboutHandler = aboutHandler;
-		// TODO Set handler to a proper item
+
+		Action<TVW> action = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_HELP_ABOUT));
+		if (action != null) {
+			Map<TVW, Handler<TVW>> handlers = action.getHandlers();
+			handlers.put(null, aboutHandler);
+		}
 	}
 
 	private boolean addMenusForActionList(final TVW window, ActionList<TVW> category, Menu currentMenu) {
@@ -191,18 +246,26 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 						
 						// If we have any handler
 						if (usingHandler != null && usingHandler.isVisible()) {
-							MenuItem menuItem = new MenuItem(currentMenu, SWT.NONE);
+							
+							int flags = SWT.NONE;
+							if (category.isRadioItems()) flags |= SWT.RADIO;
+							
+							MenuItem menuItem = new MenuItem(currentMenu, flags);
 
 							HotKey hotHey = usingHandler.getHotKey();
 							if (hotHey == null) hotHey = actionItem.getHotKey();
+							
+							String title = usingHandler.getTitle();
+							if (title == null) title = actionItem.getTitle();
 
 							if (hotHey == null) {
-								menuItem.setText(actionItem.getTitle());
+								menuItem.setText(title);
 							} else {
-								menuItem.setText(actionItem.getTitle() + "\t" + hotHey.toString());
+								menuItem.setText(title + "\t" + hotHey.toString());
 								menuItem.setAccelerator(hotHey.toAccelerator());
 							}
 
+							menuItem.setSelection(usingHandler.isChecked());
 							menuItem.setEnabled(usingHandler.isEnabled());
 							menuItem.addSelectionListener(new SelectionListener() {
 								
@@ -243,6 +306,71 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 			}
 			
 			addMenusForActionList(window, actionsRoot, windowMenu);
+		}
+		
+		final int OSX_SYSTEM_MENU_ABOUT = -1;
+		final int OSX_SYSTEM_MENU_PREFERENCES = -2;
+		final int OSX_SYSTEM_MENU_QUIT = -6;
+		
+		// Adding OS X system menu handlers
+		if (SWT.getPlatform().equals("cocoa"))
+		{
+			for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
+			{
+				MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
+				
+				switch (item.getID())
+				{
+				case OSX_SYSTEM_MENU_ABOUT:
+					item.addSelectionListener(new SelectionListener() {
+						
+						@Override
+						public void widgetSelected(SelectionEvent arg0) {
+							aboutHandler.execute(viewWindowsManager.getActiveWindow());
+							
+						}
+						
+						@Override
+						public void widgetDefaultSelected(SelectionEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+					break;
+				case OSX_SYSTEM_MENU_PREFERENCES:
+					item.addSelectionListener(new SelectionListener() {
+						
+						@Override
+						public void widgetSelected(SelectionEvent arg0) {
+							preferencesHandler.execute(viewWindowsManager.getActiveWindow());
+							
+						}
+						
+						@Override
+						public void widgetDefaultSelected(SelectionEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+					break;
+				case OSX_SYSTEM_MENU_QUIT:
+					item.addSelectionListener(new SelectionListener() {
+						
+						@Override
+						public void widgetSelected(SelectionEvent arg0) {
+							exitHandler.execute(viewWindowsManager.getActiveWindow());
+							
+						}
+						
+						@Override
+						public void widgetDefaultSelected(SelectionEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+					break;
+				}
+			}
 		}
 	}
 	

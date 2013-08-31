@@ -36,6 +36,10 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 		items.add(i, item);
 	}
 	
+	public void removeItem(ActionHierarchyMember<TVW> item) {
+		items.remove(item);
+	}
+	
 	public ActionHierarchyMember<TVW> getItem(int i) {
 		return items.get(i);
 	}

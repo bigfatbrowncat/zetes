@@ -1,16 +1,20 @@
 package crossbase.ui;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.actions.Action;
+import crossbase.ui.actions.ActionHierarchyMember;
 import crossbase.ui.actions.Action.Handler;
 import crossbase.ui.actions.ActionList;
 
@@ -24,30 +28,88 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 
 	public final static int ACTION_CATEGORY_WINDOW = 3000;
 	public final static int ACTION_WINDOW_FULLSCREEN = 3001;
-	public final static int ACTION_WINDOW_LIST_START = 3100;
+	public final static int ACTION_LIST_WINDOWS_LIST = 3100;
 	public final static int ACTION_WINDOW_CUSTOM = 3200;
 	
 	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
-	private ActionList<TVW> actionsRoot = new ActionList<TVW>(ACTION_CATEGORY_ROOT); 
 	
+	private ActionList<TVW> actionsRoot = new ActionList<TVW>(ACTION_CATEGORY_ROOT);
+	private ActionList<TVW> windowsListActionList;
+	private HashMap<TVW, Action<TVW>> viewWindowSelectionActions = new HashMap<TVW, Action<TVW>>();
+	
+	private ViewWindowsManager<?, TVW, ? extends MenuConstructorBase<TVW>> viewWindowsManager;
+	
+	private ViewWindowsManagerListener<TVW> viewWindowsManagerListener = new ViewWindowsManagerListener<TVW>() {
+
+		@Override
+		public void lastWindowClosed() {
+			// do nothing
+		}
+
+		@Override
+		public void windowOpened(final TVW window) {
+			System.out.println("window opened");
+			Action<TVW> thisWindowAction = new Action<>(ActionHierarchyMember.NO_ID);
+			thisWindowAction.setTitle(window.getDocument().getTitle());
+			thisWindowAction.getHandlers().put(null, new Handler(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent arg0)
+				{
+					window.activate(false);
+				}
+			}));
+			viewWindowSelectionActions.put(window, thisWindowAction);
+			windowsListActionList.addLastItem(thisWindowAction);
+		}
+
+		@Override
+		public void windowClosed(TVW window) {
+			System.out.println("window closed");
+			Action<TVW> thisWindowAction = viewWindowSelectionActions.get(window);
+			windowsListActionList.removeItem(thisWindowAction);
+		}
+	};
+	
+	public ViewWindowsManager<?, TVW, ? extends MenuConstructorBase<TVW>> getViewWindowsManager() {
+		return viewWindowsManager;
+	}
+
+	public void setViewWindowsManager(ViewWindowsManager<?, TVW, ? extends MenuConstructorBase<TVW>> viewWindowsManager) {
+		if (this.viewWindowsManager != null) {
+			this.viewWindowsManager.removeListener(viewWindowsManagerListener);
+		}
+		
+		this.viewWindowsManager = viewWindowsManager;
+		
+		if (this.viewWindowsManager != null) {
+			viewWindowsManager.addListener(viewWindowsManagerListener);
+		}
+	}
+
 	public ActionList<TVW> getActionsRoot() {
 		return actionsRoot;
 	}
 	
 	public MenuConstructorBase() {
+		
+		// File action list
 		ActionList<TVW> fileActionCategory = new ActionList<>(ACTION_CATEGORY_FILE, "&File");
 		actionsRoot.addLastItem(fileActionCategory);
 
 		Action<TVW> exitAction = new Action<TVW>(ACTION_FILE_EXIT, "E&xit");
 		fileActionCategory.addLastItem(exitAction);
 	
-
+		// Window action list
 		ActionList<TVW> windowActionCategory = new ActionList<>(ACTION_CATEGORY_WINDOW, "&Window");
 		actionsRoot.addLastItem(windowActionCategory);
 
 		Action<TVW> fullscreenAction = new Action<TVW>(ACTION_WINDOW_FULLSCREEN, "&Fullscreen");
 		fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
 		windowActionCategory.addLastItem(fullscreenAction);
+		
+		// Windows list action list
+		windowsListActionList = new ActionList<>(ACTION_LIST_WINDOWS_LIST);
+		windowsListActionList.setSubMenu(false);
+		windowActionCategory.addLastItem(windowsListActionList);
 	}
 
 	
@@ -156,6 +218,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 			addMenusForActionList(window, actionsRoot, windowMenu);
 		}
 	}
+	
 	
 //
 //	private ArrayList<TVW> viewWindows;

@@ -138,13 +138,16 @@ public abstract class ViewWindowsManager<TD extends Document,
 				addWindowForDocument(document, vw);
 
 				callListenersWindowOpened(vw);
+				menuConstructor.updateMenus(vw);
 				
 				return vw; 
 			}
 		}
 		
 		// If we haven't found an empty window, we open a new one
-		return openNewWindow(document);
+		TVW vw = openNewWindow(document);
+		menuConstructor.updateMenus(vw);
+		return vw;
 	}
 	
 	public Object[] openViewForDocuments(TD[] documents)

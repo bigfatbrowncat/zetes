@@ -224,6 +224,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			viewWindowsManager.addListener(viewWindowsManagerListener);
 
 			menuConstructor = createMenuConstructor();
+			menuConstructor.setViewWindowsManager(viewWindowsManager);
 			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
 			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
 			menuConstructor.updateMenus(null);

@@ -55,9 +55,9 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	{
 		super(applicationTitle, windowsManager, menuConstructor);
 		
-		ActionList<ImageViewWindow> windowActionCategory = (ActionList<ImageViewWindow>) menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_CATEGORY_WINDOW);
+/*		ActionList<ImageViewWindow> windowActionCategory = (ActionList<ImageViewWindow>) menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_CATEGORY_WINDOW);
 		
-		Action<ImageViewWindow> selectWindowAction = new Action<>(MenuConstructorBase.ACTION_WINDOW_LIST_START, applicationTitle);
+		Action<ImageViewWindow> selectWindowAction = new Action<>(MenuConstructorBase.ACTION_WINDOW_LIST_START, applicationTitle);*/
 	}
 	
 	/**

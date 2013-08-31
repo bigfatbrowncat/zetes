@@ -74,6 +74,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		this.applicationTitle = applicationTitle;
 		this.windowsManager = windowsManager;
 		this.menuConstructor = menuConstructor;
+		
 	}
 	
 	@Override

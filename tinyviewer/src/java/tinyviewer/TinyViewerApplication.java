@@ -4,11 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -16,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import crossbase.ApplicationBase;
 import crossbase.ui.DefaultAboutBox;
+import crossbase.ui.actions.Handler;
 
 public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
                                                              ImageDocument,
@@ -55,11 +51,10 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 		}
 	}
 	
-	private SelectionAdapter fileOpenSelectionAdapter = new SelectionAdapter()
-	{
+	private Handler<ImageViewWindow> fileOpenHandler = new Handler<ImageViewWindow>() {
+		
 		@Override
-		public void widgetSelected(SelectionEvent arg0)
-		{
+		public void execute(ImageViewWindow window) {
 			System.out.println("Open action running");
 			Shell dummyShell = new Shell(Display.getDefault());
 			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN | SWT.MULTI);
@@ -89,10 +84,10 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 				
 				getViewWindowsManager().openViewForDocuments(documents.toArray(new ImageDocument[] {}));
 			}
-			dummyShell.dispose();
+			dummyShell.dispose();		
 		}
 	};
-		
+	
 	public TinyViewerApplication()
 	{
 
@@ -113,7 +108,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 	public TinyViewerMenuConstructor createMenuConstructor()
 	{
 		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
-		menuConstructor.setFileOpenSelectionAdapter(fileOpenSelectionAdapter);
+		menuConstructor.setFileOpenHandler(fileOpenHandler);
 		return menuConstructor;
 	}
 

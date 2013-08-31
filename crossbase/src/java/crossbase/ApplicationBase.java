@@ -3,6 +3,7 @@ package crossbase;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -18,6 +19,7 @@ import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
+import crossbase.ui.actions.Handler;
 
 //**
 // * <p>This class is the base for Multi Document architecture.</p>
@@ -114,29 +116,42 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		}
 	};
 	
-	private SelectionAdapter aboutSelectionAdapter = new SelectionAdapter()
-	{
+	private Handler<TVW> exitHandler = new Handler<TVW> () {
+
 		@Override
-		public void widgetSelected(final SelectionEvent arg0)
-		{
-			if (arg0.display != null)
+		public void execute(TVW window) {
+			viewWindowsManager.closeAllWindows();
+			if (Display.getDefault() != null && !Display.getDefault().isDisposed())
 			{
-				showAbout(arg0.display.getActiveShell());
+				terminated = true;
+			}
+		}
+		
+	};
+	
+	private Handler<TVW> aboutHandler = new Handler<TVW> () {
+
+		@Override
+		public void execute(TVW window) {
+			if (window != null)
+			{
+				showAbout(window.getShell());
 			}
 			else
 			{
 				showAbout(null);
 			}
 		}
+		
 	};
 	
-	private SelectionAdapter preferencesSelectionAdapter = new SelectionAdapter()
-	{
+	private Handler<TVW> preferencesHandler = new Handler<TVW> () {
+
 		@Override
-		public void widgetSelected(SelectionEvent arg0)
-		{
+		public void execute(TVW window) {
 			showPreferences();
 		}
+		
 	};
 	
 	boolean terminated = false;
@@ -169,19 +184,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		Display display = Display.getDefault();
 		display.sleep();
 	}
-	
-	private SelectionAdapter exitSelectionAdapter = new SelectionAdapter()
-	{
-		@Override
-		public void widgetSelected(SelectionEvent arg0)
-		{
-			viewWindowsManager.closeAllWindows();
-			if (Display.getDefault() != null && !Display.getDefault().isDisposed())
-			{
-				terminated = true;
-			}
-		}
-	};
 	
 	protected ApplicationBase()
 	{
@@ -225,8 +227,8 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 
 			menuConstructor = createMenuConstructor();
 			menuConstructor.setViewWindowsManager(viewWindowsManager);
-			menuConstructor.setExitSelectionAdapter(exitSelectionAdapter);
-			menuConstructor.setAboutSelectionAdapter(aboutSelectionAdapter);
+			menuConstructor.setExitHandler(exitHandler);
+			menuConstructor.setAboutHandler(aboutHandler);
 			menuConstructor.updateMenus(null);
 			
 			// Here we guarantee that menuConstructor type is compatible to viewWindowsManager
@@ -242,13 +244,52 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 					switch (item.getID())
 					{
 					case OSX_SYSTEM_MENU_ABOUT:
-						item.addSelectionListener(aboutSelectionAdapter);
+						item.addSelectionListener(new SelectionListener() {
+							
+							@Override
+							public void widgetSelected(SelectionEvent arg0) {
+								aboutHandler.execute(viewWindowsManager.getActiveWindow());
+								
+							}
+							
+							@Override
+							public void widgetDefaultSelected(SelectionEvent arg0) {
+								// TODO Auto-generated method stub
+								
+							}
+						});
 						break;
 					case OSX_SYSTEM_MENU_PREFERENCES:
-						item.addSelectionListener(preferencesSelectionAdapter);
+						item.addSelectionListener(new SelectionListener() {
+							
+							@Override
+							public void widgetSelected(SelectionEvent arg0) {
+								preferencesHandler.execute(viewWindowsManager.getActiveWindow());
+								
+							}
+							
+							@Override
+							public void widgetDefaultSelected(SelectionEvent arg0) {
+								// TODO Auto-generated method stub
+								
+							}
+						});
 						break;
 					case OSX_SYSTEM_MENU_QUIT:
-						item.addSelectionListener(exitSelectionAdapter);
+						item.addSelectionListener(new SelectionListener() {
+							
+							@Override
+							public void widgetSelected(SelectionEvent arg0) {
+								exitHandler.execute(viewWindowsManager.getActiveWindow());
+								
+							}
+							
+							@Override
+							public void widgetDefaultSelected(SelectionEvent arg0) {
+								// TODO Auto-generated method stub
+								
+							}
+						});
 						break;
 					}
 				}

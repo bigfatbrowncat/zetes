@@ -41,6 +41,10 @@ public abstract class ViewWindowsManager<TD extends Document,
 		}
 	}
 	
+	public TVW getActiveWindow() {
+		return null;
+	}
+	
 	/**
 	 * Closes the window. If no windows remain opened 
 	 * and we are not in OS X, terminates the application.

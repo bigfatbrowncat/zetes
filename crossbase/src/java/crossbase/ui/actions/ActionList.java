@@ -44,6 +44,10 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 		return items.get(i);
 	}
 	
+	public int indexOf(ActionHierarchyMember<TVW> item) {
+		return items.indexOf(item);
+	}
+	
 	public int getItemsCount() {
 		return items.size();
 	}

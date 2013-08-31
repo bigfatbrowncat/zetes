@@ -1,18 +1,16 @@
 package tinyviewer;
 
-import org.eclipse.swt.events.SelectionAdapter;
-
 import crossbase.ui.HotKey;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.actions.Action;
-import crossbase.ui.actions.Action.Handler;
 import crossbase.ui.actions.ActionList;
+import crossbase.ui.actions.Handler;
 
 public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWindow>
 {
 	public static final int ACTION_FILE_OPEN = MenuConstructorBase.ACTION_FILE_CUSTOM + 1;
 	
-	private SelectionAdapter fileOpenSelectionAdapter;
+	private Handler<ImageViewWindow> fileOpenHandler;
 	private Action<ImageViewWindow> openAction;
 	
 	public TinyViewerMenuConstructor() {
@@ -38,18 +36,17 @@ public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWind
 		openMenuItem.setAccelerator(openHotKey.toAccelerator());
 	}
 */
-	public SelectionAdapter getFileOpenSelectionAdapter()
+	public Handler<ImageViewWindow> getFileOpenHandler()
 	{
-		return fileOpenSelectionAdapter;
+		return fileOpenHandler;
 	}
 
-	public void setFileOpenSelectionAdapter(SelectionAdapter fileOpenSelectionAdapter)
+	public void setFileOpenHandler(Handler<ImageViewWindow> fileOpenHandler)
 	{
-		this.fileOpenSelectionAdapter = fileOpenSelectionAdapter;
+		this.fileOpenHandler = fileOpenHandler;
 		if (openAction.getHandlers().get(null) == null) {
-			Handler h = new Handler();
-			h.setListener(fileOpenSelectionAdapter);
-			openAction.getHandlers().put(null, h);
+
+			openAction.getHandlers().put(null, fileOpenHandler);
 		}
 	}
 

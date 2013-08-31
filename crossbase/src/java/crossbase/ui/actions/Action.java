@@ -10,44 +10,9 @@ import crossbase.ui.HotKey;
 
 public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW> {
 	
-	public static class Handler {
-		private SelectionAdapter listener;
-		private boolean enabled = true;
-		private boolean visible = true;
-		
-		public Handler() {
-			enabled = true;
-			visible = true;
-		}
-		
-		public Handler(SelectionAdapter listener) {
-			this();
-			this.listener = listener;
-		}
-		
-		public SelectionAdapter getListener() {
-			return listener;
-		}
-		public void setListener(SelectionAdapter listener) {
-			this.listener = listener;
-		}
-		public boolean isEnabled() {
-			return enabled;
-		}
-		public void setEnabled(boolean enabled) {
-			this.enabled = enabled;
-		}
-		public boolean isVisible() {
-			return visible;
-		}
-		public void setVisible(boolean visible) {
-			this.visible = visible;
-		}
-	}
-	
 	private HotKey hotKey;
 
-	private HashMap<TVW, Handler> handlers = new HashMap<>();
+	private HashMap<TVW, Handler<TVW>> handlers = new HashMap<>();
 	
 	public Action(int id) {
 		super(id);
@@ -78,7 +43,7 @@ public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW
 	 * 
 	 * @return A modifiable {@link Map} that connects view windows and handlers
 	 */
-	public Map<TVW, Handler> getHandlers() {
+	public Map<TVW, Handler<TVW>> getHandlers() {
 		return handlers;
 	}
 

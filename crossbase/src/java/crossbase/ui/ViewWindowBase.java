@@ -6,8 +6,6 @@ import java.lang.reflect.Method;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Control;
@@ -19,7 +17,7 @@ import crossbase.abstracts.Document;
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.actions.Action;
-import crossbase.ui.actions.Action.Handler;
+import crossbase.ui.actions.Handler;
 
 public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, ShellListener, DisposeListener
 {
@@ -34,6 +32,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	public TD getDocument()
 	{
 		return document;
+	}
+	
+	@Override
+	public Shell getShell() {
+		return shell;
 	}
 	
 	@Override
@@ -92,15 +95,13 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 
 		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_FULLSCREEN));
 		if (fullscreenAction != null) {
-			Handler handler = new Handler(new SelectionAdapter() {
+			Handler<ViewWindowBase<TD>> handler = new Handler<ViewWindowBase<TD>>() {
+
 				@Override
-				public void widgetSelected(SelectionEvent arg0) {
-					if (Display.getCurrent() != null && !Display.getCurrent().isDisposed())
-					{
-						toggleFullScreen();
-					}
+				public void execute(ViewWindowBase<TD> window) {
+					window.toggleFullScreen();
 				}
-			});
+			};
 			
 			fullscreenAction.getHandlers().put(this, handler);
 		}

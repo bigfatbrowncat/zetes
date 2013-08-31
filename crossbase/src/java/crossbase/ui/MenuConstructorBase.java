@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -15,8 +15,8 @@ import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.actions.Action;
 import crossbase.ui.actions.ActionHierarchyMember;
-import crossbase.ui.actions.Action.Handler;
 import crossbase.ui.actions.ActionList;
+import crossbase.ui.actions.Handler;
 
 public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConstructor<TVW>
 {
@@ -31,7 +31,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	public final static int ACTION_LIST_WINDOWS_LIST = 3100;
 	public final static int ACTION_WINDOW_CUSTOM = 3200;
 	
-	private SelectionAdapter exitSelectionAdapter, aboutSelectionAdapter;
+	private Handler<TVW> exitHandler, aboutHandler;
 	
 	private ActionList<TVW> actionsRoot = new ActionList<TVW>(ACTION_CATEGORY_ROOT);
 	private ActionList<TVW> windowsListActionList;
@@ -48,22 +48,37 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 
 		@Override
 		public void windowOpened(final TVW window) {
-			System.out.println("window opened");
-			Action<TVW> thisWindowAction = new Action<>(ActionHierarchyMember.NO_ID);
+			final Action<TVW> thisWindowAction = new Action<>(ActionHierarchyMember.NO_ID);
 			thisWindowAction.setTitle(window.getDocument().getTitle());
-			thisWindowAction.getHandlers().put(null, new Handler(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent arg0)
-				{
+			thisWindowAction.getHandlers().put(null, new Handler<TVW>() {
+
+				@Override
+				public void execute(TVW win) {
 					window.activate(false);
 				}
-			}));
+				
+				public String getTitle() {
+					if (window.getDocument() == null) {
+						return null;
+					} else {
+						return window.getDocument().getTitle();
+					}
+				}
+				
+				public HotKey getHotKey() {
+					int index = windowsListActionList.indexOf(thisWindowAction);
+					if (index < 9) {
+						return new HotKey(HotKey.MOD1, (char)('1' + index));
+					}
+					else return null;
+				}
+			});
 			viewWindowSelectionActions.put(window, thisWindowAction);
 			windowsListActionList.addLastItem(thisWindowAction);
 		}
 
 		@Override
 		public void windowClosed(TVW window) {
-			System.out.println("window closed");
 			Action<TVW> thisWindowAction = viewWindowSelectionActions.get(window);
 			windowsListActionList.removeItem(thisWindowAction);
 		}
@@ -113,33 +128,31 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	}
 
 	
-	public SelectionAdapter getExitSelectionAdapter()
+	public Handler<TVW> getExitHandler()
 	{
-		return exitSelectionAdapter;
+		return exitHandler;
 	}
 
-	public void setExitSelectionAdapter(SelectionAdapter exitSelectionAdapter)
+	public void setExitHandler(Handler<TVW> exitHandler)
 	{
-		this.exitSelectionAdapter = exitSelectionAdapter;
-		Map<TVW, Handler> handlers = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT)).getHandlers();
-		if (handlers.get(null) == null) {
-			handlers.put(null, new Handler());
-		}
-		
-		handlers.get(null).setListener(exitSelectionAdapter);
+		this.exitHandler = exitHandler;
+
+		Map<TVW, Handler<TVW>> handlers = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT)).getHandlers();
+		handlers.put(null, exitHandler);
 	}
 
-	public SelectionAdapter getAboutSelectionAdapter()
+	public Handler<TVW> getAboutHandler()
 	{
-		return aboutSelectionAdapter;
+		return aboutHandler;
 	}
 
-	public void setAboutSelectionAdapter(SelectionAdapter aboutSelectionAdapter)
+	public void setAboutHandler(Handler<TVW> aboutHandler)
 	{
-		this.aboutSelectionAdapter = aboutSelectionAdapter;
+		this.aboutHandler = aboutHandler;
+		// TODO Set handler to a proper item
 	}
 
-	private boolean addMenusForActionList(TVW window, ActionList<TVW> category, Menu currentMenu) {
+	private boolean addMenusForActionList(final TVW window, ActionList<TVW> category, Menu currentMenu) {
 		boolean addedAnyActions = false;
 		
 		for (int i = 0; i < category.getItemsCount(); i++) {
@@ -174,21 +187,35 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					if (actionItem.getHandlers().containsKey(null) || actionItem.getHandlers().containsKey(window)) {
 	
 						// Getting the handler. A specific one should override the default one
-						Handler usingHandler = actionItem.getHandlers().get(window) != null ? actionItem.getHandlers().get(window) : actionItem.getHandlers().get(null);
+						final Handler<TVW> usingHandler = actionItem.getHandlers().get(window) != null ? actionItem.getHandlers().get(window) : actionItem.getHandlers().get(null);
 						
 						// If we have any handler
 						if (usingHandler != null && usingHandler.isVisible()) {
 							MenuItem menuItem = new MenuItem(currentMenu, SWT.NONE);
-							
-							if (actionItem.getHotKey() == null) {
+
+							HotKey hotHey = usingHandler.getHotKey();
+							if (hotHey == null) hotHey = actionItem.getHotKey();
+
+							if (hotHey == null) {
 								menuItem.setText(actionItem.getTitle());
 							} else {
-								menuItem.setText(actionItem.getTitle() + "\t" + actionItem.getHotKey().toString());
-								menuItem.setAccelerator(actionItem.getHotKey().toAccelerator());
+								menuItem.setText(actionItem.getTitle() + "\t" + hotHey.toString());
+								menuItem.setAccelerator(hotHey.toAccelerator());
 							}
-	
+
 							menuItem.setEnabled(usingHandler.isEnabled());
-							menuItem.addSelectionListener(usingHandler.getListener());
+							menuItem.addSelectionListener(new SelectionListener() {
+								
+								@Override
+								public void widgetSelected(SelectionEvent arg0) {
+									usingHandler.execute(window);
+								}
+								
+								@Override
+								public void widgetDefaultSelected(SelectionEvent arg0) {
+									// Doing nothing here
+								}
+							});
 							addedAnyActions = true;
 						}
 					}

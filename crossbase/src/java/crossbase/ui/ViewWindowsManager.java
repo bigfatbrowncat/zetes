@@ -18,7 +18,7 @@ public abstract class ViewWindowsManager<TD extends Document,
 	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
 	private TMC menuConstructor;
 
-	private HashSet<ViewWindowsManagerListener> listeners = new HashSet<ViewWindowsManagerListener>();
+	private HashSet<ViewWindowsManagerListener<TVW>> listeners = new HashSet<ViewWindowsManagerListener<TVW>>();
 	
 	private void addWindowForDocument(TD document, TVW window)
 	{
@@ -50,6 +50,7 @@ public abstract class ViewWindowsManager<TD extends Document,
 	{
 		findAndRemoveWindow(viewWindow);
 		
+		callListenersWindowClosed(viewWindow);
 		if (views.size() == 0)
 		{
 			callListenersLastWindowClosed();
@@ -57,7 +58,12 @@ public abstract class ViewWindowsManager<TD extends Document,
 		
 	}
 	
-	public void closeAllWindowsForDocument(TD document)
+	/**
+	 * Closes all windows assigned to the document and
+	 * forgets about that document
+	 * @param document a document to close
+	 */
+	public void closeDocument(TD document)
 	{
 		for (TVW view : views.get(document))
 		{
@@ -70,13 +76,12 @@ public abstract class ViewWindowsManager<TD extends Document,
 	/**
 	 * Closes every window. After all windows are closed,
 	 * if we are not in OS X, terminates the application.
-	 * @param viewWindow The window to close
 	 */
 	public void closeAllWindows()
 	{
 		for (TD doc : views.keySet())
 		{
-			closeAllWindowsForDocument(doc);
+			closeDocument(doc);
 		}
 	}
 	
@@ -88,7 +93,7 @@ public abstract class ViewWindowsManager<TD extends Document,
 	 * @param fileName The file's name to open in the new window (can be null)
 	 * @return The opened window
 	 */
-	public TVW openNewWindow(TD document)
+	protected TVW openNewWindow(TD document)
 	{
 		TVW newWindow = createViewWindow();
 		newWindow.open();
@@ -99,18 +104,21 @@ public abstract class ViewWindowsManager<TD extends Document,
 		}
 		
 		addWindowForDocument(document, newWindow);
+		
+		callListenersWindowOpened(newWindow);
+		
 		return newWindow;
 	}
 	
 	/**
 	 * Opens a file. If there's empty window, opens the file in it. 
 	 * If there's no, empty windows, opens a new one.
-	 * @param fileName The file's name to open
-	 * @return The window where file is opened
+	 * @param document The document to open. It shouldn't be null
+	 * @return The window where the document is opened
 	 */
-	public TVW openViewForDocument(TD document)
+	public TVW openWindowForDocument(TD document)
 	{
-		if (document == null) throw new IllegalArgumentException("file name shouldn't be null");
+		if (document == null && views.containsKey(null)) throw new IllegalArgumentException("Document shouldn't be null");
 
 		// Searching for an empty window
 		if (views.containsKey(null))
@@ -128,6 +136,8 @@ public abstract class ViewWindowsManager<TD extends Document,
 
 				// Adding the window to the document windows list
 				addWindowForDocument(document, vw);
+
+				callListenersWindowOpened(vw);
 				
 				return vw; 
 			}
@@ -142,7 +152,7 @@ public abstract class ViewWindowsManager<TD extends Document,
 		ArrayList<Object> res = new ArrayList<Object>();
 		for (int i = 0; i < documents.length; i++)
 		{
-			res.add(openViewForDocument(documents[i]));
+			res.add(openWindowForDocument(documents[i]));
 		}
 		return res.toArray();
 	}
@@ -172,18 +182,32 @@ public abstract class ViewWindowsManager<TD extends Document,
 	
 	protected void callListenersLastWindowClosed()
 	{
-		for (ViewWindowsManagerListener listener : listeners)
+		for (ViewWindowsManagerListener<TVW> listener : listeners)
 		{
 			listener.lastWindowClosed();
 		}
 	}
+	protected void callListenersWindowOpened(TVW window)
+	{
+		for (ViewWindowsManagerListener<TVW> listener : listeners)
+		{
+			listener.windowOpened(window);
+		}
+	}
+	protected void callListenersWindowClosed(TVW window)
+	{
+		for (ViewWindowsManagerListener<TVW> listener : listeners)
+		{
+			listener.windowClosed(window);
+		}
+	}
 	
-	public void addListener(ViewWindowsManagerListener listener)
+	public void addListener(ViewWindowsManagerListener<TVW> listener)
 	{
 		listeners.add(listener);
 	}
 	
-	public void removeListener(ViewWindowsManagerListener listener)
+	public void removeListener(ViewWindowsManagerListener<TVW> listener)
 	{
 		listeners.remove(listener);
 	}

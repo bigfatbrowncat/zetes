@@ -25,7 +25,7 @@ public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, I
 					try
 					{
 						document = new ImageDocument(fileList[i]);
-						openViewForDocument(document);
+						openWindowForDocument(document);
 					}
 					catch (IOException e)
 					{

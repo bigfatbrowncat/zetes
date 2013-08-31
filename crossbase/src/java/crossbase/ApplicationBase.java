@@ -96,7 +96,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			TD loadedDoc = loadFromFile(fileName);
 			if (loadedDoc != null)
 			{
-				viewWindowsManager.openViewForDocument(loadedDoc);
+				viewWindowsManager.openWindowForDocument(loadedDoc);
 			}
 		}
 	};
@@ -187,7 +187,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	{
 	}
 	
-	ViewWindowsManagerListener viewWindowsManagerListener = new ViewWindowsManagerListener()
+	ViewWindowsManagerListener<TVW> viewWindowsManagerListener = new ViewWindowsManagerListener<TVW>()
 	{
 		@Override
 		public void lastWindowClosed()
@@ -199,6 +199,16 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 					terminated = true;
 				}
 			}
+		}
+
+		@Override
+		public void windowOpened(TVW window) {
+			
+		}
+
+		@Override
+		public void windowClosed(TVW window) {
+			
 		}
 	};
 	

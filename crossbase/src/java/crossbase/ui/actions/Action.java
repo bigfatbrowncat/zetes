@@ -11,6 +11,7 @@ import crossbase.ui.HotKey;
 public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW> {
 	
 	private HotKey hotKey;
+	private String title;
 
 	private HashMap<TVW, Handler<TVW>> handlers = new HashMap<>();
 	
@@ -19,7 +20,8 @@ public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW
 	}
 	
 	public Action(int id, String title) {
-		super(id, title);
+		super(id);
+		this.title = title;
 	}
 	
 	public HotKey getHotKey() {
@@ -29,6 +31,14 @@ public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW
 		this.hotKey = hotKey;
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	
 	/**
 	 * <p>You can set an action handler for every window. If you want to set

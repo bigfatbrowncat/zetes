@@ -7,6 +7,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -17,6 +18,7 @@ import crossbase.ui.actions.Action;
 import crossbase.ui.actions.ActionHierarchyMember;
 import crossbase.ui.actions.ActionList;
 import crossbase.ui.actions.Handler;
+import crossbase.ui.actions.Separator;
 
 public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConstructor<TVW>
 {
@@ -29,11 +31,12 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	public final static int ACTION_EDIT_PREFERENCES = 2001;
 
 	public final static int ACTION_CATEGORY_VIEW = 3000;
+	public final static int ACTION_VIEW_FULLSCREEN = 3001;
 	
 	public final static int ACTION_CATEGORY_WINDOW = 4000;
-	public final static int ACTION_VIEW_FULLSCREEN = 4001;
+	public final static int ACTION_WINDOW_MINIMIZE = 4001;
+	public final static int ACTION_WINDOW_ZOOM = 4002;
 	public final static int ACTION_LIST_WINDOWS_LIST = 4100;
-	public final static int ACTION_WINDOW_CUSTOM = 4200;
 
 	public final static int ACTION_CATEGORY_HELP = 5000;
 	public final static int ACTION_HELP_ABOUT = 5001;
@@ -55,6 +58,8 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 
 		@Override
 		public void windowOpened(final TVW window) {
+			
+			// Creating an action for window selecting
 			final Action<TVW> thisWindowAction = new Action<>(ActionHierarchyMember.NO_ID);
 			thisWindowAction.setTitle(window.getTitle());
 			thisWindowAction.getHandlers().put(null, new Handler<TVW>() {
@@ -86,6 +91,8 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 			});
 			viewWindowSelectionActions.put(window, thisWindowAction);
 			windowsListActionList.addLastItem(thisWindowAction);
+			
+			// Creating window
 		}
 
 		@Override
@@ -136,6 +143,16 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		// Window action list
 		ActionList<TVW> windowActionCategory = new ActionList<>(ACTION_CATEGORY_WINDOW, "&Window");
 		actionsRoot.addLastItem(windowActionCategory);
+
+		Action<TVW> minimizeWindowAction = new Action<TVW>(ACTION_WINDOW_MINIMIZE, "&Minimize");
+		minimizeWindowAction.setHotKey(new HotKey(HotKey.MOD1, 'M'));
+		windowActionCategory.addLastItem(minimizeWindowAction);
+		
+		Action<TVW> zoomWindowAction = new Action<TVW>(ACTION_WINDOW_ZOOM, "&Zoom");
+		windowActionCategory.addLastItem(zoomWindowAction);
+		
+		windowActionCategory.addLastItem(new Separator<TVW>(Action.NO_ID));
+		
 		// Windows list action list
 		windowsListActionList = new ActionList<>(ACTION_LIST_WINDOWS_LIST);
 		windowsListActionList.setSubMenu(false);
@@ -210,6 +227,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	private boolean addMenusForActionList(final TVW window, ActionList<TVW> category, Menu currentMenu) {
 		boolean addedAnyActions = false;
 		
+		boolean previousWasSeparator = true;
 		for (int i = 0; i < category.getItemsCount(); i++) {
 			if (category.getItem(i) instanceof Action) {
 				
@@ -232,6 +250,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					
 					if (addMenusForActionList(window, actionCategoryItem, menu)) {
 						addedAnyActions = true;
+						previousWasSeparator = false;
 					} else {
 						if (menuItem != null) menuItem.dispose();
 					}
@@ -280,10 +299,25 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 								}
 							});
 							addedAnyActions = true;
+							previousWasSeparator = false;
 						}
 					}
 				}
-			} 
+			} else if (category.getItem(i) instanceof Separator) {
+				//Separator<TVW> separatorItem = (Separator<TVW>)category.getItem(i);
+				if (!previousWasSeparator) {
+					new MenuItem(currentMenu, SWT.SEPARATOR);
+					previousWasSeparator = true;
+				}
+			}
+		}
+		
+		if (currentMenu.getItemCount() > 0) {
+			// If the last item is separator, we remove it
+			MenuItem lastMenuItem = currentMenu.getItem(currentMenu.getItemCount() - 1);
+			if ((lastMenuItem.getStyle() & SWT.SEPARATOR) != 0) {
+				lastMenuItem.dispose();
+			}
 		}
 		return addedAnyActions;
 	}

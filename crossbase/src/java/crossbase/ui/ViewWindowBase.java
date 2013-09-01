@@ -98,9 +98,10 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell = constructShell();
 		prepareShell();
 
+		// Creating Fullscreen handler
 		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_VIEW_FULLSCREEN));
 		if (fullscreenAction != null) {
-			Handler<ViewWindowBase<TD>> handler = new Handler<ViewWindowBase<TD>>() {
+			Handler<ViewWindowBase<TD>> fullscreenHandler = new Handler<ViewWindowBase<TD>>() {
 
 				@Override
 				public void execute(ViewWindowBase<TD> window) {
@@ -108,8 +109,48 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 				}
 			};
 			
-			fullscreenAction.getHandlers().put(this, handler);
+			fullscreenAction.getHandlers().put(this, fullscreenHandler);
 		}
+
+		// Creating Minimize handler
+		Action<ViewWindowBase<TD>> minimizeAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_MINIMIZE));
+		if (minimizeAction != null) {
+			Handler<ViewWindowBase<TD>> minimizeHandler = new Handler<ViewWindowBase<TD>>() {
+
+				@Override
+				public void execute(ViewWindowBase<TD> window) {
+					window.toggleMinimized();
+				}
+				
+				@Override
+				public boolean isEnabled() {
+					return Display.getCurrent().getActiveShell() != null;
+				}
+				
+			};
+			minimizeAction.getHandlers().put(this, minimizeHandler);
+		}
+		
+		// Creating Zoom handler
+		Action<ViewWindowBase<TD>> zoomAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_ZOOM));
+		if (zoomAction != null) {
+			Handler<ViewWindowBase<TD>> zoomHandler = new Handler<ViewWindowBase<TD>>() {
+
+				@Override
+				public void execute(ViewWindowBase<TD> window) {
+					window.toggleMaximized();
+				}
+				
+				@Override
+				public boolean isEnabled() {
+					return Display.getCurrent().getActiveShell() != null;
+				}
+
+				
+			};
+			zoomAction.getHandlers().put(this, zoomHandler);
+		}
+		
 		
 		((MenuConstructor)menuConstructor).updateMenus(this);
 

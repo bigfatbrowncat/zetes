@@ -121,11 +121,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 				}
 				
 				public String getTitle() {
-					if (window.getDocument() == null) {
-						return null;
-					} else {
-						return window.getTitle();
-					}
+					return window.getTitle();
 				}
 				
 				public HotKey getHotKey() {
@@ -181,76 +177,6 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		}
 	};
 	
-	// Actions are available for descendants only
-	
-	protected ActionList<TVW> getActionsRoot() {
-		return actionsRoot;
-	}
-	
-	protected ActionList<TVW> getFileActionCategory() {
-		return fileActionCategory;
-	}
-
-	protected Action<TVW> getExitFileAction() {
-		return exitFileAction;
-	}
-
-	protected ActionList<TVW> getEditActionCategory() {
-		return editActionCategory;
-	}
-
-	protected Action<TVW> getPreferencesEditAction() {
-		return preferencesEditAction;
-	}
-
-	protected ActionList<TVW> getViewActionCategory() {
-		return viewActionCategory;
-	}
-
-	protected Action<TVW> getFullscreenViewAction() {
-		return fullscreenViewAction;
-	}
-
-	protected ActionList<TVW> getWindowActionCategory() {
-		return windowActionCategory;
-	}
-
-	protected Action<TVW> getMinimizeWindowAction() {
-		return minimizeWindowAction;
-	}
-
-	protected Action<TVW> getZoomWindowAction() {
-		return zoomWindowAction;
-	}
-
-	protected ActionList<TVW> getWindowsActionList() {
-		return windowsActionList;
-	}
-
-	protected ActionList<TVW> getHelpActionCategory() {
-		return helpActionCategory;
-	}
-
-	protected Action<TVW> getAboutHelpAction() {
-		return aboutHelpAction;
-	}
-	
-	public ViewWindowsManager<?, TVW> getViewWindowsManager() {
-		return viewWindowsManager;
-	}
-
-	public void setViewWindowsManager(ViewWindowsManager<?, TVW> viewWindowsManager) {
-		if (this.viewWindowsManager != null) {
-			this.viewWindowsManager.removeListener(viewWindowsManagerListener);
-		}
-		
-		this.viewWindowsManager = viewWindowsManager;
-		
-		if (this.viewWindowsManager != null) {
-			viewWindowsManager.addListener(viewWindowsManagerListener);
-		}
-	}
-
 	public MenuConstructorBase() {
 
 		// File action list
@@ -307,53 +233,6 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	
 			aboutHelpAction = new Action<TVW>("&About");
 			helpActionCategory.addLastItem(aboutHelpAction);
-		}
-	}
-
-	
-	public Handler<TVW> getExitGlobalHandler()
-	{
-		return exitGlobalHandler;
-	}
-
-	public void setExitGlobalHandler(Handler<TVW> exitGlobalHandler)
-	{
-		this.exitGlobalHandler = exitGlobalHandler;
-
-		if (exitFileAction != null) {
-			Map<TVW, Handler<TVW>> handlers = exitFileAction.getHandlers();
-			handlers.put(null, exitGlobalHandler);
-		}
-	}
-
-	public Handler<TVW> getPreferencesGlobalHandler()
-	{
-		return preferencesGlobalHandler;
-	}
-
-	public void setPreferencesGlobalHandler(Handler<TVW> exitHandler)
-	{
-		this.preferencesGlobalHandler = exitHandler;
-
-		if (preferencesEditAction != null) {
-			Map<TVW, Handler<TVW>> handlers = preferencesEditAction.getHandlers();
-			handlers.put(null, preferencesGlobalHandler);
-		}
-	}
-	
-	
-	public Handler<TVW> getAboutGlobalHandler()
-	{
-		return aboutGlobalHandler;
-	}
-
-	public void setAboutGlobalHandler(Handler<TVW> aboutGlobalHandler)
-	{
-		this.aboutGlobalHandler = aboutGlobalHandler;
-
-		if (aboutHelpAction != null) {
-			Map<TVW, Handler<TVW>> handlers = aboutHelpAction.getHandlers();
-			handlers.put(null, aboutGlobalHandler);
 		}
 	}
 
@@ -529,4 +408,120 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		}
 	}
 
+	
+	public Handler<TVW> getExitGlobalHandler()
+	{
+		return exitGlobalHandler;
+	}
+
+	public void setExitGlobalHandler(Handler<TVW> exitGlobalHandler)
+	{
+		this.exitGlobalHandler = exitGlobalHandler;
+
+		if (exitFileAction != null) {
+			Map<TVW, Handler<TVW>> handlers = exitFileAction.getHandlers();
+			handlers.put(null, exitGlobalHandler);
+		}
+	}
+
+	public Handler<TVW> getPreferencesGlobalHandler()
+	{
+		return preferencesGlobalHandler;
+	}
+
+	public void setPreferencesGlobalHandler(Handler<TVW> exitHandler)
+	{
+		this.preferencesGlobalHandler = exitHandler;
+
+		if (preferencesEditAction != null) {
+			Map<TVW, Handler<TVW>> handlers = preferencesEditAction.getHandlers();
+			handlers.put(null, preferencesGlobalHandler);
+		}
+	}
+	
+	
+	public Handler<TVW> getAboutGlobalHandler()
+	{
+		return aboutGlobalHandler;
+	}
+
+	public void setAboutGlobalHandler(Handler<TVW> aboutGlobalHandler)
+	{
+		this.aboutGlobalHandler = aboutGlobalHandler;
+
+		if (aboutHelpAction != null) {
+			Map<TVW, Handler<TVW>> handlers = aboutHelpAction.getHandlers();
+			handlers.put(null, aboutGlobalHandler);
+		}
+	}
+
+	// Actions are available for descendants only
+	
+	protected ActionList<TVW> getActionsRoot() {
+		return actionsRoot;
+	}
+	
+	protected ActionList<TVW> getFileActionCategory() {
+		return fileActionCategory;
+	}
+
+	protected Action<TVW> getExitFileAction() {
+		return exitFileAction;
+	}
+
+	protected ActionList<TVW> getEditActionCategory() {
+		return editActionCategory;
+	}
+
+	protected Action<TVW> getPreferencesEditAction() {
+		return preferencesEditAction;
+	}
+
+	protected ActionList<TVW> getViewActionCategory() {
+		return viewActionCategory;
+	}
+
+	protected Action<TVW> getFullscreenViewAction() {
+		return fullscreenViewAction;
+	}
+
+	protected ActionList<TVW> getWindowActionCategory() {
+		return windowActionCategory;
+	}
+
+	protected Action<TVW> getMinimizeWindowAction() {
+		return minimizeWindowAction;
+	}
+
+	protected Action<TVW> getZoomWindowAction() {
+		return zoomWindowAction;
+	}
+
+	protected ActionList<TVW> getWindowsActionList() {
+		return windowsActionList;
+	}
+
+	protected ActionList<TVW> getHelpActionCategory() {
+		return helpActionCategory;
+	}
+
+	protected Action<TVW> getAboutHelpAction() {
+		return aboutHelpAction;
+	}
+	
+	public ViewWindowsManager<?, TVW> getViewWindowsManager() {
+		return viewWindowsManager;
+	}
+
+	public void setViewWindowsManager(ViewWindowsManager<?, TVW> viewWindowsManager) {
+		if (this.viewWindowsManager != null) {
+			this.viewWindowsManager.removeListener(viewWindowsManagerListener);
+		}
+		
+		this.viewWindowsManager = viewWindowsManager;
+		
+		if (this.viewWindowsManager != null) {
+			viewWindowsManager.addListener(viewWindowsManagerListener);
+		}
+	}	
 }

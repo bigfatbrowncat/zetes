@@ -147,10 +147,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 
 	public void widgetDisposed(DisposeEvent arg0)
 	{
-		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
-		 
-		
-		Document doc = getDocument();
+		TD doc = getDocument();
 		if (doc != null) 
 		{
 			doc.dispose();

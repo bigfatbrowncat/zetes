@@ -1,6 +1,8 @@
 package crossbase.ui;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -13,6 +15,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -29,9 +32,19 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	 * Create the dialog.
 	 * @param parent
 	 */
-	public DefaultAboutBox(ViewWindowBase<?> parent)
+	public DefaultAboutBox(final ViewWindowBase<?> parent)
 	{
-		super(parent.getShell(), SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
+		super(new Object() {
+			
+			public Shell getShell() {
+				if (SWT.getPlatform().equals("cocoa")) {
+					return new Shell(Display.getCurrent());
+				} else {
+					return parent.getShell();
+				}
+			}
+
+		}.getShell(), SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
 	}
 
 	private void centerWindow()
@@ -271,6 +284,14 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 		aboutBoxShell.layout();
 		
 		aboutBoxShell.setSize(windowSize.x, iconLabel.getSize().y + 30 + titleLabel.getSize().y + 30 + descriptionLabel.getSize().y + 30 + copyrightLabel.getSize().y);
+		
+		aboutBoxShell.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				aboutBoxShell.getParent().getShell().dispose();
+			}
+		});
 	}
 
 	

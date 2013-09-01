@@ -22,8 +22,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
                                       TMC extends MenuConstructorBase<TVW>,
                                       TVWM extends ViewWindowsManager<TD, TVW>> implements Application<TAB, TD, TVW, TMC, TVWM>
 {
-	private boolean dummyShell = false;
-	private Shell shell;
 	private AboutBox aboutBox = null;
 
 	private TMC menuConstructor;
@@ -41,27 +39,11 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	{
 		if (aboutBox == null || aboutBox.isDisposed())
 		{
-			/*
-			if (dummyShell)
-			{
-				shell.dispose();
-				shell = null;
-				dummyShell = false;
+			if (!SWT.getPlatform().equals("cocoa")) {
+				aboutBox = createAboutBox(parentWindow);
+			} else {
+				aboutBox = createAboutBox(null);
 			}
-			
-			if (!SWT.getPlatform().equals("cocoa"))
-			{
-				// For OS X ignoring the parent shell. About box should be independent of any window
-				shell = parentShell;
-			}
-			
-			if (shell == null) 
-			{
-				shell = new Shell(Display.getDefault());
-				dummyShell = true;
-			}*/
-			
-			aboutBox = createAboutBox(parentWindow);
 			aboutBox.open();
 		}		
 	}

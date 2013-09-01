@@ -1,6 +1,7 @@
 package tinyviewer;
 
 import org.eclipse.swt.events.PaintEvent;
+
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -13,7 +14,7 @@ public class ImageView extends Canvas
 {
 	Image image = null;
 	Image zoomedImage = null;
-	double zoom = 0.2;
+	double zoom = 1.0;
 	
 	public ImageView(Composite arg0, int arg1)
 	{

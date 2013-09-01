@@ -34,6 +34,8 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	 */
 	public DefaultAboutBox(final ViewWindowBase<?> parent)
 	{
+		// Here we are creating a new shell if it's 
+		
 		super(new Object() {
 			
 			public Shell getShell() {

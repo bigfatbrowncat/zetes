@@ -197,9 +197,9 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 
 			menuConstructor = createMenuConstructor();
 			menuConstructor.setViewWindowsManager(viewWindowsManager);
-			menuConstructor.setExitHandler(exitHandler);
-			menuConstructor.setAboutHandler(aboutHandler);
-			menuConstructor.setPreferencesHandler(preferencesHandler);
+			menuConstructor.setExitGlobalHandler(exitHandler);
+			menuConstructor.setAboutGlobalHandler(aboutHandler);
+			menuConstructor.setPreferencesGlobalHandler(preferencesHandler);
 			menuConstructor.updateMenus(null);
 			
 			// Adding OS X system menu handlers

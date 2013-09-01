@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
-import org.eclipse.swt.widgets.Display;
 
 import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
@@ -159,8 +158,6 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 				// Adding the window to the document windows list
 				addWindowForDocument(document, vw);
 
-				callListenersWindowOpened(vw);
-				
 				return vw; 
 			}
 		}

@@ -13,12 +13,11 @@ public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW
 
 	private HashMap<TVW, Handler<TVW>> handlers = new HashMap<>();
 	
-	public Action(int id) {
-		super(id);
+	public Action() {
+		
 	}
 	
-	public Action(int id, String title) {
-		super(id);
+	public Action(String title) {
 		this.title = title;
 	}
 	

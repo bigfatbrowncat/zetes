@@ -16,39 +16,37 @@ import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.actions.Action;
-import crossbase.ui.actions.ActionHierarchyMember;
 import crossbase.ui.actions.ActionList;
 import crossbase.ui.actions.Handler;
 import crossbase.ui.actions.Separator;
 
 public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConstructor<TVW>
 {
-	public final static int ACTION_CATEGORY_ROOT = 0;
+	private ViewWindowsManager<?, TVW> viewWindowsManager;
 
-	public final static int ACTION_CATEGORY_FILE = 1000;
-	public final static int ACTION_FILE_EXIT = 1001;
-	public final static int ACTION_FILE_CUSTOM = 1100;
+	// Global handlers
+	private Handler<TVW> exitGlobalHandler, aboutGlobalHandler, preferencesGlobalHandler;
 
-	public final static int ACTION_EDIT_PREFERENCES = 2001;
-
-	public final static int ACTION_CATEGORY_VIEW = 3000;
-	public final static int ACTION_VIEW_FULLSCREEN = 3001;
+	// Actions
+	private ActionList<TVW> actionsRoot = new ActionList<TVW>();
 	
-	public final static int ACTION_CATEGORY_WINDOW = 4000;
-	public final static int ACTION_WINDOW_MINIMIZE = 4001;
-	public final static int ACTION_WINDOW_ZOOM = 4002;
-	public final static int ACTION_LIST_WINDOWS_LIST = 4100;
+	private ActionList<TVW> fileActionCategory;
+	private Action<TVW> exitFileAction;
 
-	public final static int ACTION_CATEGORY_HELP = 5000;
-	public final static int ACTION_HELP_ABOUT = 5001;
+	private ActionList<TVW> editActionCategory;
+	private Action<TVW> preferencesEditAction;
 	
-	private Handler<TVW> exitHandler, aboutHandler, preferencesHandler;
-	
-	private ActionList<TVW> actionsRoot = new ActionList<TVW>(ACTION_CATEGORY_ROOT);
-	private ActionList<TVW> windowsListActionList;
+	private ActionList<TVW> viewActionCategory;
+	private Action<TVW> fullscreenViewAction;
+
+	private ActionList<TVW> windowActionCategory;
+	private Action<TVW> minimizeWindowAction;
+	private Action<TVW> zoomWindowAction;
+	private ActionList<TVW> windowsActionList;
 	private HashMap<TVW, Action<TVW>> viewWindowSelectionActions = new HashMap<TVW, Action<TVW>>();
 	
-	private ViewWindowsManager<?, TVW> viewWindowsManager;
+	private ActionList<TVW> helpActionCategory;
+	private Action<TVW> aboutHelpAction;
 	
 	private ViewWindowsManagerListener<TVW> viewWindowsManagerListener = new ViewWindowsManagerListener<TVW>() {
 
@@ -61,8 +59,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		public void windowOpened(final TVW window) {
 			
 			// Creating Fullscreen handler for the window just opened
-			final Action<TVW> fullscreenAction = (Action<TVW>)(actionsRoot.findActionByIdRecursively(MenuConstructorBase.ACTION_VIEW_FULLSCREEN));
-			if (fullscreenAction != null) {
+			if (fullscreenViewAction != null) {
 				Handler<TVW> fullscreenHandler = new Handler<TVW>() {
 
 					@Override
@@ -71,12 +68,11 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					}
 				};
 				
-				fullscreenAction.getHandlers().put(window, fullscreenHandler);
+				fullscreenViewAction.getHandlers().put(window, fullscreenHandler);
 			}
 
 			// Creating Minimize handler for the window just opened
-			final Action<TVW> minimizeAction = (Action<TVW>)(actionsRoot.findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_MINIMIZE));
-			if (minimizeAction != null) {
+			if (minimizeWindowAction != null) {
 				Handler<TVW> minimizeHandler = new Handler<TVW>() {
 
 					@Override
@@ -90,12 +86,11 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					}
 					
 				};
-				minimizeAction.getHandlers().put(window, minimizeHandler);
+				minimizeWindowAction.getHandlers().put(window, minimizeHandler);
 			}
 			
 			// Creating Zoom handler for the window just opened
-			final Action<TVW> zoomAction = (Action<TVW>)(actionsRoot.findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_ZOOM));
-			if (zoomAction != null) {
+			if (zoomWindowAction != null) {
 				Handler<TVW> zoomHandler = new Handler<TVW>() {
 
 					@Override
@@ -110,13 +105,13 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 
 					
 				};
-				zoomAction.getHandlers().put(window, zoomHandler);
+				zoomWindowAction.getHandlers().put(window, zoomHandler);
 			}
 			
 			
 			
 			// Creating an action for window selection
-			final Action<TVW> thisWindowAction = new Action<>(ActionHierarchyMember.NO_ID);
+			final Action<TVW> thisWindowAction = new Action<>();
 			thisWindowAction.setTitle(window.getTitle());
 			thisWindowAction.getHandlers().put(null, new Handler<TVW>() {
 
@@ -129,12 +124,12 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					if (window.getDocument() == null) {
 						return null;
 					} else {
-						return window.getDocument().getTitle();
+						return window.getTitle();
 					}
 				}
 				
 				public HotKey getHotKey() {
-					int index = windowsListActionList.indexOf(thisWindowAction);
+					int index = windowsActionList.indexOf(thisWindowAction);
 					if (index < 9) {
 						return new HotKey(HotKey.MOD1, (char)('1' + index));
 					}
@@ -146,7 +141,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 				}
 			});
 			viewWindowSelectionActions.put(window, thisWindowAction);
-			windowsListActionList.addLastItem(thisWindowAction);
+			windowsActionList.addLastItem(thisWindowAction);
 			
 			window.addShellListener(new ShellListener() {
 				
@@ -154,14 +149,14 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 				@Override public void shellDeiconified(ShellEvent arg0) {}
 				@Override public void shellClosed(ShellEvent arg0)
 				{
-					if (fullscreenAction != null) {
-						fullscreenAction.getHandlers().remove(window);
+					if (fullscreenViewAction != null) {
+						fullscreenViewAction.getHandlers().remove(window);
 					}
-					if (minimizeAction != null) {
-						minimizeAction.getHandlers().remove(window);
+					if (minimizeWindowAction != null) {
+						minimizeWindowAction.getHandlers().remove(window);
 					}
-					if (zoomAction != null) {
-						zoomAction.getHandlers().remove(window);
+					if (zoomWindowAction != null) {
+						zoomWindowAction.getHandlers().remove(window);
 					}
 				}
 				
@@ -169,7 +164,6 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 				public void shellDeactivated(ShellEvent arg0) {
 					updateMenus(window);
 				}
-				
 				
 				@Override
 				public void shellActivated(ShellEvent arg0) {
@@ -183,12 +177,62 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		@Override
 		public void windowClosed(TVW window) {
 			Action<TVW> thisWindowAction = viewWindowSelectionActions.get(window);
-			windowsListActionList.removeItem(thisWindowAction);
+			windowsActionList.removeItem(thisWindowAction);
 		}
 	};
 	
+	// Actions are available for descendants only
+	
 	protected ActionList<TVW> getActionsRoot() {
 		return actionsRoot;
+	}
+	
+	protected ActionList<TVW> getFileActionCategory() {
+		return fileActionCategory;
+	}
+
+	protected Action<TVW> getExitFileAction() {
+		return exitFileAction;
+	}
+
+	protected ActionList<TVW> getEditActionCategory() {
+		return editActionCategory;
+	}
+
+	protected Action<TVW> getPreferencesEditAction() {
+		return preferencesEditAction;
+	}
+
+	protected ActionList<TVW> getViewActionCategory() {
+		return viewActionCategory;
+	}
+
+	protected Action<TVW> getFullscreenViewAction() {
+		return fullscreenViewAction;
+	}
+
+	protected ActionList<TVW> getWindowActionCategory() {
+		return windowActionCategory;
+	}
+
+	protected Action<TVW> getMinimizeWindowAction() {
+		return minimizeWindowAction;
+	}
+
+	protected Action<TVW> getZoomWindowAction() {
+		return zoomWindowAction;
+	}
+
+	protected ActionList<TVW> getWindowsActionList() {
+		return windowsActionList;
+	}
+
+	protected ActionList<TVW> getHelpActionCategory() {
+		return helpActionCategory;
+	}
+
+	protected Action<TVW> getAboutHelpAction() {
+		return aboutHelpAction;
 	}
 	
 	public ViewWindowsManager<?, TVW> getViewWindowsManager() {
@@ -210,102 +254,102 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	public MenuConstructorBase() {
 
 		// File action list
-		ActionList<TVW> fileActionCategory = new ActionList<>(ACTION_CATEGORY_FILE, "&File");
+		fileActionCategory = new ActionList<>("&File");
 		actionsRoot.addLastItem(fileActionCategory);
 
 		// Window action list
-		ActionList<TVW> viewActionCategory = new ActionList<>(ACTION_CATEGORY_VIEW, "&View");
+		viewActionCategory = new ActionList<>("&View");
 		actionsRoot.addLastItem(viewActionCategory);
 
-		Action<TVW> fullscreenAction = new Action<TVW>(ACTION_VIEW_FULLSCREEN, "&Fullscreen");
+		fullscreenViewAction = new Action<TVW>("&Fullscreen");
 		if (SWT.getPlatform().equals("cocoa")) {
-			fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.CTRL, 'F'));
+			fullscreenViewAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.CTRL, 'F'));
 		} else {
-			fullscreenAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
+			fullscreenViewAction.setHotKey(new HotKey(HotKey.MOD1 | HotKey.SHIFT, 'F'));
 		}
-		viewActionCategory.addLastItem(fullscreenAction);
+		viewActionCategory.addLastItem(fullscreenViewAction);
 		
 		// Window action list
-		ActionList<TVW> windowActionCategory = new ActionList<>(ACTION_CATEGORY_WINDOW, "&Window");
+		windowActionCategory = new ActionList<>("&Window");
 		actionsRoot.addLastItem(windowActionCategory);
 
-		Action<TVW> minimizeWindowAction = new Action<TVW>(ACTION_WINDOW_MINIMIZE, "&Minimize");
+		minimizeWindowAction = new Action<TVW>("&Minimize");
 		minimizeWindowAction.setHotKey(new HotKey(HotKey.MOD1, 'M'));
 		windowActionCategory.addLastItem(minimizeWindowAction);
 		
-		Action<TVW> zoomWindowAction = new Action<TVW>(ACTION_WINDOW_ZOOM, "&Zoom");
+		zoomWindowAction = new Action<TVW>("&Zoom");
 		windowActionCategory.addLastItem(zoomWindowAction);
 		
-		windowActionCategory.addLastItem(new Separator<TVW>(Action.NO_ID));
+		windowActionCategory.addLastItem(new Separator<TVW>());
 		
 		// Windows list action list
-		windowsListActionList = new ActionList<>(ACTION_LIST_WINDOWS_LIST);
-		windowsListActionList.setSubMenu(false);
-		windowsListActionList.setRadioItems(true);
-		windowActionCategory.addLastItem(windowsListActionList);
+		windowsActionList = new ActionList<>();
+		windowsActionList.setSubMenu(false);
+		windowsActionList.setRadioItems(true);
+		windowActionCategory.addLastItem(windowsActionList);
 
 		// Help action list
-		ActionList<TVW> helpActionCategory = new ActionList<>(ACTION_CATEGORY_HELP, "&Help");
+		helpActionCategory = new ActionList<>("&Help");
 		actionsRoot.addLastItem(helpActionCategory);
 
 		
 		if (!SWT.getPlatform().equals("cocoa")) {
 	
-			Action<TVW> exitAction = new Action<TVW>(ACTION_FILE_EXIT, "E&xit");
-			fileActionCategory.addLastItem(exitAction);
+			exitFileAction = new Action<TVW>("E&xit");
+			fileActionCategory.addLastItem(exitFileAction);
+			
+			preferencesEditAction = new Action<TVW>("&Preferences");
+			editActionCategory.addLastItem(preferencesEditAction);
 	
-			Action<TVW> aboutAction = new Action<TVW>(ACTION_HELP_ABOUT, "&About");
-			helpActionCategory.addLastItem(aboutAction);
+			aboutHelpAction = new Action<TVW>("&About");
+			helpActionCategory.addLastItem(aboutHelpAction);
 		}
 	}
 
 	
-	public Handler<TVW> getExitHandler()
+	public Handler<TVW> getExitGlobalHandler()
 	{
-		return exitHandler;
+		return exitGlobalHandler;
 	}
 
-	public void setExitHandler(Handler<TVW> exitHandler)
+	public void setExitGlobalHandler(Handler<TVW> exitGlobalHandler)
 	{
-		this.exitHandler = exitHandler;
+		this.exitGlobalHandler = exitGlobalHandler;
 
-		Action<TVW> action = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_FILE_EXIT));
-		if (action != null) {
-			Map<TVW, Handler<TVW>> handlers = action.getHandlers();
-			handlers.put(null, exitHandler);
+		if (exitFileAction != null) {
+			Map<TVW, Handler<TVW>> handlers = exitFileAction.getHandlers();
+			handlers.put(null, exitGlobalHandler);
 		}
 	}
 
-	public Handler<TVW> getPreferencesHandler()
+	public Handler<TVW> getPreferencesGlobalHandler()
 	{
-		return preferencesHandler;
+		return preferencesGlobalHandler;
 	}
 
-	public void setPreferencesHandler(Handler<TVW> exitHandler)
+	public void setPreferencesGlobalHandler(Handler<TVW> exitHandler)
 	{
-		this.preferencesHandler = exitHandler;
+		this.preferencesGlobalHandler = exitHandler;
 
-		Action<TVW> action = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_EDIT_PREFERENCES));
-		if (action != null) {
-			Map<TVW, Handler<TVW>> handlers = action.getHandlers();
-			handlers.put(null, preferencesHandler);
+		if (preferencesEditAction != null) {
+			Map<TVW, Handler<TVW>> handlers = preferencesEditAction.getHandlers();
+			handlers.put(null, preferencesGlobalHandler);
 		}
 	}
 	
 	
-	public Handler<TVW> getAboutHandler()
+	public Handler<TVW> getAboutGlobalHandler()
 	{
-		return aboutHandler;
+		return aboutGlobalHandler;
 	}
 
-	public void setAboutHandler(Handler<TVW> aboutHandler)
+	public void setAboutGlobalHandler(Handler<TVW> aboutGlobalHandler)
 	{
-		this.aboutHandler = aboutHandler;
+		this.aboutGlobalHandler = aboutGlobalHandler;
 
-		Action<TVW> action = ((Action<TVW>)actionsRoot.findActionByIdRecursively(ACTION_HELP_ABOUT));
-		if (action != null) {
-			Map<TVW, Handler<TVW>> handlers = action.getHandlers();
-			handlers.put(null, aboutHandler);
+		if (aboutHelpAction != null) {
+			Map<TVW, Handler<TVW>> handlers = aboutHelpAction.getHandlers();
+			handlers.put(null, aboutGlobalHandler);
 		}
 	}
 
@@ -446,7 +490,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 						
 						@Override
 						public void widgetSelected(SelectionEvent arg0) {
-							aboutHandler.execute(viewWindowsManager.getActiveWindow());
+							aboutGlobalHandler.execute(viewWindowsManager.getActiveWindow());
 							
 						}
 						
@@ -458,7 +502,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 
 						@Override
 						public void widgetSelected(SelectionEvent arg0) {
-							preferencesHandler.execute(viewWindowsManager.getActiveWindow());
+							preferencesGlobalHandler.execute(viewWindowsManager.getActiveWindow());
 							
 						}
 						
@@ -470,7 +514,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 
 						@Override
 						public void widgetSelected(SelectionEvent arg0) {
-							exitHandler.execute(viewWindowsManager.getActiveWindow());
+							exitGlobalHandler.execute(viewWindowsManager.getActiveWindow());
 							
 						}
 						

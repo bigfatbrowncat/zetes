@@ -12,16 +12,16 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 	private boolean isSubMenu = true;
 	private boolean isRadioItems;
 	
-	public ActionList(int id) {
-		super(id);
+	public ActionList() {
+		super();
+	}
+	
+	public ActionList(String title) {
+		super(title);
 	}
 
-	public ActionList(int id, String title) {
-		super(id, title);
-	}
-
-	public ActionList(int id, String title, boolean isSubMenu) {
-		super(id, title);
+	public ActionList(String title, boolean isSubMenu) {
+		super(title);
 		this.setSubMenu(isSubMenu);
 	}
 
@@ -81,26 +81,5 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 	
 	public void setRadioItems(boolean radioItems) {
 		this.isRadioItems = radioItems;
-	}
-	
-	public ActionHierarchyMember<TVW> findActionByIdRecursively(int id) {
-		List<ActionList<TVW>> inners = new ArrayList<>();
-
-		for (int i = 0; i < items.size(); i++) {
-			if (items.get(i).getId() == id) {
-				return items.get(i);
-			}
-			
-			if (items.get(i) instanceof ActionList) {
-				inners.add((ActionList<TVW>)items.get(i));
-			}
-		}
-		
-		for (int i = 0; i < inners.size(); i++) {
-			ActionHierarchyMember<TVW> res = inners.get(i).findActionByIdRecursively(id);
-			if (res != null) return res;
-		}
-		
-		return null;
 	}
 }

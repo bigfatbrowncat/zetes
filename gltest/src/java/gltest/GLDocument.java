@@ -4,17 +4,15 @@ import crossbase.abstracts.Document;
 
 public class GLDocument implements Document
 {
-
 	@Override
 	public String getTitle()
 	{
-		return "GLDoc";
+		return null;
 	}
 
 	@Override
 	public void dispose()
 	{
 	}
-
 	
 }

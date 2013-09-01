@@ -257,7 +257,11 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		fileActionCategory = new ActionList<>("&File");
 		actionsRoot.addLastItem(fileActionCategory);
 
-		// Window action list
+		// Edit action list
+		editActionCategory = new ActionList<>("&Edit");
+		actionsRoot.addLastItem(editActionCategory);
+		
+		// View action list
 		viewActionCategory = new ActionList<>("&View");
 		actionsRoot.addLastItem(viewActionCategory);
 

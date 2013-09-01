@@ -8,7 +8,7 @@ import org.eclipse.swt.dnd.FileTransfer;
 
 import crossbase.ui.ViewWindowsManager;
 
-public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, ImageViewWindow, TinyViewerMenuConstructor>
+public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, ImageViewWindow>
 {
 	private String applicationTitle;
 	
@@ -39,7 +39,7 @@ public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, I
 	@Override
 	protected ImageViewWindow createViewWindow()
 	{
-		ImageViewWindow vw = new ImageViewWindow(applicationTitle, this, (TinyViewerMenuConstructor)getMenuConstructor());
+		ImageViewWindow vw = new ImageViewWindow(applicationTitle);
 		vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
 	}

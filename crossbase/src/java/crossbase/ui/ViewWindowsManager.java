@@ -6,17 +6,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.widgets.Display;
+
 import crossbase.abstracts.Document;
-import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 
-public abstract class ViewWindowsManager<TD extends Document,
-                                         TVW extends ViewWindow<TD>,
-                                         TMC extends MenuConstructor<TVW>>
+public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWindow<TD>>
 {
 	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
-	private TMC menuConstructor;
 
 	private HashSet<ViewWindowsManagerListener<TVW>> listeners = new HashSet<ViewWindowsManagerListener<TVW>>();
 	
@@ -42,6 +42,11 @@ public abstract class ViewWindowsManager<TD extends Document,
 	}
 	
 	public TVW getActiveWindow() {
+		for (TD doc : views.keySet()) {
+			for (TVW view : views.get(doc)) {
+				if (view.isActive()) return view;
+			}
+		}
 		return null;
 	}
 	
@@ -99,7 +104,7 @@ public abstract class ViewWindowsManager<TD extends Document,
 	 */
 	protected TVW openNewWindow(TD document)
 	{
-		TVW newWindow = createViewWindow();
+		final TVW newWindow = createViewWindow();
 		newWindow.open();
 		
 		if (document != null)
@@ -109,6 +114,19 @@ public abstract class ViewWindowsManager<TD extends Document,
 		
 		addWindowForDocument(document, newWindow);
 		
+		newWindow.addShellListener(new ShellListener() {
+			
+			@Override public void shellIconified(ShellEvent arg0) {}
+			@Override public void shellDeiconified(ShellEvent arg0) {}
+			@Override public void shellDeactivated(ShellEvent arg0) {}
+			@Override public void shellActivated(ShellEvent arg0) {}
+			
+			@Override
+			public void shellClosed(ShellEvent arg0) {
+				closeWindow(newWindow);
+			}
+			
+		});
 		callListenersWindowOpened(newWindow);
 		
 		return newWindow;
@@ -142,7 +160,6 @@ public abstract class ViewWindowsManager<TD extends Document,
 				addWindowForDocument(document, vw);
 
 				callListenersWindowOpened(vw);
-				menuConstructor.updateMenus(vw);
 				
 				return vw; 
 			}
@@ -150,7 +167,6 @@ public abstract class ViewWindowsManager<TD extends Document,
 		
 		// If we haven't found an empty window, we open a new one
 		TVW vw = openNewWindow(document);
-		menuConstructor.updateMenus(vw);
 		return vw;
 	}
 	
@@ -175,16 +191,6 @@ public abstract class ViewWindowsManager<TD extends Document,
 		{
 			openNewWindow(null);
 		}
-	}
-	
-	public MenuConstructor<TVW> getMenuConstructor()
-	{
-		return menuConstructor;
-	}
-	
-	public void setMenuConstructor(TMC menuConstructor)
-	{
-		this.menuConstructor = menuConstructor;
 	}
 	
 	protected void callListenersLastWindowClosed()

@@ -29,9 +29,9 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	 * Create the dialog.
 	 * @param parent
 	 */
-	public DefaultAboutBox(Shell parent)
+	public DefaultAboutBox(ViewWindowBase<?> parent)
 	{
-		super(parent, SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
+		super(parent.getShell(), SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
 	}
 
 	private void centerWindow()

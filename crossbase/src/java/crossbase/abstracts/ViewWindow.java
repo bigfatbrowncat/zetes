@@ -1,7 +1,7 @@
 package crossbase.abstracts;
 
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 
 public interface ViewWindow<TD extends Document>
 {
@@ -22,6 +22,7 @@ public interface ViewWindow<TD extends Document>
 	boolean supportsFullscreen();
 	boolean supportsMaximizing();
 	
-	Shell getShell();
+	void addShellListener(ShellListener shellListener);
+	
 	String getTitle();
 }

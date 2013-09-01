@@ -1,7 +1,6 @@
 package gltest;
 
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Shell;
 
 import crossbase.ApplicationBase;
 import crossbase.ui.DefaultAboutBox;
@@ -50,9 +49,9 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
 	}
 
 	@Override
-	public DefaultAboutBox createAboutBox(Shell parent)
+	public DefaultAboutBox createAboutBox(GLViewWindow parentWindow)
 	{
-		DefaultAboutBox res = new DefaultAboutBox(parent);
+		DefaultAboutBox res = new DefaultAboutBox(parentWindow);
 		res.setApplicationName(getTitle());
 		res.setIconResourceName("/gltest/gltest64.png");
 		res.setDescriptionText("A graphics demonstration which uses OpenGL canvas.\nThis application shows the power of Avian + SWT");

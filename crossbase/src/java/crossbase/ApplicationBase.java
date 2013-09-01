@@ -1,40 +1,26 @@
 package crossbase;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import crossbase.abstracts.AboutBox;
 import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
-import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowsManager;
 import crossbase.ui.actions.Handler;
 
-//**
-// * <p>This class is the base for Multi Document architecture.</p>
-// * 
-// * <p>You should use it if your application opens more than one document at a time. 
-// * Some native Windows and Linux applications work in a mode of multi-loaded single-document
-// * application style (for example you can open as much Notepad windows as you want and all of them
-// * would become independent different processes). But this model is impossible on OS X where
-// * only one instance of a UI application is possible to be executed at a moment.</p>
-// */
 public abstract class ApplicationBase<TAB extends AboutBox, 
                                       TD extends Document, 
                                       TVW extends ViewWindow<TD>, 
                                       TMC extends MenuConstructorBase<TVW>,
-                                      TVWM extends ViewWindowsManager<TD, TVW, TMC>> implements Application<TAB, TD, TVW, TMC, TVWM>
+                                      TVWM extends ViewWindowsManager<TD, TVW>> implements Application<TAB, TD, TVW, TMC, TVWM>
 {
 	private boolean dummyShell = false;
 	private Shell shell;
@@ -51,10 +37,11 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	 * @param shell The parent shell for about box window to create.
 	 *              May be null &#151; in that case the about box will be created for the whole display.
 	 */
-	protected final void showAbout(Shell parentShell)
+	protected final void showAbout(TVW parentWindow)
 	{
 		if (aboutBox == null || aboutBox.isDisposed())
 		{
+			/*
 			if (dummyShell)
 			{
 				shell.dispose();
@@ -72,9 +59,9 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			{
 				shell = new Shell(Display.getDefault());
 				dummyShell = true;
-			}
+			}*/
 			
-			aboutBox = createAboutBox(shell);
+			aboutBox = createAboutBox(parentWindow);
 			aboutBox.open();
 		}		
 	}
@@ -131,7 +118,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		public void execute(TVW window) {
 			if (window != null)
 			{
-				showAbout(window.getShell());
+				showAbout(window);
 			}
 			else
 			{
@@ -230,10 +217,8 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			menuConstructor.setViewWindowsManager(viewWindowsManager);
 			menuConstructor.setExitHandler(exitHandler);
 			menuConstructor.setAboutHandler(aboutHandler);
+			menuConstructor.setPreferencesHandler(preferencesHandler);
 			menuConstructor.updateMenus(null);
-			
-			// Here we guarantee that menuConstructor type is compatible to viewWindowsManager
-			viewWindowsManager.setMenuConstructor(menuConstructor);
 			
 			// Adding OS X system menu handlers
 			if (SWT.getPlatform().equals("cocoa"))

@@ -16,10 +16,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.ui.MenuConstructorBase;
 import crossbase.ui.ViewWindowBase;
-import crossbase.ui.actions.Action;
-import crossbase.ui.actions.ActionList;
 
 public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 {
@@ -49,15 +46,9 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		}
 	}
 	
-	public ImageViewWindow(String applicationTitle, 
-	                       ImageViewWindowsManager windowsManager, 
-	                       TinyViewerMenuConstructor menuConstructor)
+	public ImageViewWindow(String applicationTitle)
 	{
-		super(applicationTitle, windowsManager, menuConstructor);
-		
-/*		ActionList<ImageViewWindow> windowActionCategory = (ActionList<ImageViewWindow>) menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_CATEGORY_WINDOW);
-		
-		Action<ImageViewWindow> selectWindowAction = new Action<>(MenuConstructorBase.ACTION_WINDOW_LIST_START, applicationTitle);*/
+		super(applicationTitle);
 	}
 	
 	/**
@@ -141,18 +132,17 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		super.setDocument(document);
 		
 		imageView.setImage(getDocument().getImage());
-		shell.setText(getDocument().getTitle() + " \u2013 " + getApplicationTitle());
+		getShell().setText(getDocument().getTitle() + " \u2013 " + getApplicationTitle());
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		updateImageViewSize();
 		imageView.setVisible(true);
-		shell.forceActive();
-		getMenuConstructor().updateMenus(this);
+		getShell().forceActive();
 	}
 	
-	public boolean isDisposed()
+	/*public boolean isDisposed()
 	{
-		return shell.isDisposed();
-	}
+		return getShell().isDisposed();
+	}*/
 
 	@Override
 	public boolean supportsFullscreen()
@@ -164,10 +154,5 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	public boolean supportsMaximizing()
 	{
 		return true;
-	}
-	
-	public TinyViewerMenuConstructor getMenuConstructor()
-	{
-		return (TinyViewerMenuConstructor) super.getMenuConstructor();
 	}
 }

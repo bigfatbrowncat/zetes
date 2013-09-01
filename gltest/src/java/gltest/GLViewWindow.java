@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.abstracts.MenuConstructor;
 import crossbase.ui.ViewWindowBase;
 
 public class GLViewWindow extends ViewWindowBase<GLDocument>
@@ -38,12 +37,9 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	private Date lastFrameMoment = new Date();
 	private float framesPerSecond = 50;
 	
-	public GLViewWindow(
-			String applicationTitle,
-			GLViewWindowsManager windowsManager,
-			MenuConstructor<GLViewWindow> menuConstructor)
+	public GLViewWindow(String applicationTitle)
 	{
-		super(applicationTitle, windowsManager, menuConstructor);
+		super(applicationTitle);
 	}
 	
 	/**

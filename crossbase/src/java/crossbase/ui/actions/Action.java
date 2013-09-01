@@ -3,8 +3,6 @@ package crossbase.ui.actions;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.swt.events.SelectionAdapter;
-
 import crossbase.abstracts.ViewWindow;
 import crossbase.ui.HotKey;
 

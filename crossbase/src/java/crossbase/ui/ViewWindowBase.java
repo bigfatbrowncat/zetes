@@ -5,8 +5,6 @@ import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -14,19 +12,21 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
 import crossbase.abstracts.Document;
-import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
-import crossbase.ui.actions.Action;
-import crossbase.ui.actions.Handler;
 
-public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, ShellListener, DisposeListener
+public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>
 {
-	private ViewWindowsManager<TD, ?, ?> windowsManager;
-	private MenuConstructor<? extends ViewWindowBase<TD>> menuConstructor;
-	
-	protected Shell shell;
+	private Shell shell;
 	private String applicationTitle;
 	private TD document;
+	
+	protected Shell getShell() {
+		return shell;
+	}
+	
+	public boolean isDisposed() {
+		return shell.isDisposed();
+	}
 	
 	@Override
 	public TD getDocument()
@@ -35,8 +35,8 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	}
 	
 	@Override
-	public Shell getShell() {
-		return shell;
+	public void addShellListener(ShellListener shellListener) {
+		shell.addShellListener(shellListener);
 	}
 	
 	@Override
@@ -75,14 +75,9 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		}
 	}
 
-	public ViewWindowBase(String applicationTitle, 
-	                      ViewWindowsManager<TD, ?, ?> windowsManager,
-	                      MenuConstructor<? extends ViewWindowBase<TD>> menuConstructor)
+	public ViewWindowBase(String applicationTitle)
 	{
 		this.applicationTitle = applicationTitle;
-		this.windowsManager = windowsManager;
-		this.menuConstructor = menuConstructor;
-		
 	}
 	
 	@Override
@@ -91,68 +86,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		return shell.getMenuBar();
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public final void open()
 	{
 		shell = constructShell();
 		prepareShell();
-
-		// Creating Fullscreen handler
-		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_VIEW_FULLSCREEN));
-		if (fullscreenAction != null) {
-			Handler<ViewWindowBase<TD>> fullscreenHandler = new Handler<ViewWindowBase<TD>>() {
-
-				@Override
-				public void execute(ViewWindowBase<TD> window) {
-					window.toggleFullScreen();
-				}
-			};
-			
-			fullscreenAction.getHandlers().put(this, fullscreenHandler);
-		}
-
-		// Creating Minimize handler
-		Action<ViewWindowBase<TD>> minimizeAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_MINIMIZE));
-		if (minimizeAction != null) {
-			Handler<ViewWindowBase<TD>> minimizeHandler = new Handler<ViewWindowBase<TD>>() {
-
-				@Override
-				public void execute(ViewWindowBase<TD> window) {
-					window.toggleMinimized();
-				}
-				
-				@Override
-				public boolean isEnabled() {
-					return Display.getCurrent().getActiveShell() != null;
-				}
-				
-			};
-			minimizeAction.getHandlers().put(this, minimizeHandler);
-		}
-		
-		// Creating Zoom handler
-		Action<ViewWindowBase<TD>> zoomAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_WINDOW_ZOOM));
-		if (zoomAction != null) {
-			Handler<ViewWindowBase<TD>> zoomHandler = new Handler<ViewWindowBase<TD>>() {
-
-				@Override
-				public void execute(ViewWindowBase<TD> window) {
-					window.toggleMaximized();
-				}
-				
-				@Override
-				public boolean isEnabled() {
-					return Display.getCurrent().getActiveShell() != null;
-				}
-
-				
-			};
-			zoomAction.getHandlers().put(this, zoomHandler);
-		}
-		
-		
-		((MenuConstructor)menuConstructor).updateMenus(this);
 
 		shell.layout();
 		shell.open();
@@ -206,48 +144,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		if (shell.getMaximized()) shell.setMaximized(false);
 		shell.setFullScreen(!shell.getFullScreen());
 	}
-	
-	@Override
-	public void shellIconified(ShellEvent arg0)
-	{
-	}
-	
-	@Override
-	public void shellDeiconified(ShellEvent arg0)
-	{
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public void shellDeactivated(ShellEvent arg0)
-	{
-		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public void shellActivated(ShellEvent arg0)
-	{
-		((MenuConstructor)menuConstructor).updateMenus(ViewWindowBase.this);
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public void shellClosed(ShellEvent arg0)
-	{
-		// If we want this to work, we should guarantee that the generic parameter type TVW of windowsManager equals to our type
-		((ViewWindowsManager)windowsManager).closeWindow(ViewWindowBase.this);
-	}
 
 	public void widgetDisposed(DisposeEvent arg0)
 	{
 		// If we want this to work, we should guarantee that the generic parameter type TVW of menuConstructor equals to our type
 		 
-		@SuppressWarnings("unchecked")
-		Action<ViewWindowBase<TD>> fullscreenAction = (Action<ViewWindowBase<TD>>)(menuConstructor.getActionsRoot().findActionByIdRecursively(MenuConstructorBase.ACTION_VIEW_FULLSCREEN));
-		if (fullscreenAction != null) {
-			fullscreenAction.getHandlers().remove(this);
-		}
 		
 		Document doc = getDocument();
 		if (doc != null) 
@@ -267,15 +168,6 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		{
 			setCocoaFullscreenButton(supportsFullscreen());
 		}
-		
-		shell.addShellListener(this);
-		
-		shell.addDisposeListener(this);
-	}
-
-	public MenuConstructor<? extends ViewWindowBase<TD>> getMenuConstructor()
-	{
-		return menuConstructor;
 	}
 
 	public String getApplicationTitle()

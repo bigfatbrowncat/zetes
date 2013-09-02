@@ -1,6 +1,5 @@
 package crossbase.abstracts;
 
-
 public interface MenuConstructor<TVW extends ViewWindow<?>>
 {
 	/**

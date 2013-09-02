@@ -46,11 +46,6 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		}
 	}
 	
-	public ImageViewWindow(String applicationTitle)
-	{
-		super(applicationTitle);
-	}
-	
 	/**
 	 * Create contents of the window.
 	 * 
@@ -132,7 +127,6 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		super.setDocument(document);
 		
 		imageView.setImage(getDocument().getImage());
-		getShell().setText(getDocument().getTitle() + " \u2013 " + getApplicationTitle());
 		scrolledComposite.setMinSize(imageView.desiredSize());
 		updateImageViewSize();
 		imageView.setVisible(true);

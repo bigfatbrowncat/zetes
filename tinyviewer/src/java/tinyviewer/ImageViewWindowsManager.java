@@ -6,12 +6,10 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 
-import crossbase.ui.ViewWindowsManager;
+import crossbase.ui.ViewWindowsManagerBase;
 
-public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, ImageViewWindow>
+public class ImageViewWindowsManager extends ViewWindowsManagerBase<ImageDocument, ImageViewWindow>
 {
-	private String applicationTitle;
-	
 	private DropTargetAdapter viewWindowDropTargetAdapter = new DropTargetAdapter()
 	{
 		public void drop(DropTargetEvent event) {
@@ -39,7 +37,7 @@ public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, I
 	@Override
 	protected ImageViewWindow createViewWindow()
 	{
-		ImageViewWindow vw = new ImageViewWindow(applicationTitle);
+		ImageViewWindow vw = new ImageViewWindow();
 		vw.addDropTargetListener(viewWindowDropTargetAdapter);
 		return vw;
 	}
@@ -47,10 +45,5 @@ public class ImageViewWindowsManager extends ViewWindowsManager<ImageDocument, I
 	public DropTargetAdapter getViewWindowDropTargetAdapter()
 	{
 		return viewWindowDropTargetAdapter;
-	}
-
-	public ImageViewWindowsManager(String applicationTitle)
-	{
-		this.applicationTitle = applicationTitle;
 	}
 }

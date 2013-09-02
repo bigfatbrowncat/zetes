@@ -13,11 +13,7 @@ import crossbase.ApplicationBase;
 import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.actions.Handler;
 
-public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
-                                                             ImageDocument,
-                                                             ImageViewWindow,
-                                                             TinyViewerMenuConstructor,
-                                                             ImageViewWindowsManager>
+public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor, ImageViewWindowsManager>
 {
 	@Override
 	public String getTitle()
@@ -82,7 +78,7 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 					}
 				}
 				
-				getViewWindowsManager().openViewForDocuments(documents.toArray(new ImageDocument[] {}));
+				getViewWindowsManager().openWindowsForDocuments(documents.toArray(new ImageDocument[] {}));
 			}
 			dummyShell.dispose();		
 		}
@@ -93,15 +89,10 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 
 	}
 	
-	public static void main(String... args)
-	{
-		new TinyViewerApplication().run(args);
-	}
-
 	@Override
 	public ImageViewWindowsManager createViewWindowsManager()
 	{
-		return new ImageViewWindowsManager(getTitle());
+		return new ImageViewWindowsManager();
 	}
 
 	@Override
@@ -116,5 +107,10 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox,
 	public boolean needsAtLeastOneView()
 	{
 		return false;
+	}
+
+	public static void main(String... args)
+	{
+		new TinyViewerApplication().run(args);
 	}
 }

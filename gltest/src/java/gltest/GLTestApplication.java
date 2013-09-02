@@ -3,14 +3,11 @@ package gltest;
 import org.eclipse.swt.graphics.Point;
 
 import crossbase.ApplicationBase;
+import crossbase.NullDocument;
 import crossbase.ui.DefaultAboutBox;
 import crossbase.ui.MenuConstructorBase;
 
-public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
-                                                       GLDocument, 
-                                                       GLViewWindow, 
-                                                       MenuConstructorBase<GLViewWindow>,
-                                                       GLViewWindowsManager>
+public class GLTestApplication extends ApplicationBase<DefaultAboutBox, NullDocument, GLViewWindow, MenuConstructorBase<GLViewWindow>, GLViewWindowsManager>
 {
 	private GLViewWindow glViewWindow;
 	/**
@@ -64,7 +61,7 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
 	@Override
 	public GLViewWindowsManager createViewWindowsManager()
 	{
-		return new GLViewWindowsManager(getTitle());
+		return new GLViewWindowsManager();
 	}
 
 	@Override
@@ -74,7 +71,7 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox,
 	}
 
 	@Override
-	public GLDocument loadFromFile(String fileName)
+	public NullDocument loadFromFile(String fileName)
 	{
 		return null;
 	}

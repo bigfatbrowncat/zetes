@@ -11,14 +11,23 @@ import org.eclipse.swt.events.ShellListener;
 
 import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowsManager;
 import crossbase.abstracts.ViewWindowsManagerListener;
 
-public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWindow<TD>>
+public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends ViewWindow<TD>> implements ViewWindowsManager<TD, TVW>
 {
+	private String applicationTitle;
 	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
-
 	private HashSet<ViewWindowsManagerListener<TVW>> listeners = new HashSet<ViewWindowsManagerListener<TVW>>();
 	
+	public String getApplicationTitle() {
+		return applicationTitle;
+	}
+
+	public void setApplicationTitle(String applicationTitle) {
+		this.applicationTitle = applicationTitle;
+	}
+
 	private void addWindowForDocument(TD document, TVW window)
 	{
 		if (!views.containsKey(document))
@@ -54,6 +63,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 * and we are not in OS X, terminates the application.
 	 * @param viewWindow The window to close
 	 */
+	@Override
 	public void closeWindow(TVW viewWindow)
 	{
 		findAndRemoveWindow(viewWindow);
@@ -71,6 +81,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 * forgets about that document
 	 * @param document a document to close
 	 */
+	@Override
 	public void closeDocument(TD document)
 	{
 		for (TVW view : views.get(document))
@@ -85,6 +96,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 * Closes every window. After all windows are closed,
 	 * if we are not in OS X, terminates the application.
 	 */
+	@Override
 	public void closeAllWindows()
 	{
 		for (TD doc : views.keySet())
@@ -93,6 +105,11 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 		}
 	}
 	
+	/**
+	 * This method should be overridden to create a new instance of {@link TVW} template
+	 * parameter class, i.e. the new view window  
+	 * @return a new view window
+	 */
 	protected abstract TVW createViewWindow();
 	
 	/**
@@ -104,6 +121,8 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	protected TVW openNewWindow(TD document)
 	{
 		final TVW newWindow = createViewWindow();
+		newWindow.setTitleSuffix(applicationTitle);
+		
 		newWindow.open();
 		
 		if (document != null)
@@ -137,6 +156,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 	 * @param document The document to open. It shouldn't be null
 	 * @return The window where the document is opened
 	 */
+	@Override
 	public TVW openWindowForDocument(TD document)
 	{
 		if (document == null && views.containsKey(null)) throw new IllegalArgumentException("Document shouldn't be null");
@@ -167,7 +187,7 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 		return vw;
 	}
 	
-	public Object[] openViewForDocuments(TD[] documents)
+	public Object[] openWindowsForDocuments(TD[] documents)
 	{
 		ArrayList<Object> res = new ArrayList<Object>();
 		for (int i = 0; i < documents.length; i++)
@@ -212,11 +232,13 @@ public abstract class ViewWindowsManager<TD extends Document, TVW extends ViewWi
 		}
 	}
 	
+	@Override
 	public void addListener(ViewWindowsManagerListener<TVW> listener)
 	{
 		listeners.add(listener);
 	}
 	
+	@Override
 	public void removeListener(ViewWindowsManagerListener<TVW> listener)
 	{
 		listeners.remove(listener);

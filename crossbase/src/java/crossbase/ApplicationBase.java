@@ -4,16 +4,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 
 import crossbase.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import crossbase.abstracts.AboutBox;
 import crossbase.abstracts.Application;
 import crossbase.abstracts.Document;
 import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowsManager;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.MenuConstructorBase;
-import crossbase.ui.ViewWindowsManager;
 import crossbase.ui.actions.Handler;
 
 public abstract class ApplicationBase<TAB extends AboutBox, 
@@ -192,6 +191,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			Display.setAppName(getTitle());
 	
 			viewWindowsManager = createViewWindowsManager();
+			viewWindowsManager.setApplicationTitle(getTitle());
 			
 			viewWindowsManager.addListener(viewWindowsManagerListener);
 

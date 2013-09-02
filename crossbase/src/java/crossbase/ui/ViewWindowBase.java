@@ -17,8 +17,8 @@ import crossbase.abstracts.ViewWindow;
 public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>
 {
 	private Shell shell;
-	private String applicationTitle;
 	private TD document;
+	private String titleSuffix;
 	
 	protected Shell getShell() {
 		return shell;
@@ -40,7 +40,12 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	}
 	
 	@Override
-	public String getTitle() {
+	public String getWindowTitle() {
+		return getShell().getText();
+	}
+	
+	@Override
+	public String getViewTitle() {
 		if (getDocument() != null) {
 			return getDocument().getTitle();
 		} else {
@@ -52,6 +57,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	public void setDocument(TD document)
 	{
 		this.document = document;
+		if (document != null && document.getTitle() != null) {
+			getShell().setText(getDocument().getTitle() + " \u2013 " + getTitleSuffix());
+		} else {
+			getShell().setText(getTitleSuffix());
+		}
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -79,9 +89,8 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		}
 	}
 
-	public ViewWindowBase(String applicationTitle)
+	public ViewWindowBase()
 	{
-		this.applicationTitle = applicationTitle;
 	}
 	
 	@Override
@@ -160,7 +169,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	
 	private void prepareShell()
 	{
-		shell.setText(applicationTitle);
+		shell.setText(titleSuffix);
 
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
@@ -171,8 +180,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		}
 	}
 
-	public String getApplicationTitle()
-	{
-		return applicationTitle;
+	public String getTitleSuffix() {
+		return titleSuffix;
+	}
+
+	public void setTitleSuffix(String titleSuffix) {
+		this.titleSuffix = titleSuffix;
 	}
 }

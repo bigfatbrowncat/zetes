@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import crossbase.abstracts.MenuConstructor;
 import crossbase.abstracts.ViewWindow;
+import crossbase.abstracts.ViewWindowsManager;
 import crossbase.abstracts.ViewWindowsManagerListener;
 import crossbase.ui.actions.Action;
 import crossbase.ui.actions.ActionList;
@@ -111,9 +112,9 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 			
 			
 			// Creating an action for window selection
-			final Action<TVW> thisWindowAction = new Action<>();
-			thisWindowAction.setTitle(window.getTitle());
-			thisWindowAction.getHandlers().put(null, new Handler<TVW>() {
+			final Action<TVW> thisWindowSelectionAction = new Action<>();
+			thisWindowSelectionAction.setTitle(window.getViewTitle());
+			thisWindowSelectionAction.getHandlers().put(null, new Handler<TVW>() {
 
 				@Override
 				public void execute(TVW win) {
@@ -121,11 +122,11 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 				}
 				
 				public String getTitle() {
-					return window.getTitle();
+					return window.getViewTitle();
 				}
 				
 				public HotKey getHotKey() {
-					int index = windowsActionList.indexOf(thisWindowAction);
+					int index = windowsActionList.indexOf(thisWindowSelectionAction);
 					if (index < 9) {
 						return new HotKey(HotKey.MOD1, (char)('1' + index));
 					}
@@ -136,8 +137,8 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					return window.isActive();
 				}
 			});
-			viewWindowSelectionActions.put(window, thisWindowAction);
-			windowsActionList.addLastItem(thisWindowAction);
+			viewWindowSelectionActions.put(window, thisWindowSelectionAction);
+			windowsActionList.addLastItem(thisWindowSelectionAction);
 			
 			window.addShellListener(new ShellListener() {
 				
@@ -229,6 +230,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 			fileActionCategory.addLastItem(exitFileAction);
 			
 			preferencesEditAction = new Action<TVW>("&Preferences");
+			preferencesEditAction.setHotKey(new HotKey(HotKey.MOD1, 'P'));
 			editActionCategory.addLastItem(preferencesEditAction);
 	
 			aboutHelpAction = new Action<TVW>("&About");

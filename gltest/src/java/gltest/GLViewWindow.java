@@ -17,9 +17,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import crossbase.NullDocument;
 import crossbase.ui.ViewWindowBase;
 
-public class GLViewWindow extends ViewWindowBase<GLDocument>
+public class GLViewWindow extends ViewWindowBase<NullDocument>
 {
 	// Model constants
 	private static final int MODEL_CUBE = 0;
@@ -37,9 +38,9 @@ public class GLViewWindow extends ViewWindowBase<GLDocument>
 	private Date lastFrameMoment = new Date();
 	private float framesPerSecond = 50;
 	
-	public GLViewWindow(String applicationTitle)
+	public GLViewWindow()
 	{
-		super(applicationTitle);
+		super();
 	}
 	
 	/**

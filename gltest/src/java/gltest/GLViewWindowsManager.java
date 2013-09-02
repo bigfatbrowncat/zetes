@@ -1,19 +1,13 @@
 package gltest;
 
-import crossbase.ui.ViewWindowsManager;
+import crossbase.NullDocument;
+import crossbase.ui.ViewWindowsManagerBase;
 
-public class GLViewWindowsManager extends ViewWindowsManager<GLDocument, GLViewWindow>
+public class GLViewWindowsManager extends ViewWindowsManagerBase<NullDocument, GLViewWindow>
 {
-	private String applicationTitle;
-
 	@Override
 	protected GLViewWindow createViewWindow()
 	{
-		return new GLViewWindow(applicationTitle);
-	}
-	
-	public GLViewWindowsManager(String applicationTitle)
-	{
-		this.applicationTitle = applicationTitle;
+		return new GLViewWindow();
 	}
 }

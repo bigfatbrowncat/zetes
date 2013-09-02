@@ -1,8 +1,6 @@
 package crossbase.ui.actions;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import crossbase.abstracts.ViewWindow;
 

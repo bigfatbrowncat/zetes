@@ -11,7 +11,7 @@
 	<key>CFBundleName</key>
 	<string>Tiny Viewer</string>
 	<key>CFBundleIconFile</key>
-	<string>tinyview.icns</string>
+	<string>wing.icns</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.0</string>
 	<key>LSMinimumSystemVersion</key>

@@ -7,6 +7,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -24,6 +28,7 @@ import crossbase.abstracts.AboutBox;
 
 public class DefaultAboutBox extends Dialog implements AboutBox
 {
+	private static Shell emptyShell;
 	protected Shell aboutBoxShell;
 	private String applicationName = "", descriptionText = "", copyrightText = "", iconResourceName = "";
 	private Point windowSize = new Point(370, 160);
@@ -40,7 +45,8 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 			
 			public Shell getShell() {
 				if (SWT.getPlatform().equals("cocoa")) {
-					return new Shell(Display.getCurrent());
+					if (emptyShell == null) emptyShell = new Shell(Display.getCurrent());
+					return emptyShell;
 				} else {
 					return parent.getShell();
 				}
@@ -243,7 +249,7 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 		
 
  		Label iconLabel = new Label(aboutBoxShell, SWT.NO_BACKGROUND);
-		iconLabel.setAlignment(SWT.CENTER);
+ 		iconLabel.setAlignment(SWT.CENTER);
 		iconLabel.setImage(SWTResourceManager.getImage(DefaultAboutBox.class, iconResourceName /*"/crossbase/icon.png"*/));
 		FormData fd_iconLabel = new FormData();
 		fd_iconLabel.left = new FormAttachment(0, 10);
@@ -287,13 +293,6 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 		
 		aboutBoxShell.setSize(windowSize.x, iconLabel.getSize().y + 30 + titleLabel.getSize().y + 30 + descriptionLabel.getSize().y + 30 + copyrightLabel.getSize().y);
 		
-		aboutBoxShell.addDisposeListener(new DisposeListener() {
-			
-			@Override
-			public void widgetDisposed(DisposeEvent arg0) {
-				aboutBoxShell.getParent().getShell().dispose();
-			}
-		});
 	}
 
 	

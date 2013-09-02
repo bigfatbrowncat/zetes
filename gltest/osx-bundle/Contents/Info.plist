@@ -11,7 +11,7 @@
 	<key>CFBundleName</key>
 	<string>GL Demo</string>
 	<key>CFBundleIconFile</key>
-	<string>gltest.icns</string>
+	<string>wingcube.icns</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.0</string>
 	<key>LSMinimumSystemVersion</key>

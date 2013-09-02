@@ -50,7 +50,7 @@ public class GLTestApplication extends ApplicationBase<DefaultAboutBox, NullDocu
 	{
 		DefaultAboutBox res = new DefaultAboutBox(parentWindow);
 		res.setApplicationName(getTitle());
-		res.setIconResourceName("/gltest/gltest64.png");
+		res.setIconResourceName("/gltest/wingcube64.png");
 		res.setDescriptionText("A graphics demonstration which uses OpenGL canvas.\nThis application shows the power of Avian + SWT");
 		res.setCopyrightText("Copyright \u00a9 2013, Ilya Mizus");
 		res.setWindowSize(new Point(410, 180));

@@ -56,11 +56,11 @@ public class GLViewWindow extends ViewWindowBase<NullDocument>
 		shell.setSize(size.x - clientSize.x + 800, size.y - clientSize.y + 600);
 		if (SWT.getPlatform().equals("win32"))
 		{
-			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/gltest16.png"));
+			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/wingcube.ico"));
 		}
 		else
 		{
-			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/gltest64.png"));
+			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/wingcube.ico"));
 		}
 		
 		shell.setLayout(new FillLayout());

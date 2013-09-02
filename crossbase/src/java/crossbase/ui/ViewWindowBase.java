@@ -41,7 +41,11 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	
 	@Override
 	public String getTitle() {
-		return shell.getText();
+		if (getDocument() != null) {
+			return getDocument().getTitle();
+		} else {
+			return getShell().getText();
+		}
 	}
 	
 	@Override

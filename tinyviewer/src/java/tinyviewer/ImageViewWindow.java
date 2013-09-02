@@ -140,15 +140,6 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 	}
 	
 	@Override
-	public String getTitle() {
-		if (getDocument() != null) {
-			return getDocument().getTitle();
-		} else {
-			return getShell().getText();
-		}
-	}
-	
-	@Override
 	public boolean supportsFullscreen()
 	{
 		return true;

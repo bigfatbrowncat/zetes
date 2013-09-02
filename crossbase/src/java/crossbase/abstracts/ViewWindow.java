@@ -5,10 +5,7 @@ import org.eclipse.swt.widgets.Menu;
 
 public interface ViewWindow<TD extends Document>
 {
-	void setDocument(TD document);
-	
 	Menu getMenu();
-	TD getDocument();
 	
 	boolean isActive();
 	void activate(boolean force);
@@ -23,6 +20,9 @@ public interface ViewWindow<TD extends Document>
 	boolean supportsMaximizing();
 	
 	void addShellListener(ShellListener shellListener);
-	
+
+	TD getDocument();
+	void setDocument(TD document);
+
 	String getTitle();
 }

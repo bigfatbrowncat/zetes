@@ -27,7 +27,7 @@ public interface Application<TAB extends AboutBox,
 	
 	/**
 	 * Behaviour controlling function. Should return constant. 
-	 * @return If the overridden function returns true, when we start the application
+	 * @return If the overridden function returns true, then after the application is started
 	 * it creates a new empty view window (even on OS X). When the last view window
 	 * (not necessarily the same) is closed, the application will be terminated (yes, even on OS X).
 	 */

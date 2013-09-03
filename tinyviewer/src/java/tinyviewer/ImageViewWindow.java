@@ -11,6 +11,7 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
@@ -58,8 +59,10 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		shell.setMinimumSize(new Point(150, 200));
-		shell.setImage(SWTResourceManager.getImage(ImageViewWindow.class,
-				"/tinyviewer/wingphotos.ico"));
+		shell.setImages(new Image[] { 
+				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos16.png"),
+				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos64.png")
+		});
 	
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 

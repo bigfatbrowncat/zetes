@@ -9,6 +9,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.opengl.CrossBaseGLCanvas;
@@ -54,15 +55,11 @@ public class GLViewWindow extends ViewWindowBase<NullDocument>
 		Point clientSize = new Point(shell.getClientArea().width, shell.getClientArea().height);
 		
 		shell.setSize(size.x - clientSize.x + 800, size.y - clientSize.y + 600);
-		if (SWT.getPlatform().equals("win32"))
-		{
-			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/wingcube.ico"));
-		}
-		else
-		{
-			shell.setImage(SWTResourceManager.getImage(GLViewWindow.class, "/gltest/wingcube.ico"));
-		}
-		
+		shell.setImages(new Image[] { 
+				SWTResourceManager.getImage(GLViewWindow.class, "/gltest/wingcube16.png"),
+				SWTResourceManager.getImage(GLViewWindow.class, "/gltest/wingcube64.png")
+		});
+
 		shell.setLayout(new FillLayout());
 		Composite comp = new Composite(shell, SWT.NO_BACKGROUND);
 		comp.setLayout(new FillLayout());

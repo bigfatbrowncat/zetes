@@ -59,7 +59,7 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		shell.setMinimumSize(new Point(150, 200));
 		shell.setImage(SWTResourceManager.getImage(ImageViewWindow.class,
-				"/crossbase/icon.png"));
+				"/tinyviewer/wingphotos.ico"));
 	
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 

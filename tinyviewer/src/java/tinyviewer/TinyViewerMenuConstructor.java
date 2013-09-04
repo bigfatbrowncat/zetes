@@ -10,8 +10,8 @@ public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWind
 	private Handler<ImageViewWindow> fileOpenHandler;
 	private Action<ImageViewWindow> openAction;
 	
-	public TinyViewerMenuConstructor() {
-		super();
+	public TinyViewerMenuConstructor(ImageViewWindowsManager viewWindowsManager) {
+		super(viewWindowsManager);
 		
 		openAction = new Action<>("&Open");
 		openAction.setHotKey(new HotKey(HotKey.MOD1, 'O'));

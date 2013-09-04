@@ -31,9 +31,10 @@ public interface Application<TAB extends AboutBox,
 	/**
 	 * <p>This function should be defined in descendant class in order to provide a specific
 	 * menu constructor for the application.</p>
+	 * <p>The {@link MenuConstructor} should be connected to a {@link ViewWindowsManager}
 	 * @return a new {@link MenuConstructor} interface implementation
 	 */
-	TMC createMenuConstructor();
+	TMC createMenuConstructor(TVWM viewWindowsManager);
 	
 	/**
 	 * This function creates a document object from a file.

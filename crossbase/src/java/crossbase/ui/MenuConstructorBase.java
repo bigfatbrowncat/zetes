@@ -178,8 +178,14 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		}
 	};
 	
-	public MenuConstructorBase() {
+	public MenuConstructorBase(ViewWindowsManager<?, TVW> viewWindowsManager) {
 
+		// Starting listening to viewWindowsManager events
+		this.viewWindowsManager = viewWindowsManager;
+		viewWindowsManager.addListener(viewWindowsManagerListener);
+		
+		// *** Creating the basic menu actions ***
+		
 		// File action list
 		fileActionCategory = new ActionList<>("&File");
 		actionsRoot.addLastItem(fileActionCategory);
@@ -515,15 +521,15 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		return viewWindowsManager;
 	}
 
-	public void setViewWindowsManager(ViewWindowsManager<?, TVW> viewWindowsManager) {
-		if (this.viewWindowsManager != null) {
-			this.viewWindowsManager.removeListener(viewWindowsManagerListener);
-		}
-		
-		this.viewWindowsManager = viewWindowsManager;
-		
-		if (this.viewWindowsManager != null) {
-			viewWindowsManager.addListener(viewWindowsManagerListener);
-		}
-	}	
+//	public void setViewWindowsManager() {
+//		if (this.viewWindowsManager != null) {
+//			this.viewWindowsManager.removeListener(viewWindowsManagerListener);
+//		}
+//		
+//		this.viewWindowsManager = viewWindowsManager;
+//		
+//		if (this.viewWindowsManager != null) {
+//			viewWindowsManager.addListener(viewWindowsManagerListener);
+//		}
+//	}	
 }

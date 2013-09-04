@@ -192,11 +192,9 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	
 			viewWindowsManager = createViewWindowsManager();
 			viewWindowsManager.setApplicationTitle(getTitle());
-			
 			viewWindowsManager.addListener(viewWindowsManagerListener);
 
-			menuConstructor = createMenuConstructor();
-			menuConstructor.setViewWindowsManager(viewWindowsManager);
+			menuConstructor = createMenuConstructor(viewWindowsManager);
 			menuConstructor.setExitGlobalHandler(exitHandler);
 			menuConstructor.setAboutGlobalHandler(aboutHandler);
 			menuConstructor.setPreferencesGlobalHandler(preferencesHandler);

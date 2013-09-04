@@ -10,14 +10,18 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 	private boolean isSubMenu = true;
 	private boolean isRadioItems;
 	
-	public ActionList() {
-		super();
-	}
-	
 	public ActionList(String title) {
 		super(title);
 	}
 
+	/**
+	 * Empty constructor. Title set to null and isSubMenu set to false
+	 */
+	public ActionList() {
+		super(null);
+		this.setSubMenu(false);
+	}
+	
 	public ActionList(String title, boolean isSubMenu) {
 		super(title);
 		this.setSubMenu(isSubMenu);

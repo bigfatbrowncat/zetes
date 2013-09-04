@@ -20,6 +20,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import crossbase.NullDocument;
 import crossbase.ui.ViewWindowBase;
+import crossbase.ui.actions.Handler;
 
 public class GLViewWindow extends ViewWindowBase<NullDocument>
 {
@@ -39,9 +40,42 @@ public class GLViewWindow extends ViewWindowBase<NullDocument>
 	private Date lastFrameMoment = new Date();
 	private float framesPerSecond = 50;
 	
+	private Handler<GLViewWindow> viewCubeActionHandler;
+	private Handler<GLViewWindow> viewMonkeyActionHandler;
+	private Handler<GLViewWindow> viewMonkeySubdivActionHandler;
+
+	
 	public GLViewWindow()
 	{
 		super();
+		
+		viewCubeActionHandler = new Handler<GLViewWindow>() {
+			public void execute(GLViewWindow window)
+			{
+				Point size = canvas.getSize();
+				destroyScene();
+				createScene(MODEL_CUBE, size.x, size.y);			
+			}
+		};
+
+		viewMonkeyActionHandler = new Handler<GLViewWindow>() {
+			public void execute(GLViewWindow window)
+			{
+				Point size = canvas.getSize();
+				destroyScene();
+				createScene(MODEL_MONKEY_SIMPLE, size.x, size.y);		
+			}
+		};
+		
+		viewMonkeySubdivActionHandler = new Handler<GLViewWindow>() {
+			public void execute(GLViewWindow window)
+			{
+				Point size = canvas.getSize();
+				destroyScene();
+				createScene(MODEL_MONKEY_SUBDIVIDED, size.x, size.y);		
+			}
+		};
+		
 	}
 	
 	/**
@@ -76,37 +110,6 @@ public class GLViewWindow extends ViewWindowBase<NullDocument>
 		
 		Point csize = canvas.getSize();
 		createScene(MODEL_CUBE, csize.x, csize.y);
-		
-		canvas.addKeyListener(new KeyListener() {
-			
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent arg0)
-			{
-				Point size = canvas.getSize();
-				
-				if (arg0.character == '1')
-				{
-					destroyScene();
-					createScene(MODEL_CUBE, size.x, size.y);
-				}
-				else if (arg0.character == '2')
-				{
-					destroyScene();
-					createScene(MODEL_MONKEY_SIMPLE, size.x, size.y);
-				}
-				else if (arg0.character == '3')
-				{
-					destroyScene();
-					createScene(MODEL_MONKEY_SUBDIVIDED, size.x, size.y);
-				}
-			}
-		});
 		
 		canvas.addControlListener(new ControlListener()
 		{
@@ -178,4 +181,15 @@ public class GLViewWindow extends ViewWindowBase<NullDocument>
 	{
 		return true;
 	}
+	
+	public Handler<GLViewWindow> getViewCubeActionHandler() {
+		return viewCubeActionHandler;
+	}
+	public Handler<GLViewWindow> getViewMonkeyActionHandler() {
+		return viewMonkeyActionHandler;
+	}
+	public Handler<GLViewWindow> getViewMonkeySubdivActionHandler() {
+		return viewMonkeySubdivActionHandler;
+	}
+
 }

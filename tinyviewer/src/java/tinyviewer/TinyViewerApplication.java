@@ -96,9 +96,9 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 	}
 
 	@Override
-	public TinyViewerMenuConstructor createMenuConstructor()
+	public TinyViewerMenuConstructor createMenuConstructor(ImageViewWindowsManager viewWindowsManager)
 	{
-		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor();
+		TinyViewerMenuConstructor menuConstructor = new TinyViewerMenuConstructor(viewWindowsManager);
 		menuConstructor.setFileOpenHandler(fileOpenHandler);
 		return menuConstructor;
 	}

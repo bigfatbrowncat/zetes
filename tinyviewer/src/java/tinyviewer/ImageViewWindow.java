@@ -17,7 +17,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.ui.ViewWindowBase;
+import zetes.ui.ViewWindowBase;
+
 
 public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 {

@@ -5,8 +5,6 @@ import java.util.Date;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
@@ -18,9 +16,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import crossbase.NullDocument;
-import crossbase.ui.ViewWindowBase;
-import crossbase.ui.actions.Handler;
+import zetes.NullDocument;
+import zetes.ui.ViewWindowBase;
+import zetes.ui.actions.Handler;
+
 
 public class GLViewWindow extends ViewWindowBase<NullDocument>
 {

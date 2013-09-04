@@ -2,10 +2,10 @@ package gltest;
 
 import org.eclipse.swt.graphics.Point;
 
-import crossbase.ApplicationBase;
-import crossbase.NullDocument;
-import crossbase.ui.DefaultAboutBox;
-import crossbase.ui.MenuConstructorBase;
+import zetes.ApplicationBase;
+import zetes.NullDocument;
+import zetes.ui.DefaultAboutBox;
+
 
 public class GLTestApplication extends ApplicationBase<DefaultAboutBox, NullDocument, GLViewWindow, GLTestMenuConstructor, GLViewWindowsManager>
 {

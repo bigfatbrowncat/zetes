@@ -1,8 +1,8 @@
-CROSSBASE_PATH = ../crossbase
+ZETES_PATH = ../zetes
 
 APPLICATION_NAME = Tiny\ Viewer
 BINARY_NAME = tinyview
 
 all: package
 
-include $(CROSSBASE_PATH)/User.mk
+include $(ZETES_PATH)/User.mk

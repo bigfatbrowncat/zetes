@@ -1,7 +1,7 @@
 package gltest;
 
-import crossbase.NullDocument;
-import crossbase.ui.ViewWindowsManagerBase;
+import zetes.NullDocument;
+import zetes.ui.ViewWindowsManagerBase;
 
 public class GLViewWindowsManager extends ViewWindowsManagerBase<NullDocument, GLViewWindow>
 {

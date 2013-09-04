@@ -1,9 +1,9 @@
 package tinyviewer;
 
-import crossbase.ui.HotKey;
-import crossbase.ui.MenuConstructorBase;
-import crossbase.ui.actions.Action;
-import crossbase.ui.actions.Handler;
+import zetes.ui.HotKey;
+import zetes.ui.MenuConstructorBase;
+import zetes.ui.actions.Action;
+import zetes.ui.actions.Handler;
 
 public class TinyViewerMenuConstructor extends MenuConstructorBase<ImageViewWindow>
 {

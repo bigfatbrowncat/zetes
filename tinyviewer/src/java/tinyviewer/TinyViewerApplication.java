@@ -9,9 +9,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import crossbase.ApplicationBase;
-import crossbase.ui.DefaultAboutBox;
-import crossbase.ui.actions.Handler;
+import zetes.ApplicationBase;
+import zetes.ui.DefaultAboutBox;
+import zetes.ui.actions.Handler;
+
 
 public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor, ImageViewWindowsManager>
 {

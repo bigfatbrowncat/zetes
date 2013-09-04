@@ -1,4 +1,4 @@
-CROSSBASE_PATH = ../crossbase
+ZETES_PATH = ../zetes
 
 APPLICATION_NAME = GLDemo
 BINARY_NAME = gltest
@@ -16,4 +16,4 @@ endif
 
 all: package
 
-include $(CROSSBASE_PATH)/User.mk
+include $(ZETES_PATH)/User.mk

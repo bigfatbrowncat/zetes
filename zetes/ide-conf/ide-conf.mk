@@ -21,6 +21,7 @@ ide-conf-eclipse:
 	@echo Extracting Eclipse project files for $(PLATFORM_TAG)...
 	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/eclipse/.project ./
 	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/eclipse/.cproject ./
+	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/eclipse/.classpath ./
+	cp -rf $(IDE_CONF)/$(PLATFORM_TAG)/eclipse/.settings ./
 
-.PHONY: all
 .SILENT:

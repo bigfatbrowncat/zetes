@@ -71,11 +71,11 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="OS X (x86_64)">
-			<resource resourceType="FOLDER" workspacePath="/zetes/bin"/>
-		</configuration>
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/zetes"/>
+		</configuration>
+		<configuration configurationName="OS X (x86_64)">
+			<resource resourceType="FOLDER" workspacePath="/zetes/bin"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>

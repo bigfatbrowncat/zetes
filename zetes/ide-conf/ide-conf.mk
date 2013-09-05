@@ -19,8 +19,8 @@ endif
 
 ide-conf-eclipse:
 	@echo Extracting Eclipse project files for $(PLATFORM_TAG)...
-	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/.project ./
-	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/.cproject ./
+	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/eclipse/.project ./
+	cp -f $(IDE_CONF)/$(PLATFORM_TAG)/eclipse/.cproject ./
 
 .PHONY: all
 .SILENT:

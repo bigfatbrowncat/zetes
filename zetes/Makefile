@@ -1,3 +1,5 @@
+include ide-conf/ide-conf.mk
+
 UNAME := $(shell uname)
 ifndef ARCH
   ARCH := $(shell uname -m)
@@ -89,8 +91,6 @@ SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf
 SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
 all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
-
-include "ide-conf/ide-conf.mk"
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
 	@echo Compiling $<...

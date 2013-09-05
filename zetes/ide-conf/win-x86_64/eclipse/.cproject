@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="0.1356258865">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.1356258865" moduleId="org.eclipse.cdt.core.settings" name="Windows (x86_64)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="zetes" buildProperties="" description="" id="0.1356258865" name="Windows (x86_64)" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+					<folderInfo id="0.1356258865." name="/" resourcePath="">
+						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.1447256318" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.PE" id="org.eclipse.cdt.build.core.prefbase.toolchain.1447256318.995355774" name=""/>
+							<builder id="org.eclipse.cdt.build.core.settings.default.builder.1437850748" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="org.eclipse.cdt.build.core.settings.default.builder">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH" kind="outputPath" name="bin"/>
+								</outputEntries>
+							</builder>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1302414069" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs">
+								<option id="org.eclipse.cdt.build.core.settings.holder.libpaths.949383061" name="Library Paths" superClass="org.eclipse.cdt.build.core.settings.holder.libpaths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/lib/win-x86_64}&quot;"/>
+								</option>
+								<option id="org.eclipse.cdt.build.core.settings.holder.libfiles.914979617" name="Library Files" superClass="org.eclipse.cdt.build.core.settings.holder.libfiles" valueType="libFiles">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${workspace_loc:/zetes/lib/win-x86_64/libavian.a}&quot;"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${workspace_loc:/zetes/lib/win-x86_64/libz.a}&quot;"/>
+								</option>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.1085049511" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1527620359" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/include}&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1480014851" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.885443108" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.2057893750" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/include}&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1285439841" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.1279909749" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.501705676" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/include}&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1232955337" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/cpp"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="zetes.null.477883847" name="zetes"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="0.1356258865">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/zetes"/>
+		</configuration>
+		<configuration configurationName="OS X (x86_64)">
+			<resource resourceType="FOLDER" workspacePath="/zetes/bin"/>
+		</configuration>
+		<configuration configurationName="Windows (x86_64)">
+			<resource resourceType="FOLDER" workspacePath="/zetes/bin"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>

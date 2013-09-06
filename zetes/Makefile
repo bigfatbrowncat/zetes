@@ -88,9 +88,49 @@ CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILE
 SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
 SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
-all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
+help:
+	@echo "*** This is Zetes build utility ***"
+	@echo
+	@echo 1. Set up your build environment
+	@echo Zetes library needs Java 7 compiler, so JAVA_HOME is to be set correctly. 
+	@echo
+	@echo Current value: JAVA_HOME=$(JAVA_HOME)
+	@echo
+	@echo To change it you can type:
+	@echo
+	@echo "  > export JAVA_HOME=<path>"
+	@echo
+	@echo Make sure that the current value ARCH=$(ARCH) is a correct architecture of the
+	@echo target that you are going to build. If it\'s not, type
+	@echo
+	@echo "  > export ARCH=<arch>"
+	@echo
+	@echo "where <arch> is one of: i386, x86_64"
+	@echo
+	@echo 2. Build Zetes or config IDE 
+	@echo To build the library right now from the command line, type 
+	@echo
+	@echo "  > make all"
+	@echo
+	@echo To setup project files for Eclipse CDT IDE, type
+	@echo
+	@echo "  > make ideconf-eclipse"
+	@echo
+	@echo To clean compiled binary files, type 
+	@echo
+	@echo "  > make clean"
+	@echo
+	
 
-include ide-conf/ide-conf.mk
+all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
+	@echo "*** Building process completed successfully. ***"
+	@echo You can find the result in folders:
+	@echo
+	@echo "  $(BINARY_PATH)"
+	@echo "  $(BIN)/java"
+	@echo
+
+include ideconf/ideconf.mk
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
 	@echo Compiling $<...

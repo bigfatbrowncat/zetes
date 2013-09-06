@@ -14,6 +14,7 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -60,9 +61,11 @@ public class ImageViewWindow extends ViewWindowBase<ImageDocument>
 
 		shell.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		shell.setMinimumSize(new Point(150, 200));
+
 		shell.setImages(new Image[] { 
-				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos16.png"),
-				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos64.png")
+				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos16.png"),		// Necessary in Windows (for taskbar)
+				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos32.png"),		// Necessary in Windows (for Alt-Tab)
+				SWTResourceManager.getImage(ImageViewWindow.class, "/tinyviewer/wingphotos512.png")		// Necessary in OS X
 		});
 	
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));

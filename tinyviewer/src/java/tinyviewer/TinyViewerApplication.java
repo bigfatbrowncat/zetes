@@ -16,6 +16,10 @@ import zetes.ui.actions.Handler;
 
 public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, ImageDocument, ImageViewWindow, TinyViewerMenuConstructor, ImageViewWindowsManager>
 {
+	//static {
+	//	System.loadLibrary("tinyview.debug");
+	//}
+	
 	@Override
 	public String getTitle()
 	{

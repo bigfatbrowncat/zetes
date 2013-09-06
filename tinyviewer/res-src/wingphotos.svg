@@ -17,9 +17,9 @@
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="wingphotos.svg"
-   inkscape:export-filename="wingphotos64.png"
-   inkscape:export-xdpi="11.25"
-   inkscape:export-ydpi="11.25">
+   inkscape:export-filename="wingphotos32.png"
+   inkscape:export-xdpi="5.625"
+   inkscape:export-ydpi="5.625">
   <defs
      id="defs4">
     <linearGradient
@@ -846,14 +846,14 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.56568543"
      inkscape:cx="-210.63237"
-     inkscape:cy="184.3143"
+     inkscape:cy="185.19818"
      inkscape:document-units="px"
      inkscape:current-layer="layer4"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="975"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-height="1028"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true"

@@ -20,6 +20,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  SH_LIB_EXT=.so
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
@@ -32,6 +33,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  SH_LIB_EXT=.so
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
@@ -44,6 +46,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  SH_LIB_EXT=.so
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
@@ -56,6 +59,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
+  SH_LIB_EXT=.dll
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
@@ -68,6 +72,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
+  SH_LIB_EXT=.dll
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
@@ -120,7 +125,7 @@ $(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_
 	hdiutil create $(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg -srcfolder $(BINARY_PATH)/$(APPLICATION_NAME) -ov
 
 else
-package: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+package: $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
 endif
 
 $(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_PATH)/bin/$(PLATFORM_TAG)/%
@@ -165,6 +170,26 @@ $(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	$(ZETES_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libzetes/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+
+$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BIN)/java/boot.jar $(CPP_OBJECTS)
+	@echo Linking $@...
+	mkdir -p $(BINARY_PATH);
+
+	# Extracting libavian objects
+	( \
+	    cd $(OBJ); \
+	    mkdir -p libzetes; \
+	    cd libzetes; \
+	    ar x ../../$(ZETES_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME); \
+	)
+
+	mkdir -p $(BIN)/java
+
+	# Making an object file from the java class library
+	$(ZETES_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libzetes/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
+
 
 $(BIN)/java/boot.jar: $(ZETES_PATH)/bin/java/$(JAVA_ZETES_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)
 	@echo Constructing $@...

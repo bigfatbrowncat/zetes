@@ -2,7 +2,7 @@
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="0.1356258865">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.1356258865" moduleId="org.eclipse.cdt.core.settings" name="OS X (x86_64)">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.1356258865" moduleId="org.eclipse.cdt.core.settings" name="OS X (<ARCH>)">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
@@ -15,7 +15,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="zetes" buildProperties="" description="" id="0.1356258865" name="OS X (x86_64)" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactName="zetes" buildProperties="" description="" id="0.1356258865" name="OS X (<ARCH>)" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.1356258865." name="/" resourcePath="">
 						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.1447256318" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.MachO64" id="org.eclipse.cdt.build.core.prefbase.toolchain.1447256318.995355774" name=""/>
@@ -26,10 +26,10 @@
 							</builder>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1302414069" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs">
 								<option id="org.eclipse.cdt.build.core.settings.holder.libpaths.949383061" name="Library Paths" superClass="org.eclipse.cdt.build.core.settings.holder.libpaths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/lib/osx-x86_64}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/lib/osx-<ARCH>}&quot;"/>
 								</option>
 								<option id="org.eclipse.cdt.build.core.settings.holder.libfiles.914979617" name="Library Files" superClass="org.eclipse.cdt.build.core.settings.holder.libfiles" valueType="libFiles">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${workspace_loc:/zetes/lib/osx-x86_64/libavian.a}&quot;"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${workspace_loc:/zetes/lib/osx-<ARCH>/libavian.a}&quot;"/>
 								</option>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1085049511" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
@@ -74,7 +74,7 @@
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/zetes"/>
 		</configuration>
-		<configuration configurationName="OS X (x86_64)">
+		<configuration configurationName="OS X (<ARCH>)">
 			<resource resourceType="FOLDER" workspacePath="/zetes/bin"/>
 		</configuration>
 	</storageModule>

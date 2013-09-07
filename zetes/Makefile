@@ -13,7 +13,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
   PLATFORM_TAG = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
-  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon
+  PLATFORM_GENERAL_LINKER_OPTIONS = #-framework Carbon
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   JNILIB_EXT=.jnilib

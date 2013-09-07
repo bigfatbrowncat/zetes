@@ -17,7 +17,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
   PLATFORM_TAG = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Carbon $(CUSTOM_LIBS)
+  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
   SH_LIB_EXT=.so

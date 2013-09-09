@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="lib" path="lib/java/classpath.jar"/>
+	<classpathentry kind="output" path="bin/java/classes"/>
+</classpath>

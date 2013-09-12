@@ -91,7 +91,8 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 	
 	public TinyViewerApplication()
 	{
-
+		super();
+		System.out.println("TinyViewerApplication()");
 	}
 	
 	@Override
@@ -116,6 +117,8 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 
 	public static void main(String... args)
 	{
+		System.out.println("hello from main");
+		System.out.flush();
 		new TinyViewerApplication().run(args);
 	}
 }

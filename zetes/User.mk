@@ -152,7 +152,7 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(dir $@)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) -I$(ZETES_INCLUDE) $< -o $@
 
-$(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
+$(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(ZETES_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME) $(CPP_OBJECTS)
 	@echo Linking $@...
 	mkdir -p $(BINARY_PATH);
 
@@ -171,7 +171,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(CPP_OBJECTS)
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libzetes/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
-$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BIN)/java/boot.jar $(CPP_OBJECTS)
+$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BIN)/java/boot.jar $(ZETES_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME) $(CPP_OBJECTS)
 	@echo Linking $@...
 	mkdir -p $(BINARY_PATH);
 

@@ -7,7 +7,9 @@ SRC = src
 BIN = bin
 OBJ = obj
 
-DEBUG_OPTIMIZE = -O3 #-O0 -g
+DEBUG_OPTIMIZE = -O0 -g
+
+ZETES_FEET_PATH = ../zetesfeet
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_ARCH = darwin x86_64
@@ -63,6 +65,8 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
 endif
+
+ZETES_FEET_INCLUDE = -I$(ZETES_FEET_PATH)/include
 
 JAVA_SOURCE_PATH = $(SRC)/java
 JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
@@ -145,35 +149,37 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CL
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	@echo Compiling $<...
 	mkdir -p $(OBJECTS_PATH)
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
+	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
+$(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/bin/$(PLATFORM_TAG)/libzetesfeet.a
 	@echo Constructing $@...
 	mkdir -p $(BINARY_PATH);
 
-	# Extracting libavian objects
+	# Extracting libzetesfeet objects
 	( \
 	    cd $(OBJ); \
-	    mkdir -p libavian; \
-	    cd libavian; \
-	    ar x ../../lib/$(PLATFORM_TAG)/libavian.a; \
+	    mkdir -p libzetesfeet; \
+	    cd libzetesfeet; \
+	    ar x ../../$(ZETES_FEET_PATH)/bin/$(PLATFORM_TAG)/libzetesfeet.a; \
 	)
 
 	mkdir -p $(BIN)/java
 
 	# Making an object file from the java class library
 	
-	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libavian/*.o
+	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libzetesfeet/*.o
 
-$(BIN)/java/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
+$(BIN)/java/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/bin/java/zetesfeet.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo Constructing $@...
-	mkdir -p $(BINARY_PATH);
-
 	# Making the java class library
-	cp -f lib/java/classpath.jar $(BIN)/java/$(JAVA_LIBRARY_NAME); \
 	( \
-	    cd $(BIN)/java; \
-	    "$(JAVA_HOME)/bin/jar" u0f $(JAVA_LIBRARY_NAME) -C ../java/classes .; \
+	    set -e; \
+	    mkdir -p $(BINARY_PATH); \
+	    cp -f $(ZETES_FEET_PATH)/bin/java/zetesfeet.jar $(BIN)/java/$(JAVA_LIBRARY_NAME); \
+	    ( \
+	        cd $(BIN)/java; \
+	        "$(JAVA_HOME)/bin/jar" u0f $(JAVA_LIBRARY_NAME) -C ../java/classes .; \
+	    ) \
 	)
 
 $(SWT_CLASSES) $(SWT_LIBS): %:

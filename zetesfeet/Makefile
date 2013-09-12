@@ -7,7 +7,7 @@ SRC = src
 BIN = bin
 OBJ = obj
 
-DEBUG_OPTIMIZE = -O3 #-O0 -g
+DEBUG_OPTIMIZE = -O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_TAG = osx-x86_64

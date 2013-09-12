@@ -158,10 +158,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	
 	protected ApplicationBase()
 	{
-		System.out.println("ApplicationBase() start");
-		// Constructing the display
-		Display.getDefault();
-		System.out.println("ApplicationBase() end");
 	}
 	
 	ViewWindowsManagerListener<TVW> viewWindowsManagerListener = new ViewWindowsManagerListener<TVW>()
@@ -191,9 +187,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	
 	public void run(String[] arguments)
 	{
-		System.out.println("r1");
 		SingleAppInstanceDocumentHandler mdiHelper = null;
-		System.out.println("r2");
 		try
 		{
 			Display.setAppName(getTitle());
@@ -201,18 +195,12 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			viewWindowsManager = createViewWindowsManager();
 			viewWindowsManager.setApplicationTitle(getTitle());
 			viewWindowsManager.addListener(viewWindowsManagerListener);
-			System.out.println("r3");
 
 			menuConstructor = createMenuConstructor(viewWindowsManager);
-			System.out.println("r4");System.out.flush();
 			menuConstructor.setExitGlobalHandler(exitHandler);
-			System.out.println("r5");System.out.flush();
 			menuConstructor.setAboutGlobalHandler(aboutHandler);
-			System.out.println("r6");System.out.flush();
 			menuConstructor.setPreferencesGlobalHandler(preferencesHandler);
-			System.out.println("r7");System.out.flush();
 			menuConstructor.updateMenus(null);
-			System.out.println("r8");System.out.flush();
 			
 			// Adding OS X system menu handlers
 			if (SWT.getPlatform().equals("cocoa"))

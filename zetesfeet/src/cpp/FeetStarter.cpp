@@ -72,8 +72,6 @@ namespace zetes
 		void FeetStarter::setDefinition(const std::string& name, const std::string& value)
 		{
 			definitions.insert(std::pair<string, string>(name, value));
-			cout << name << ":" << value << endl;
-			cout << definitions.size() << endl;
 		}
 
 		const std::string* FeetStarter::getDefinition(const std::string& name) const
@@ -98,7 +96,7 @@ namespace zetes
 		{
 			JavaVMInitArgs vmArgs;
 			vmArgs.version = JNI_VERSION_1_2;
-			vmArgs.nOptions = /*definitions.size() +*/ 3;
+			vmArgs.nOptions = definitions.size() + 2;
 			vmArgs.ignoreUnrecognized = JNI_TRUE;
 
 			JavaVMOption options[vmArgs.nOptions];
@@ -112,25 +110,22 @@ namespace zetes
 			xmxss << "-Xmx" << maximumHeapSizeMegabytes << "m";
 			options[1].optionString = const_cast<char*>(xmxss.str().c_str());	// "-Xmx16000m"
 
-			options[2].optionString = const_cast<char*>("-XstartOnFirstThread");
+//			options[2].optionString = const_cast<char*>("-XstartOnFirstThread");
 
 
-/*
+
 			// Adding definitions
 			int i = 0;
 			for (map<string, string>::const_iterator iter = definitions.begin(); iter != definitions.end(); iter++)
 			{
 				stringstream dss;
 				dss << "-D" << (*iter).first << "=" << (*iter).second;
-				cout << "f:" << (*iter).first << ", " << (*iter).second << endl;
 				char* tmp = new char[255];
 
-				options[i + 3].optionString = new char[strlen(dss.str().c_str()) + 1];
-				strcpy(options[i + 3].optionString, dss.str().c_str());
-
-				cout << options[i + 3].optionString << endl;
+				options[i + 2].optionString = new char[strlen(dss.str().c_str()) + 1];
+				strcpy(options[i + 2].optionString, dss.str().c_str());
 				i++;
-			}*/
+			}
 
 			for (int i = 0; i < vmArgs.nOptions; i++)
 			{
@@ -140,29 +135,22 @@ namespace zetes
 
 			JavaVM* vm;
 			void* env;
-			cout << "hello 1" << endl;
 			JNI_CreateJavaVM(&vm, &env, &vmArgs);
-			cout << "hello 2" << endl;
 			JNIEnv* e = static_cast<JNIEnv*>(env);
 
 			jclass c = e->FindClass(applicationClassName.c_str());
 			cout << applicationClassName << endl;
-			cout << "hello 3" << endl;
 			if (not e->ExceptionCheck())
 			{
-				cout << "hello 4" << endl;
 				jmethodID m = e->GetStaticMethodID(c, "main", "([Ljava/lang/String;)V");
 				if (not e->ExceptionCheck())
 				{
-					cout << "hello 5" << endl;
 					jclass stringClass = e->FindClass("java/lang/String");
 					if (not e->ExceptionCheck())
 					{
-						cout << "hello 6" << endl;
 						jobjectArray a = e->NewObjectArray((jsize)(arguments.size()), stringClass, (jobject)0);
 						if (not e->ExceptionCheck())
 						{
-							cout << "hello 7" << endl;
 							int index = 0;
 							for (list<string>::const_iterator argi = arguments.begin(); argi != arguments.end(); argi++)
 							{
@@ -176,12 +164,10 @@ namespace zetes
 								jstring arg = e->NewStringUTF((char*) ((*argi).c_str()));
 		#endif
 								e->SetObjectArrayElement(a, index, arg);
-								index++;
 							}
+								index++;
 
-							cout << "hello 8" << endl;
 							e->CallStaticVoidMethod(c, m, a);
-							cout << "hello 9" << endl;
 						}
 					}
 				}

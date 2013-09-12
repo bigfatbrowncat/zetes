@@ -346,28 +346,20 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	@Override
 	public void updateMenus(TVW window) {
 		Menu windowMenu;
-		System.out.println("u1");System.out.flush();
 		
 		if (window != null)
 		{
-			System.out.println("u2");System.out.flush();
 			windowMenu = window.getMenu();
 		} else {
-			System.out.println("u2b");System.out.flush();
 			Display display = Display.getDefault();
-			System.out.println(display == null);System.out.flush();
 			windowMenu = display.getMenuBar();
-			System.out.println("u2d");System.out.flush();
 		}
-		System.out.println("u3");System.out.flush();
 
 		if (windowMenu != null) {
-			System.out.println("u4");System.out.flush();
 			while (windowMenu.getItems().length > 0) {
 				windowMenu.getItems()[0].dispose();
 			}
 			
-			System.out.println("u5");System.out.flush();
 			addMenusForActionList(window, actionsRoot, windowMenu);
 		}
 		
@@ -375,13 +367,11 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		final int OSX_SYSTEM_MENU_PREFERENCES = -2;
 		final int OSX_SYSTEM_MENU_QUIT = -6;
 		
-		System.out.println("u6");System.out.flush();
 		// Adding OS X system menu handlers
 		if (SWT.getPlatform().equals("cocoa"))
 		{
 			for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
 			{
-				System.out.println("u7: " + i);System.out.flush();
 				MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
 				
 				switch (item.getID())

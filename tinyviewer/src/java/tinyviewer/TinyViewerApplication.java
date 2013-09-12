@@ -56,7 +56,6 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 		
 		@Override
 		public void execute(ImageViewWindow window) {
-			System.out.println("Open action running");
 			Shell dummyShell = new Shell(Display.getDefault());
 			FileDialog fileDialog = new FileDialog(dummyShell, SWT.OPEN | SWT.MULTI);
 			fileDialog.setText("Open image");
@@ -91,8 +90,6 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 	
 	public TinyViewerApplication()
 	{
-		super();
-		System.out.println("TinyViewerApplication()");
 	}
 	
 	@Override
@@ -117,8 +114,6 @@ public class TinyViewerApplication extends ApplicationBase<DefaultAboutBox, Imag
 
 	public static void main(String... args)
 	{
-		System.out.println("hello from main");
-		System.out.flush();
 		new TinyViewerApplication().run(args);
 	}
 }

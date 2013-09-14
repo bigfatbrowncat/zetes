@@ -1,3 +1,5 @@
+APPLICATION_NAME = ZetesWings
+
 UNAME := $(shell uname)
 ifndef ARCH
   ARCH := $(shell uname -m)
@@ -75,8 +77,8 @@ CPP_SOURCE_PATH = $(SRC)/cpp
 BINARY_PATH = $(BIN)/$(PLATFORM_TAG)
 OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
 
-LIBRARY_NAME = libzetes.a
-JAVA_LIBRARY_NAME = zetes.jar
+LIBRARY_NAME = libzeteswings.a
+JAVA_LIBRARY_NAME = zeteswings.jar
 
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1')
 JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
@@ -127,7 +129,7 @@ help:
 	
 
 all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
-	@echo "*** Building process completed successfully. ***"
+	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
 	@echo "  $(BINARY_PATH)"
@@ -137,22 +139,22 @@ all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
 include ideconf/ideconf.mk
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
-	@echo Compiling $<...
+	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES)
-	@echo Compiling platform specific $<...
+	@echo [$(APPLICATION_NAME)] Compiling platform specific $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
-	@echo Compiling $<...
+	@echo [$(APPLICATION_NAME)] Compiling $<...
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
 $(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/bin/$(PLATFORM_TAG)/libzetesfeet.a
-	@echo Constructing $@...
+	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libzetesfeet objects
@@ -170,7 +172,7 @@ $(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/bin/$(PLATFORM
 	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libzetesfeet/*.o
 
 $(BIN)/java/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/bin/java/zetesfeet.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
-	@echo Constructing $@...
+	@echo [$(APPLICATION_NAME)] Constructing $@...
 	# Making the java class library
 	( \
 	    set -e; \
@@ -183,7 +185,7 @@ $(BIN)/java/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/bin/java/zetesfeet.jar $(JA
 	)
 
 $(SWT_CLASSES) $(SWT_LIBS): %:
-	@echo Extracting SWT library...
+	@echo [$(APPLICATION_NAME)] Extracting SWT library...
 	mkdir -p $(BINARY_PATH);
 	mkdir -p $(BIN)/java/swt;
 	mkdir -p $(BIN)/java/classes;
@@ -196,7 +198,7 @@ $(SWT_CLASSES) $(SWT_LIBS): %:
 	)
 
 clean:
-	@echo Cleaning all...
+	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(OBJ)
 	rm -rf $(BIN)
 

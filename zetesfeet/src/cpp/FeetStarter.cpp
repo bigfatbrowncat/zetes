@@ -151,7 +151,7 @@ namespace zetes
 						jobjectArray a = e->NewObjectArray((jsize)(arguments.size()), stringClass, (jobject)0);
 						if (not e->ExceptionCheck())
 						{
-							int index = 0;
+							jsize index = 0;
 							for (list<string>::const_iterator argi = arguments.begin(); argi != arguments.end(); argi++)
 							{
 		#ifdef __MINGW32__

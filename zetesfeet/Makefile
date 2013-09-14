@@ -1,3 +1,5 @@
+APPLICATION_NAME = ZetesFeet
+
 UNAME := $(shell uname)
 ifndef ARCH
   ARCH := $(shell uname -m)
@@ -86,7 +88,7 @@ help:
 	
 
 all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
-	@echo "*** Building process completed successfully. ***"
+	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
 	@echo "  $(BINARY_PATH)"
@@ -96,22 +98,22 @@ all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
 include ideconf/ideconf.mk
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
-	@echo Compiling $<...
+	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES)
-	@echo Compiling platform specific $<...
+	@echo [$(APPLICATION_NAME)] Compiling platform specific $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
-	@echo Compiling $<...
+	@echo [$(APPLICATION_NAME)] Compiling $<...
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
 $(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
-	@echo Constructing $@...
+	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libavian objects
@@ -129,7 +131,7 @@ $(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
 	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libavian/*.o
 
 $(BIN)/java/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
-	@echo Constructing $@...
+	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Making the java class library
@@ -140,7 +142,7 @@ $(BIN)/java/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_
 	)
 
 clean:
-	@echo Cleaning all...
+	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(OBJ)
 	rm -rf $(BIN)
 

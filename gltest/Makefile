@@ -1,4 +1,4 @@
-ZETES_PATH = ../zetes
+ZETES_WINGS_PATH = ../zeteswings
 
 APPLICATION_NAME = GLDemo
 BINARY_NAME = gltest
@@ -16,4 +16,4 @@ endif
 
 all: package
 
-include $(ZETES_PATH)/User.mk
+include $(ZETES_WINGS_PATH)/User.mk

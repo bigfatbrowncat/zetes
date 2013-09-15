@@ -1,3 +1,4 @@
+ZETES_FEET_PATH = ../zetesfeet
 ZETES_WINGS_PATH = ../zeteswings
 
 APPLICATION_NAME = Tiny\ Viewer

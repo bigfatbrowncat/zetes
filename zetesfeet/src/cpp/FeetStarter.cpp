@@ -127,19 +127,12 @@ namespace zetes
 				i++;
 			}
 
-			for (int i = 0; i < vmArgs.nOptions; i++)
-			{
-				cout << "options[" << i << "] = " << options[i].optionString << endl;
-			}
-
-
 			JavaVM* vm;
 			void* env;
 			JNI_CreateJavaVM(&vm, &env, &vmArgs);
 			JNIEnv* e = static_cast<JNIEnv*>(env);
 
 			jclass c = e->FindClass(applicationClassName.c_str());
-			cout << applicationClassName << endl;
 			if (not e->ExceptionCheck())
 			{
 				jmethodID m = e->GetStaticMethodID(c, "main", "([Ljava/lang/String;)V");
@@ -164,8 +157,8 @@ namespace zetes
 								jstring arg = e->NewStringUTF((char*) ((*argi).c_str()));
 		#endif
 								e->SetObjectArrayElement(a, index, arg);
-							}
 								index++;
+							}
 
 							e->CallStaticVoidMethod(c, m, a);
 						}

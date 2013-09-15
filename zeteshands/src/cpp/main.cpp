@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 
-#include "WinLinMacApi.h"
 #include "FeetStarter.h"
 
 using namespace std;
@@ -39,13 +38,7 @@ int main(int argc, const char** argv)
 		args.push_back(wav[i]);
 	}
 
-	// Setting libraries paths
-	string swtExecPath = WinLinMacApi::locateExecutable();
-	string execPath = WinLinMacApi::locateExecutable();
-
 	feetStarter.setApplicationClassName(applicationClass);
-	feetStarter.setDefinition("swt.library.path", swtExecPath);
-	feetStarter.setDefinition("java.library.path", execPath);
 
 	int exitCode = feetStarter.run();
 

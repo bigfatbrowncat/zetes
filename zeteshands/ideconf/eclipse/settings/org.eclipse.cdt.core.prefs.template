@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+environment/project/0.1356258865/ARCH/delimiter=;
+environment/project/0.1356258865/ARCH/operation=replace
+environment/project/0.1356258865/ARCH/value=<ARCH>
+environment/project/0.1356258865/JAVA_HOME/delimiter=;
+environment/project/0.1356258865/JAVA_HOME/operation=replace
+environment/project/0.1356258865/JAVA_HOME/value=<JAVA_HOME>
+environment/project/0.1356258865/append=true
+environment/project/0.1356258865/appendContributed=true

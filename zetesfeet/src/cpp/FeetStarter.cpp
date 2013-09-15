@@ -5,9 +5,13 @@
  *      Author: il
  */
 
+#include <jni.h>
+#include <stdint.h>
+#include <string.h>
+
 #include <sstream>
 #include <iostream>
-#include <jni.h>
+#include <list>
 
 #include "FeetStarter.h"
 
@@ -145,7 +149,7 @@ namespace zetes
 						if (not e->ExceptionCheck())
 						{
 							jsize index = 0;
-							for (list<string>::const_iterator argi = arguments.begin(); argi != arguments.end(); argi++)
+							for (list<argstring>::const_iterator argi = arguments.begin(); argi != arguments.end(); argi++)
 							{
 		#ifdef __MINGW32__
 								// For Windows: Sending wide string to Java

@@ -207,7 +207,7 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BIN)/java/boot.jar $(ZETES_W
 	mkdir -p $(BIN)/java
 
 	# Making an object file from the java class library
-	$(ZETES_WINGS_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
 	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libzeteswings/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 

@@ -5,7 +5,9 @@ Zetes is a crossplatform lightweight framework which allows the user to develop 
 native-looking GUI programs, written in Java, that could run on a machine without any JVM installed.
 
 The core of Zetes is built upon Avian Java machine implementation which would be embedded
-into every target binary thus it could run without any dependencies except the system API.
+into every target binary thus your program <i>could run without any dependencies except the system API</i>. 
+Imagine your program that has been written in Java and it even could run external jars, but it doesn't need 
+any JRE or JDK installed at all. Really. It's just an exe file. And in addition it has a beautiful GUI.
 
 ## Supported OS
 
@@ -28,18 +30,15 @@ At first you should prepare the environment
 
 Download and install Oracle JDK 7 (it isn't needed to _run_ the target binaries, 
 but it's used to _build_ them and the framework itself, cause it doesn't contain any Java
-compiler tool).
-
-The fresh Oracle JDK7 could be downloaded from the official site: 
-http://www.oracle.com/technetwork/java/javase/downloads/index.html
+compiler tool). You can get it from the official <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">download site</a>.
 
 This framework is made crossplatform and it needs Unix compilers and tools to work, so
 under Windows you need <code>mingw-w64</code> to build (and use) it. If you have a 32-bit OS, don't worry -
-<code>mingw-w64</code> doesn't have only 64-bit tools, but 32-bit versions too.
+<b>mingw-w64</b> doesn't have only 64-bit tools, but 32-bit versions too.
 
 Go to http://mingw-w64.sourceforge.net site, find <b>Mingw-builds</b> title there. Under this title
 you will find a list of implementations for different windows platforms and a small link to the
-universal installer (the direct link is http://sourceforge.net/projects/mingwbuilds/files/mingw-builds-install/mingw-builds-install.exe/download).
+universal installer (the <a href="http://sourceforge.net/projects/mingwbuilds/files/mingw-builds-install/mingw-builds-install.exe/download">direct link</a> to the installer).
 Download this installer, run it and install any mingw toolchain, suitable for your system. 
 Avoid installing it to a default "Program Files" folder cause you could have problems with configuration.
 I'd recommend c:\mingw\mingw-builds\<i>name_of_toolchain</i>\
@@ -88,12 +87,12 @@ For example, on my machine it looks like
 	export ARCH=x86_64
 	
 Now let's check the configuration. Make sure you saved all the files you've edited recently.
-Go to your <code>msys</msys> directory and run <code>msys.bat</code> script there. It will open
+Go to your <code>msys</code> directory and run <code>msys.bat</code> script there. It will open
 a terminal window for you. This terminal isn't a simple one. It's an MSYS terminal. You will
 use it to work with Zetes framework and your projects dependent on it. 
 
 Two tests:
-1. Enter
+* Enter
 
 	gcc
 	
@@ -104,7 +103,7 @@ If you see something like
 then <code>gcc</code> compiler (and all the toolchain) is installed properly. If the response is
 like "command not found", something went wrong.
 
-2. Enter
+* Enter
 
 	"$JAVA_HOME/bin/javac"
 	

@@ -95,7 +95,7 @@ all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
 	@echo "  $(BIN)/java"
 	@echo
 
-include ideconf/ideconf.mk
+include ../common-scripts/ideconf/ideconf.mk
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
 	@echo [$(APPLICATION_NAME)] Compiling $<...

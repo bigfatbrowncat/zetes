@@ -77,7 +77,7 @@ CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH)
 CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
 help:
-	@echo "*** This is Zetes build utility ***"
+	@echo "*** This is Zetes build utility: This part builds hands of Zetes ***"
 	@echo
 	@echo 1. Set up your build environment
 	@echo Zetes library needs Java 7 compiler, so JAVA_HOME is to be set correctly. 
@@ -118,7 +118,7 @@ all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
 	@echo "  $(BIN)/java"
 	@echo
 
-include ideconf/ideconf.mk
+include ../common-scripts/ideconf/ideconf.mk
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java
 	@echo [$(APPLICATION_NAME)] Compiling $<...

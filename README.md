@@ -8,24 +8,30 @@ The core of Zetes is built upon Avian Java machine implementation which would be
 ## Supported OS
 
 Fully supported at the moment:
-* Windows (XP - 7) i686 (32 bit) or x86_64 (64 bit)
-* OS X 10.8 Mountain Lion
+<ul>
+	<li>Windows (XP - 7) i686 (32 bit) or x86_64 (64 bit)</li>
+	<li>OS X 10.8 Mountain Lion</li>
+</ul>
 
 Partially supported (only console applications, no GUI yet):
-* Ubuntu 12.10 or any compatible (x86_64)
-* Raspbian on Raspberry Pi board (armv6l processor, a Debian-based linux)
+<ul>
+	<li>Ubuntu 12.10 or any compatible (x86_64)</li>
+	<li>Raspbian on Raspberry Pi board (armv6l processor, a Debian-based linux)</li>
+</ul>
 
 Hopefully it should work under any Intel-based Linux, Windows or Mac platform and on everything compatible with Raspberry Pi.
 
-## Building on Windows
+## Building Zetes and demo applications
 
-At first you should prepare the environment. In Windows it would take about 10-15 minutes
+At first you should prepare the environment. Although Zetes is a crossplatform library and its building process is the same on any supported platform, at first you need to prepare environment and this preparation is a different process on different platforms.
 
-### Environment
+### Environment on Windows on i686 (32 bit) and x86_64 (64 bit)
+
+As soon as Windows isn't a POSIX platform, the environment preparation isn't completely trivial. In Windows it would take about 10-15 minutes.
 
 Download and install Oracle JDK 7 (it isn't needed to _run_ the target binaries, but it's used to _build_ them and the framework itself, cause it doesn't contain any Java compiler tool). You can get it from the official <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">download site</a>.
 
-This framework is made crossplatform and it needs Unix compilers and tools to work, sounder Windows you need <code>mingw-w64</code> to build (and use) it. If you have a 32-bit OS, don't worry &#151; <b>mingw-w64</b> doesn't have only 64-bit tools, but 32-bit versions too.
+This framework is made crossplatform and it needs Unix compilers and tools to work, so under Windows you need <code>mingw-w64</code> to build (and use) it. If you have a 32-bit OS, don't worry – <b>mingw-w64</b> doesn't have only 64-bit tools, but 32-bit versions too.
 
 Go to http://mingw-w64.sourceforge.net site, find <b>Mingw-builds</b> title there. Under this title you will find a list of implementations for different windows platforms and a small link to the universal installer (the <a href="http://sourceforge.net/projects/mingwbuilds/files/mingw-builds-install/mingw-builds-install.exe/download">direct link</a> to the installer).
 Download this installer, run it and install any mingw toolchain, suitable for your system. Avoid installing it to a default "Program Files" folder cause you could have problems with configuration. I'd recommend c:\mingw\mingw-builds\<i>name_of_toolchain</i>\
@@ -33,7 +39,7 @@ Download this installer, run it and install any mingw toolchain, suitable for yo
 Now you have gcc compiler, but don't have a proper unix environment for it. You should take it from the same place. It's called MSYS and located in the same sourceforge repo as mingw-w64.
 
 Open http://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/ and download the latest <b>msys+7za+wget+svn+git+mercurial+cvs-rev??.7z</b> version. 
-The direct link to the current version is http://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/msys%2B7za%2Bwget%2Bsvn%2Bgit%2Bmercurial%2Bcvs-rev13.7z/download
+The direct link to the current version is <a href="http://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/msys%2B7za%2Bwget%2Bsvn%2Bgit%2Bmercurial%2Bcvs-rev13.7z/download">msys+7za+wget+svn+git+mercurial+cvs-rev13.7z</a>
 
 Extract the archive contents to some folder near your mingw compiler toolchain (I recommend c:\mingw\mingw-builds\msys).
 
@@ -69,7 +75,8 @@ Now let's check the configuration. Make sure you saved all the files you've edit
 
 Let's do two tests to ensure everything's configured fine:
 
-* Enter
+#### Test 1 
+Enter this command to MSYS terminal:
 
 	gcc
 	
@@ -79,7 +86,8 @@ If you see something like
 	
 then <code>gcc</code> compiler (and all the toolchain) is installed properly. If the response is like "command not found", something went wrong.
 
-* Enter
+#### Test 2
+Enter this command to MSYS terminal:
 
 	"$JAVA_HOME/bin/javac"
 	

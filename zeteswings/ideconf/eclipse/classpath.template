@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="lib" path="lib/<PLATFORM_SHORT>-<ARCH>/swt.jar"/>
-	<classpathentry kind="lib" path="lib/java/classpath.jar"/>
+	<classpathentry kind="lib" path="/zetesfeet/bin/java/zetesfeet.jar"/>
 	<classpathentry kind="output" path="bin/java/classes"/>
 </classpath>

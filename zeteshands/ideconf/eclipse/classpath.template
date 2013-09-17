@@ -2,5 +2,5 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="lib" path="lib/java/classpath.jar"/>
-	<classpathentry kind="output" path="bin/java/classes"/>
+	<classpathentry kind="lib" path="/zetesfeet/bin/java/zetesfeet.jar"/>
 </classpath>

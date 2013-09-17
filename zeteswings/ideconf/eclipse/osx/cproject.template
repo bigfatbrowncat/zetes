@@ -14,7 +14,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="zetes" buildProperties="" description="" id="0.1356258865" name="OS X (<ARCH>)" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactName="zeteswings" buildProperties="" description="" id="0.1356258865" name="OS X (<ARCH>)" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.1356258865." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.macosx.base.541808214" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64" id="cdt.managedbuild.target.gnu.platform.macosx.base.1931362146" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.gnu.platform.macosx.base"/>
@@ -64,15 +64,15 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="zetes.null.477883847" name="zetes"/>
+		<project id="zeteswings.null.477883847" name="zeteswings"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/zetes"/>
+			<resource resourceType="PROJECT" workspacePath="/zeteswings"/>
 		</configuration>
 		<configuration configurationName="OS X (<ARCH>)">
-			<resource resourceType="FOLDER" workspacePath="/zetes/bin"/>
+			<resource resourceType="FOLDER" workspacePath="/zeteswings/bin"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>

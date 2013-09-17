@@ -21,6 +21,8 @@
 							<builder id="cdt.managedbuild.target.gnu.builder.base.1440340993" managedBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.662126886" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.2136565055" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zeteswings/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetesfeet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1624611551" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -28,12 +30,16 @@
 							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.1392889596" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1643718339" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
 								<option id="gnu.cpp.compiler.option.include.paths.1033281520" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zeteswings/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetesfeet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1977455019" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.211063479" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
 								<option id="gnu.c.compiler.option.include.paths.1926280452" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zeteswings/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetesfeet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.358989329" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>

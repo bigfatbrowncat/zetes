@@ -28,7 +28,8 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.macosx.base.1332408457" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.base">
 								<option id="gnu.both.asm.option.include.paths.1623360586" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zeteswings/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetesfeet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}/include&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.538102775" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -36,7 +37,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1943946035" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.965266965" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base">
 								<option id="gnu.cpp.compiler.option.include.paths.99967048" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zeteswings/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetesfeet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}/include&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/lib/c++/v1"/>
 								</option>
@@ -44,7 +46,8 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.macosx.base.148347964" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.base">
 								<option id="gnu.c.compiler.option.include.paths.82950301" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetes/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zeteswings/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/zetesfeet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}/include&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include"/>
 								</option>

@@ -1,40 +1,40 @@
-all: zetes gltest tinyviewer bellardpi
+all: zetes #gltest tinyviewer bellardpi
 
 zetes: zetesfeet zeteswings zeteshands
 
 zetesfeet:
-	$(MAKE) all -C zetesfeet
+	$(MAKE) TARGET=../target all -C zetesfeet
 	
 zeteswings: zetesfeet
-	$(MAKE) all -C zeteswings
+	$(MAKE) TARGET=../target ZETES_FEET_PATH=../target all -C zeteswings
 
 zeteshands: zetesfeet
-	$(MAKE) all -C zeteshands
+	$(MAKE) TARGET=../target all -C zeteshands
 
 gltest: zeteswings
-	$(MAKE) app -C gltest
+#	$(MAKE) app -C gltest
 
-tinyviewer: zeteswings
-	$(MAKE) app -C tinyviewer
+#tinyviewer: zeteswings
+#	$(MAKE) app -C tinyviewer
 
-bellardpi: zeteshands
-	$(MAKE) app -C bellardpi
+#bellardpi: zeteshands
+#	$(MAKE) app -C bellardpi
 
 clean:
-	$(MAKE) clean -C zetesfeet
-	$(MAKE) clean -C zeteswings
-	$(MAKE) clean -C zeteshands
-	$(MAKE) clean -C gltest
-	$(MAKE) clean -C tinyviewer
-	$(MAKE) clean -C bellardpi
+	$(MAKE) TARGET=../target clean -C zetesfeet
+	$(MAKE) TARGET=../target clean -C zeteswings
+	$(MAKE) TARGET=../target clean -C zeteshands
+#	$(MAKE) clean -C gltest
+#	$(MAKE) clean -C tinyviewer
+#	$(MAKE) clean -C bellardpi
 
-package: gltest-pack tinyviewer-pack
+#package: gltest-pack tinyviewer-pack
 
-gltest-pack:
-	$(MAKE) package -C gltest
+#gltest-pack:
+#	$(MAKE) package -C gltest
 
-tinyviewer-pack:
-	$(MAKE) package -C tinyviewer
+#tinyviewer-pack:
+#	$(MAKE) package -C tinyviewer
 
 ideconf-eclipse:
 	$(MAKE) ideconf-eclipse -C zetesfeet

@@ -36,4 +36,4 @@ ideconf-eclipse:
 	sed $(VARS_SUBST) < $(IDE_CONF_PATH)/eclipse/project.template > .project
 	sed $(VARS_SUBST) < $(IDE_CONF_PATH)/eclipse/$(PLATFORM_SHORT)/cproject.template > .cproject
 
-.SILENT:
+#.SILENT:

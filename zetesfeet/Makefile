@@ -5,27 +5,37 @@ ifndef ARCH
   ARCH := $(shell uname -m)
 endif
 
+ifndef TARGET
+  TARGET := ./target
+endif
+
 SRC = src
 BIN = bin
 OBJ = obj
+LIB = lib
 
 DEBUG_OPTIMIZE = -O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_TAG = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
+  EXE_EXT=
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
   PLATFORM_TAG = linux-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
+  EXE_EXT=
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
   PLATFORM_TAG = linux-armv6l
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
+  EXE_EXT=
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM_TAG = win-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
+  EXE_EXT=.exe
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   PLATFORM_TAG = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
+  EXE_EXT=.exe
 endif
 
 # Java platform agnostic
@@ -44,14 +54,23 @@ CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ 
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
+# Other files that should just be copied to the target folder 
+JUST_COPY_FILES = $(BIN_TO_OBJ) include/FeetStarter.h
+JUST_COPY_FILES_TARGET = $(addprefix $(TARGET)/,$(JUST_COPY_FILES))
+
 # Target paths
-BINARY_PATH = $(BIN)/$(PLATFORM_TAG)
-OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
-JAVA_CLASSPATH = $(BIN)/java/classes
+LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
+OBJECTS_PATH = $(TARGET)/$(OBJ)/$(PLATFORM_TAG)
+JAVA_LIBRARY_PATH = $(TARGET)/$(LIB)/java
+JAVA_OBJECTS_PATH = $(TARGET)/$(OBJ)/java
+JAVA_CLASSPATH = $(JAVA_OBJECTS_PATH)/classes
 
 # Target names
 LIBRARY_NAME = libzetesfeet.a
 JAVA_LIBRARY_NAME = zetesfeet.jar
+TOOLS_PATH = tools/$(PLATFORM_TAG)
+BIN_TO_OBJ = $(TOOLS_PATH)/binaryToObject$(EXE_EXT)
+PACKAGE_NAME = zetesfeet.zip
 
 help:
 	@echo "*** This is Zetes build utility: This part builds feet of Zetes ***"
@@ -85,24 +104,26 @@ help:
 	@echo
 	@echo "  > make clean"
 	@echo
-	
 
-all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
+
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
-	@echo "  $(BINARY_PATH)"
-	@echo "  $(BIN)/java"
+	@echo "  $(realpath $(LIBRARY_PATH))"
+	@echo "  $(realpath $(JAVA_LIBRARY_PATH))"
 	@echo
+
+package: $(TARGET)/$(PACKAGE_NAME)
 
 include ../common-scripts/ideconf/ideconf.mk
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java
 	@echo [$(APPLICATION_NAME)] Compiling platform specific $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
@@ -112,39 +133,52 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(BINARY_PATH);
-
+	mkdir -p $(LIBRARY_PATH);
+	mkdir -p $(OBJECTS_PATH);
+	
 	# Extracting libavian objects
 	( \
-	    cd $(OBJ); \
+	    cd $(OBJECTS_PATH); \
 	    mkdir -p libavian; \
 	    cd libavian; \
-	    ar x ../../lib/$(PLATFORM_TAG)/libavian.a; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libavian.a; \
 	)
 
-	mkdir -p $(BIN)/java
+	mkdir -p $(JAVA_LIBRARY_PATH)
 
 	# Making an object file from the java class library
 	
-	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libavian/*.o
+	ar rvs $@ $(CPP_OBJECTS) $(OBJECTS_PATH)/libavian/*.o
 
-$(BIN)/java/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
+$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(BINARY_PATH);
+	mkdir -p $(LIBRARY_PATH);
 
 	# Making the java class library
-	cp -f lib/java/classpath.jar $(BIN)/java/$(JAVA_LIBRARY_NAME); \
+	cp -f lib/java/classpath.jar $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME); \
 	( \
-	    cd $(BIN)/java; \
-	    "$(JAVA_HOME)/bin/jar" u0f $(JAVA_LIBRARY_NAME) -C ../java/classes .; \
+	    cd $(JAVA_LIBRARY_PATH); \
+	    "$(JAVA_HOME)/bin/jar" uf $(JAVA_LIBRARY_NAME) -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
+	)
+
+$(JUST_COPY_FILES_TARGET): $(TARGET)/%: %
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	mkdir -p $(dir $@)
+	cp -f $< $(TARGET)/$<
+
+$(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
+	@echo [$(APPLICATION_NAME)] Making package file $@...
+	( \
+	    cd $(TARGET); \
+	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)); \
 	)
 
 clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
-	rm -rf $(OBJ)
-	rm -rf $(BIN)
+	rm -rf $(TARGET)
+	
 
-.PHONY: all
+.PHONY: all package help
 .SILENT:

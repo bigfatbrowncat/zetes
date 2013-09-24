@@ -5,94 +5,79 @@ ifndef ARCH
   ARCH := $(shell uname -m)
 endif
 
+ifndef TARGET
+  TARGET := ./target
+endif
+
+ifndef ZETES_FEET_PATH
+  ZETES_FEET_PATH := ../zetesfeet/target
+endif
+
 SRC = src
 BIN = bin
 OBJ = obj
+LIB = lib
 
 DEBUG_OPTIMIZE = -O0 -g
 
-ZETES_FEET_PATH = ../zetesfeet
-
 ifeq ($(UNAME), Darwin)	# OS X
-  PLATFORM_ARCH = darwin x86_64
   PLATFORM_TAG = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
-  PLATFORM_GENERAL_LINKER_OPTIONS = #-framework Carbon
-  PLATFORM_CONSOLE_OPTION = 
-  EXE_EXT=
   JNILIB_EXT=.jnilib
-  STRIP_OPTIONS=-S -x
-  RDYNAMIC=-rdynamic
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
-  PLATFORM_ARCH = linux x86_64
   PLATFORM_TAG = linux-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
-  PLATFORM_CONSOLE_OPTION = 
-  EXE_EXT=
   JNILIB_EXT=.so
-  STRIP_OPTIONS=--strip-all
-  RDYNAMIC=-rdynamic
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
-  PLATFORM_ARCH = linux arm
   PLATFORM_TAG = linux-armv6l
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl
-  PLATFORM_CONSOLE_OPTION = 
-  EXE_EXT=
   JNILIB_EXT=.so
-  STRIP_OPTIONS=--strip-all
-  RDYNAMIC=-rdynamic
-  CLASSPATH_DELIM=:
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows
-  PLATFORM_ARCH = windows i386
   PLATFORM_TAG = win-i386
-  
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
-  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
-  EXE_EXT=.exe
   JNILIB_EXT=.dll
-  STRIP_OPTIONS=--strip-all
-  RDYNAMIC=
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows
-  PLATFORM_ARCH = windows x86_64
   PLATFORM_TAG = win-x86_64
-  
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -mwindows -static-libgcc -static-libstdc++
-  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   JNILIB_EXT=.dll
-  STRIP_OPTIONS=--strip-all
-  RDYNAMIC=
 endif
 
 ZETES_FEET_INCLUDE = -I$(ZETES_FEET_PATH)/include
 
+# Java platform agnostic
 JAVA_SOURCE_PATH = $(SRC)/java
-JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
-JAVA_CLASSPATH = $(BIN)/java/classes
-CPP_SOURCE_PATH = $(SRC)/cpp
-BINARY_PATH = $(BIN)/$(PLATFORM_TAG)
-OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
-
-LIBRARY_NAME = libzeteswings.a
-JAVA_LIBRARY_NAME = zeteswings.jar
-
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1')
-JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+JAVA_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
 
+# Java platform specific
+JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
 JAVA_PLATFORM_SPECIFIC_FILES = $(shell if [ -d "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" ]; then cd $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1'; fi)
-JAVA_PLATFORM_SPECIFIC_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_PLATFORM_SPECIFIC_FILES))))
+JAVA_PLATFORM_SPECIFIC_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_PLATFORM_SPECIFIC_FILES))))
 
+# C++ Platform agnostic
+CPP_SOURCE_PATH = $(SRC)/cpp
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
+CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
-CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
+# SWT binaries
+SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
+SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
-SWT_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
-SWT_LIBS := $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
+# Target paths
+BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)
+LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
+OBJECTS_PATH = $(TARGET)/$(OBJ)/$(PLATFORM_TAG)
+JAVA_BINARY_PATH = $(TARGET)/$(BIN)/java
+JAVA_LIBRARY_PATH = $(TARGET)/$(LIB)/java
+JAVA_OBJECTS_PATH = $(TARGET)/$(OBJ)/java
+JAVA_CLASSPATH = $(JAVA_OBJECTS_PATH)/classes
+
+# Target names
+LIBRARY_NAME = libzeteswings.a
+JAVA_LIBRARY_NAME = zeteswings.jar
+PACKAGE_NAME = zeteswings.zip
 
 help:
 	@echo "*** This is Zetes build utility ***"
@@ -128,13 +113,15 @@ help:
 	@echo
 	
 
-all: $(BINARY_PATH)/$(LIBRARY_NAME) $(BIN)/java/$(JAVA_LIBRARY_NAME)
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
-	@echo "  $(BINARY_PATH)"
-	@echo "  $(BIN)/java"
+	@echo "  $(realpath $(LIBRARY_PATH))"
+	@echo "  $(realpath $(JAVA_LIBRARY_PATH))"
 	@echo
+
+package: $(TARGET)/$(PACKAGE_NAME)
 
 include ../common-scripts/ideconf/ideconf.mk
 
@@ -153,54 +140,48 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/bin/$(PLATFORM_TAG)/libzetesfeet.a
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
 	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(BINARY_PATH);
+	mkdir -p $(LIBRARY_PATH);
+	ar rvs $@ $(CPP_OBJECTS)
 
-	# Extracting libzetesfeet objects
-	( \
-	    cd $(OBJ); \
-	    mkdir -p libzetesfeet; \
-	    cd libzetesfeet; \
-	    ar x ../../$(ZETES_FEET_PATH)/bin/$(PLATFORM_TAG)/libzetesfeet.a; \
-	)
-
-	mkdir -p $(BIN)/java
-
-	# Making an object file from the java class library
-	
-	ar rvs $@ $(CPP_OBJECTS) $(OBJ)/libzetesfeet/*.o
-
-$(BIN)/java/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/bin/java/zetesfeet.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
+$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/$(LIB)/java/zetesfeet.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
+	mkdir -p $(JAVA_LIBRARY_PATH)
 	# Making the java class library
 	( \
 	    set -e; \
-	    mkdir -p $(BINARY_PATH); \
-	    cp -f $(ZETES_FEET_PATH)/bin/java/zetesfeet.jar $(BIN)/java/$(JAVA_LIBRARY_NAME); \
+	    mkdir -p $(LIBRARY_PATH); \
 	    ( \
-	        cd $(BIN)/java; \
-	        "$(JAVA_HOME)/bin/jar" u0f $(JAVA_LIBRARY_NAME) -C ../java/classes .; \
+	        cd $(JAVA_LIBRARY_PATH); \
+	        "$(JAVA_HOME)/bin/jar" cf $(JAVA_LIBRARY_NAME) -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
 	    ) \
 	)
 
 $(SWT_CLASSES) $(SWT_LIBS): %:
 	@echo [$(APPLICATION_NAME)] Extracting SWT library...
 	mkdir -p $(BINARY_PATH);
-	mkdir -p $(BIN)/java/swt;
-	mkdir -p $(BIN)/java/classes;
+	mkdir -p $(JAVA_OBJECTS_PATH)/swt;
+	mkdir -p $(JAVA_CLASSPATH);
 	# Extracting swt
 	( \
-	    cd $(BIN)/java/swt; \
-	    "$(JAVA_HOME)/bin/jar" xf ../../../lib/$(PLATFORM_TAG)/swt.jar; \
-	    cp -rf org ../classes/; \
-	    cp -rf *$(JNILIB_EXT) ../../$(PLATFORM_TAG)/; \
+	    cd $(JAVA_OBJECTS_PATH)/swt; \
+	    "$(JAVA_HOME)/bin/jar" xf $(CURDIR)/lib/$(PLATFORM_TAG)/swt.jar; \
+	    cp -rf org $(CURDIR)/$(JAVA_CLASSPATH); \
+	    cp -rf *$(JNILIB_EXT) $(CURDIR)/$(BINARY_PATH)/; \
 	)
+
+$(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS)
+	@echo [$(APPLICATION_NAME)] Making package file $@...
+	( \
+	    cd $(TARGET); \
+	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS)); \
+	)
+
 
 clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
-	rm -rf $(OBJ)
-	rm -rf $(BIN)
+	rm -rf $(TARGET)
 
 .PHONY: all
 .SILENT:

@@ -9,13 +9,16 @@ ifndef TARGET
   TARGET := ./target
 endif
 
+ifndef ZETES_FEET_PATH
+  ZETES_FEET_PATH := ../zetesfeet/target
+endif
+
 SRC = src
 BIN = bin
 OBJ = obj
+LIB = lib
 
 DEBUG_OPTIMIZE = -O0 -g
-
-ZETES_FEET_PATH = ../zetesfeet/target
 
 ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_TAG = osx-x86_64
@@ -54,9 +57,12 @@ CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES
 
 # Target paths
 BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)
+LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
 OBJECTS_PATH = $(TARGET)/$(OBJ)/$(PLATFORM_TAG)
 JAVA_BINARY_PATH = $(TARGET)/$(BIN)/java
-JAVA_CLASSPATH = $(TARGET)/$(BIN)/java/classes
+JAVA_LIBRARY_PATH = $(TARGET)/$(LIB)/java
+JAVA_OBJECTS_PATH = $(TARGET)/$(OBJ)/java
+JAVA_CLASSPATH = $(JAVA_OBJECTS_PATH)/java/classes
 
 # Target names
 LIBRARY_NAME = libzeteshands.a
@@ -97,12 +103,12 @@ help:
 	@echo
 	
 
-all: $(BINARY_PATH)/$(LIBRARY_NAME) $(JAVA_BINARY_PATH)/$(JAVA_LIBRARY_NAME)
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
-	@echo "  $(realpath $(BINARY_PATH))"
-	@echo "  $(realpath $(JAVA_BINARY_PATH))"
+	@echo "  $(realpath $(LIBRARY_PATH))"
+	@echo "  $(realpath $(JAVA_LIBRARY_PATH))"
 	@echo
 
 package: $(TARGET)/$(PACKAGE_NAME)
@@ -124,28 +130,28 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(BINARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(BINARY_PATH);
+	mkdir -p $(LIBRARY_PATH);
 	ar rvs $@ $(CPP_OBJECTS)
 
-$(JAVA_BINARY_PATH)/$(JAVA_LIBRARY_NAME): $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
+$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	# Making the java class library
 	( \
 	    set -e; \
-	    mkdir -p $(BINARY_PATH); \
+	    mkdir -p $(LIBRARY_PATH); \
 	    ( \
-	        cd $(JAVA_BINARY_PATH); \
-	        "$(JAVA_HOME)/bin/jar" cf $(JAVA_LIBRARY_NAME) -C ../java/classes .; \
+	        cd $(JAVA_LIBRARY_PATH); \
+	        "$(JAVA_HOME)/bin/jar" cf $(JAVA_LIBRARY_NAME) -C  $(CURDIR)/$(JAVA_CLASSPATH) .; \
 	    ) \
 	)
 	
-$(TARGET)/$(PACKAGE_NAME): $(BINARY_PATH)/$(LIBRARY_NAME) $(JAVA_BINARY_PATH)/$(JAVA_LIBRARY_NAME)
+$(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)
 	@echo [$(APPLICATION_NAME)] Making package file $@...
 	( \
 	    cd $(TARGET); \
-	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(BINARY_PATH)/$(LIBRARY_NAME) $(JAVA_BINARY_PATH)/$(JAVA_LIBRARY_NAME)); \
+	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)); \
 	)
 
 clean:

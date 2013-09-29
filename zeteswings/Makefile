@@ -65,6 +65,8 @@ CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES
 SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
 SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
+USER_MK = User.mk
+
 # Target paths
 BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)
 LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
@@ -111,9 +113,13 @@ help:
 	@echo
 	@echo "  > make clean"
 	@echo
+
+# Other files that should just be copied to the target folder 
+JUST_COPY_FILES = include/WinLinMacApi.h $(USER_MK)
+include ../common-scripts/just_copy.mk
 	
 
-all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS) $(TARGET)/$(USER_MK) $(TARGET)/include/WinLinMacApi.h
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
@@ -171,7 +177,8 @@ $(SWT_CLASSES) $(SWT_LIBS): %:
 	    cp -rf *$(JNILIB_EXT) $(CURDIR)/$(BINARY_PATH)/; \
 	)
 
-$(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS)
+
+$(TARGET)/$(PACKAGE_NAME): all
 	@echo [$(APPLICATION_NAME)] Making package file $@...
 	( \
 	    cd $(TARGET); \

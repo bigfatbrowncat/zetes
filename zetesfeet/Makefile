@@ -54,10 +54,6 @@ CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ 
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
-# Other files that should just be copied to the target folder 
-JUST_COPY_FILES = $(BIN_TO_OBJ) include/FeetStarter.h
-JUST_COPY_FILES_TARGET = $(addprefix $(TARGET)/,$(JUST_COPY_FILES))
-
 # Target paths
 LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
 OBJECTS_PATH = $(TARGET)/$(OBJ)/$(PLATFORM_TAG)
@@ -105,6 +101,9 @@ help:
 	@echo "  > make clean"
 	@echo
 
+# Other files that should just be copied to the target folder 
+JUST_COPY_FILES = $(BIN_TO_OBJ) include/FeetStarter.h
+include ../common-scripts/just_copy.mk
 
 all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
@@ -162,11 +161,6 @@ $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES
 	    cd $(JAVA_LIBRARY_PATH); \
 	    "$(JAVA_HOME)/bin/jar" uf $(JAVA_LIBRARY_NAME) -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
 	)
-
-$(JUST_COPY_FILES_TARGET): $(TARGET)/%: %
-	@echo [$(APPLICATION_NAME)] Copying $@...
-	mkdir -p $(dir $@)
-	cp -f $< $(TARGET)/$<
 
 $(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo [$(APPLICATION_NAME)] Making package file $@...

@@ -1,6 +1,7 @@
 # This makefile should be included by every user of the ZetesWings library
 
-# Attention! You should set ZETES_WINGS_PATH to the zeteswings library path
+# Attention! You should set ZETES_FEET_PATH and ZETES_WINGS_PATH 
+# to the zeteswings library path
 
 UNAME := $(shell uname)
 ifndef ARCH
@@ -11,9 +12,8 @@ SRC = src
 INCLUDE = include
 BIN = bin
 OBJ = obj
+LIB = lib
 RESOURCES = resources
-
-PWD = $(shell pwd)
 
 DEBUG_OPTIMIZE = -O0  -g
 
@@ -84,31 +84,46 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 endif
 
+ZETES_FEET_INCLUDE = -I$(ZETES_FEET_PATH)/include
+
+# Java platform agnostic
 JAVA_SOURCE_PATH = $(SRC)/java
-JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
-JAVA_CLASSPATH = $(BIN)/java/classes
-CPP_SOURCE_PATH = $(SRC)/cpp
-BINARY_PATH = $(BIN)/$(PLATFORM_TAG)
-OBJECTS_PATH = $(OBJ)/$(PLATFORM_TAG)
-
+RES_PATH = $(SRC)/res
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1')
-JAVA_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+JAVA_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
 
+# Java platform specific
+JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
 JAVA_PLATFORM_SPECIFIC_FILES = $(shell if [ -d "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" ]; then cd $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1'; fi)
-JAVA_PLATFORM_SPECIFIC_CLASSES := $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_PLATFORM_SPECIFIC_FILES))))
+JAVA_PLATFORM_SPECIFIC_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_PLATFORM_SPECIFIC_FILES))))
 
-CUSTOM_JARS =  $(shell if [ -d "lib/java" ]; then find lib/java -name \*.jar; fi)
-BUILD_CLASSPATHS = $(shell echo "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(ZETES_WINGS_PATH)/bin/java/$(JAVA_ZETES_LIBRARY)$(CLASSPATH_DELIM)$(CUSTOM_JARS)" | awk 'gsub(/ +/, "$(CLASSPATH_DELIM)"); 1';)
-
+# C++ Platform agnostic
+CPP_SOURCE_PATH = $(SRC)/cpp
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
-CPP_OBJECTS := $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
+CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
+
+# SWT binaries
+SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
+SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
+
+# Target paths
+BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)
+LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
+OBJECTS_PATH = $(TARGET)/$(OBJ)/$(PLATFORM_TAG)
+JAVA_BINARY_PATH = $(TARGET)/$(BIN)/java
+JAVA_LIBRARY_PATH = $(TARGET)/$(LIB)/java
+JAVA_OBJECTS_PATH = $(TARGET)/$(OBJ)/java
+JAVA_CLASSPATH = $(JAVA_OBJECTS_PATH)/classes
+
+CUSTOM_JARS =  $(shell if [ -d "lib/java" ]; then find lib/java -name \*.jar; fi)
+BUILD_CLASSPATHS = $(shell echo "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY)$(CLASSPATH_DELIM)$(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY)$(CLASSPATH_DELIM)$(CUSTOM_JARS)" | awk 'gsub(/ +/, "$(CLASSPATH_DELIM)"); 1';)
 
 ZETES_JNI_LIBS = \
     $(shell \
-        if [ -d $(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG) ]; \
+        if [ -d $(ZETES_WINGS_PATH)/$(BIN)/$(PLATFORM_TAG) ]; \
         then \
-            cd $(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG); \
+            cd $(ZETES_WINGS_PATH)/$(BIN)/$(PLATFORM_TAG)/; \
             find . -type f -name \*$(JNILIB_EXT) | awk '{ sub(/.\//,"") }; 1'; \
         fi \
     )
@@ -120,8 +135,11 @@ RESOURCE_FILES_TARGET = $(addprefix $(RESOURCE_FILES_TARGET_PATH)/, $(RESOURCE_F
 
 ZETES_INCLUDE = $(ZETES_WINGS_PATH)/include
 
-JAVA_ZETES_LIBRARY = zeteswings.jar
-ZETES_LIBRARY_NAME = libzeteswings.a
+JAVA_ZETES_WINGS_LIBRARY = zeteswings.jar
+JAVA_ZETES_FEET_LIBRARY = zetesfeet.jar
+
+ZETES_WINGS_LIBRARY = libzeteswings.a
+ZETES_FEET_LIBRARY = libzetesfeet.a
 
 ifeq ($(UNAME), Darwin)	# OS X
 package: app
@@ -149,7 +167,7 @@ package: app
 app: $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
 endif
 
-$(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG)/%
+$(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_WINGS_PATH)/$(BIN)/$(PLATFORM_TAG)/%
 	@echo [$(APPLICATION_NAME)] Copying library $<...
 	cp -f $< "$@"
 
@@ -158,12 +176,12 @@ $(RESOURCE_FILES_TARGET) : $(RESOURCE_FILES_TARGET_PATH)/% : $(RESOURCES)/%
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	cp -f $< $@
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(ZETES_WINGS_PATH)/bin/java/$(JAVA_ZETES_LIBRARY)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)$(CLASSPATH_DELIM)$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(BUILD_CLASSPATHS)" -d "$(JAVA_CLASSPATH)" $<
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(ZETES_WINGS_PATH)/bin/java/$(JAVA_ZETES_LIBRARY)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY)
 	@echo [$(APPLICATION_NAME)] Compiling platform specific $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -sourcepath "$(JAVA_SOURCE_PATH)$(CLASSPATH_DELIM)$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(BUILD_CLASSPATHS)" -d "$(JAVA_CLASSPATH)" $<
@@ -173,67 +191,79 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(dir $@)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) -I$(ZETES_INCLUDE) $< -o $@
 
-$(BINARY_PATH)/$(BINARY_NAME): $(BIN)/java/boot.jar $(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME) $(CPP_OBJECTS)
+$(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libzeteswings objects
 	( \
-	    cd $(OBJ); \
+	    set -e; \
+	    cd $(OBJECTS_PATH); \
 	    mkdir -p libzeteswings; \
 	    cd libzeteswings; \
-	    ar x ../../$(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME); \
+	    ar x $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY); \
+	)
+	# Extracting libzetesfeet objects
+	( \
+	    set -e; \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libzetesfeet; \
+	    cd libzetesfeet; \
+	    ar x $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY); \
 	)
 
-	mkdir -p $(BIN)/java
+	mkdir -p $(JAVA_OBJECTS_PATH)
 
 	# Making an object file from the java class library
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libzeteswings/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJECTS_PATH)/libzeteswings/*.o $(OBJECTS_PATH)/libzetesfeet/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
-$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BIN)/java/boot.jar $(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME) $(CPP_OBJECTS)
-	@echo [$(APPLICATION_NAME)] Linking $@...
+$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(CPP_OBJECTS)
+	@echo [$(OBJECTS_PATH)] Linking $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libavian objects
 	( \
-	    cd $(OBJ); \
+	    set -e; \
+	    cd $(OBJECTS_PATH); \
 	    mkdir -p libzeteswings; \
 	    cd libzeteswings; \
-	    ar x ../../$(ZETES_WINGS_PATH)/bin/$(PLATFORM_TAG)/$(ZETES_LIBRARY_NAME); \
+	    ar x $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY); \
 	)
 
-	mkdir -p $(BIN)/java
+	mkdir -p $(JAVA_OBJECTS_PATH)
 
 	# Making an object file from the java class library
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(BIN)/java/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJ)/libzeteswings/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJECTS_PATH)/libzeteswings/*.o $(OBJECTS_PATH)/libzetesfeet/*.o $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
 
-$(BIN)/java/boot.jar: $(ZETES_WINGS_PATH)/bin/java/$(JAVA_ZETES_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)
+$(JAVA_OBJECTS_PATH)/boot.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(BIN)/java/classes;
+	mkdir -p $(JAVA_CLASSPATH);
 
 	# Extracting custom jars
 	for cust_jar in $(CUSTOM_JARS); do \
 	    echo [$(APPLICATION_NAME)] Extracting $$cust_jar...; \
-	    (cd $(BIN)/java/classes; "$(JAVA_HOME)/bin/jar" xvf $(PWD)/$$cust_jar ); \
+	    (cd $(JAVA_CLASSPATH); "$(JAVA_HOME)/bin/jar" xvf $(CURDIR)/$$cust_jar ); \
 	done
 	
 	# Making the java class library
-	cp -f $(ZETES_WINGS_PATH)/bin/java/$(JAVA_ZETES_LIBRARY) $(BIN)/java/boot.jar; \
 	( \
-	    cd $(BIN)/java; \
-	    "$(JAVA_HOME)/bin/jar" u0f boot.jar -C ../java/classes .; \
-	    "$(JAVA_HOME)/bin/jar" u0f boot.jar -C ../../src/res .; \
+	    set -e; \
+	    cd $(CURDIR)/$(JAVA_CLASSPATH); \
+	    "$(JAVA_HOME)/bin/jar" xf $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY); \
+	    "$(JAVA_HOME)/bin/jar" xf $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY); \
+	    cd $(CURDIR)/$(JAVA_OBJECTS_PATH); \
+	    "$(JAVA_HOME)/bin/jar" cf boot.jar -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
+	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(RES_PATH) .; \
 	)
 
 clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
-	rm -rf $(OBJ)
-	rm -rf $(BIN)
+	rm -rf $(TARGET)
 
 .PHONY: package clean
-.SILENT:
+#.SILENT:

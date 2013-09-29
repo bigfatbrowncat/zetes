@@ -1,5 +1,5 @@
-ZETES_FEET_PATH = ../zetesfeet
-ZETES_HANDS_PATH = ../zeteshands
+ZETES_FEET_PATH = ../target
+ZETES_HANDS_PATH = ../target
 
 APPLICATION_NAME = BellardPI
 BINARY_NAME = bellardpi

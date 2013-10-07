@@ -1,4 +1,4 @@
-all: zetes #gltest tinyviewer bellardpi
+all: zetes
 
 zetes: zetesfeet zeteswings zeteshands
 
@@ -11,30 +11,10 @@ zeteswings: zetesfeet
 zeteshands: zetesfeet
 	$(MAKE) TARGET=../target all -C zeteshands
 
-gltest: zeteswings
-#	$(MAKE) app -C gltest
-
-#tinyviewer: zeteswings
-#	$(MAKE) app -C tinyviewer
-
-#bellardpi: zeteshands
-#	$(MAKE) app -C bellardpi
-
 clean:
 	$(MAKE) TARGET=../target clean -C zetesfeet
 	$(MAKE) TARGET=../target clean -C zeteswings
 	$(MAKE) TARGET=../target clean -C zeteshands
-#	$(MAKE) clean -C gltest
-#	$(MAKE) clean -C tinyviewer
-#	$(MAKE) clean -C bellardpi
-
-#package: gltest-pack tinyviewer-pack
-
-#gltest-pack:
-#	$(MAKE) package -C gltest
-
-#tinyviewer-pack:
-#	$(MAKE) package -C tinyviewer
 
 ideconf-eclipse:
 	$(MAKE) ideconf-eclipse -C zetesfeet
@@ -43,5 +23,5 @@ ideconf-eclipse:
 	$(MAKE) ideconf-eclipse -C bellardpi
 	
 
-.PHONY: all zetes zeteswings zetesfeet zeteshands gltest tinyviewer bellardpi
+.PHONY: all zetes zeteswings zetesfeet zeteshands
 .SILENT:

@@ -61,7 +61,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_TAG = win-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
-  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
+  PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   SH_LIB_EXT=.dll
   JNILIB_EXT=.dll
@@ -102,10 +102,6 @@ CPP_SOURCE_PATH = $(SRC)/cpp
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
-
-# SWT binaries
-SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
-SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
 # Target paths
 BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)

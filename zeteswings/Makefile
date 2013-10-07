@@ -65,7 +65,7 @@ CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES
 SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
 SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
-USER_MK = User.mk
+USER_MK = ZetesWings.mk
 
 # Target paths
 BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)

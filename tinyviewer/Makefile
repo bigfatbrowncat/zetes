@@ -8,4 +8,4 @@ TARGET = target
 
 all: package
 
-include $(ZETES_WINGS_PATH)/User.mk
+include $(ZETES_WINGS_PATH)/ZetesWings.mk

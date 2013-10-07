@@ -55,6 +55,8 @@ CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ 
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
+USER_MK = ZetesHands.mk
+
 # Target paths
 BINARY_PATH = $(TARGET)/$(BIN)/$(PLATFORM_TAG)
 LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
@@ -102,8 +104,12 @@ help:
 	@echo "  > make clean"
 	@echo
 	
+# Other files that should just be copied to the target folder 
+JUST_COPY_FILES = $(USER_MK)
+include ../common-scripts/just_copy.mk
 
-all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)
+
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(TARGET)/$(USER_MK)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
@@ -140,7 +146,7 @@ $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECI
 	# Making the java class library
 	( \
 	    set -e; \
-	    mkdir -p $(LIBRARY_PATH); \
+	    mkdir -p $(JAVA_LIBRARY_PATH); \
 	    ( \
 	        cd $(JAVA_LIBRARY_PATH); \
 	        "$(JAVA_HOME)/bin/jar" cf $(JAVA_LIBRARY_NAME) -C  $(CURDIR)/$(JAVA_CLASSPATH) .; \

@@ -216,7 +216,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(CPP_OBJECTS)
-	@echo [$(OBJECTS_PATH)] Linking $@...
+	@echo [$(APPLICATION_NAME)] Linking $@...
 	mkdir -p $(BINARY_PATH);
 
 	# Extracting libavian objects

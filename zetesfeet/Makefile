@@ -132,7 +132,7 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS)
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
 	mkdir -p $(OBJECTS_PATH);

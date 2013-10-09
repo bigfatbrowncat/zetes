@@ -105,11 +105,11 @@ help:
 	@echo
 	
 # Other files that should just be copied to the target folder 
-JUST_COPY_FILES = $(USER_MK)
+JUST_COPY_FILES = $(USER_MK) include/ZetesHands.h
 include ../common-scripts/just_copy.mk
 
 
-all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(TARGET)/$(USER_MK)
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo

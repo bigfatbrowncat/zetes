@@ -6,6 +6,7 @@
 #include <map>
 
 #include "FeetStarter.h"
+#include "ZetesHands.h"
 
 using namespace std;
 using namespace zetes::feet;
@@ -14,7 +15,6 @@ using namespace zetes::feet;
 #include <windows.h>
 #endif
 
-extern char* applicationClass;
 
 int main(int argc, const char** argv)
 {
@@ -38,7 +38,12 @@ int main(int argc, const char** argv)
 		args.push_back(wav[i]);
 	}
 
-	feetStarter.setApplicationClassName(applicationClass);
+	feetStarter.setApplicationClassName(zetes::hands::applicationClass);
+
+#ifdef __MINGW32__
+	SetConsoleCP(65001);		// UTF-8
+	SetConsoleOutputCP(65001);	// UTF-8 too
+#endif
 
 	int exitCode = feetStarter.run();
 

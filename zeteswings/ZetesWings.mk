@@ -85,6 +85,8 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
 endif
 
 ZETES_FEET_INCLUDE = -I$(ZETES_FEET_PATH)/include
+ZETES_WINGS_INCLUDE = -I$(ZETES_WINGS_PATH)/include
+ZETES_INCLUDE = $(ZETES_FEET_INCLUDE) $(ZETES_WINGS_INCLUDE)
 
 # Java platform agnostic
 JAVA_SOURCE_PATH = $(SRC)/java
@@ -128,8 +130,6 @@ ZETES_JNI_LIBS_TARGET = $(addprefix $(BINARY_PATH)/,$(addsuffix $(JNILIB_EXT),$(
 
 RESOURCE_FILES = $(shell if [ -d "$(RESOURCES)" ]; then cd $(RESOURCES); find . -type f -name \* | awk '{ sub(/.\//,"") }; 1'; fi)
 RESOURCE_FILES_TARGET = $(addprefix $(RESOURCE_FILES_TARGET_PATH)/, $(RESOURCE_FILES))
-
-ZETES_INCLUDE = $(ZETES_WINGS_PATH)/include
 
 JAVA_ZETES_WINGS_LIBRARY = zeteswings.jar
 JAVA_ZETES_FEET_LIBRARY = zetesfeet.jar
@@ -185,7 +185,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(ZETES_
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	mkdir -p $(dir $@)
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) -I$(ZETES_INCLUDE) $< -o $@
+	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $(ZETES_INCLUDE) $< -o $@
 
 $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...

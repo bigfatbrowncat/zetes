@@ -21,6 +21,7 @@ LIB = lib
 DEBUG_OPTIMIZE = -O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
+  JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_TAG = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC

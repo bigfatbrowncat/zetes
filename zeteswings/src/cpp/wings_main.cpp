@@ -15,8 +15,6 @@ using namespace zetes::feet;
 #include <windows.h>
 #endif
 
-extern char* applicationClass;
-
 int main(int argc, const char** argv)
 {
 	FeetStarter feetStarter;
@@ -43,7 +41,7 @@ int main(int argc, const char** argv)
 	string swtExecPath = WinLinMacApi::locateExecutable();
 	string execPath = WinLinMacApi::locateExecutable();
 
-	feetStarter.setApplicationClassName(applicationClass);
+//	feetStarter.setApplicationClassName(applicationClass);
 	feetStarter.setDefinition("swt.library.path", swtExecPath);
 	feetStarter.setDefinition("java.library.path", execPath);
 

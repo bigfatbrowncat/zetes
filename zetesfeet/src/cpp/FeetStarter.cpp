@@ -25,21 +25,26 @@ using namespace std;
 #endif
 
 #if (! defined __x86_64__) && (defined __MINGW32__)
-#  define SYMBOL(x) binary_boot_jar_##x
+#  define BOOT_JAR_SYMBOL(x)				binary_boot_jar_##x
+#  define ENTRY_CLASS_NAME_SYMBOL(x)		boot_class_name_##x
 #else
-#  define SYMBOL(x) _binary_boot_jar_##x
+#  define BOOT_JAR_SYMBOL(x) 				_binary_boot_jar_##x
+#  define ENTRY_CLASS_NAME_SYMBOL(x)		_boot_class_name_##x
 #endif
 
 extern "C"
 {
 
-	extern const uint8_t SYMBOL(start)[];
-	extern const uint8_t SYMBOL(end)[];
+	extern const uint8_t BOOT_JAR_SYMBOL(start)[];
+	extern const uint8_t BOOT_JAR_SYMBOL(end)[];
+	extern const char ENTRY_CLASS_NAME_SYMBOL(start)[];
+	extern const char ENTRY_CLASS_NAME_SYMBOL(end)[];
+
 
 	EXPORT const uint8_t* bootJar(unsigned* size)
 	{
-		*size = SYMBOL(end) - SYMBOL(start);
-		return SYMBOL(start);
+		*size = BOOT_JAR_SYMBOL(end) - BOOT_JAR_SYMBOL(start);
+		return BOOT_JAR_SYMBOL(start);
 	}
 
 } // extern "C"
@@ -48,12 +53,20 @@ namespace zetes
 {
 	namespace feet
 	{
+		string extractEntryClassName() {
+			size_t size = ENTRY_CLASS_NAME_SYMBOL(end) - ENTRY_CLASS_NAME_SYMBOL(start);
+			char* str = new char[size];
+			memcpy(str, ENTRY_CLASS_NAME_SYMBOL(start), size);
+			str[size - 1] = 0;
+			return string(str);
+		}
+
 		FeetStarter::FeetStarter() : maximumHeapSizeMegabytes(16000)
 		{
 
 		}
 
-		void FeetStarter::setApplicationClassName(const std::string& applicationClassName)
+/*		void FeetStarter::setApplicationClassName(const std::string& applicationClassName)
 		{
 			this->applicationClassName = applicationClassName;
 		}
@@ -61,7 +74,7 @@ namespace zetes
 		const std::string& FeetStarter::getApplicationClassName() const
 		{
 			return applicationClassName;
-		}
+		}*/
 
 		void FeetStarter::setMaximumHeapSizeMegabytes(int maximumHeapSizeMegabytes)
 		{
@@ -136,7 +149,7 @@ namespace zetes
 			JNI_CreateJavaVM(&vm, &env, &vmArgs);
 			JNIEnv* e = static_cast<JNIEnv*>(env);
 
-			jclass c = e->FindClass(applicationClassName.c_str());
+			jclass c = e->FindClass(extractEntryClassName().c_str());
 			if (not e->ExceptionCheck())
 			{
 				jmethodID m = e->GetStaticMethodID(c, "main", "([Ljava/lang/String;)V");

@@ -25,15 +25,15 @@ namespace zetes
 		class FeetStarter
 		{
 		private:
-			std::string applicationClassName;
+//			std::string applicationClassName;
 			int maximumHeapSizeMegabytes;
 			std::map<std::string, std::string> definitions;
 			std::list<argstring> arguments;
 		public:
 			FeetStarter();
 
-			void setApplicationClassName(const std::string& applicationClassName);
-			const std::string& getApplicationClassName() const;
+//			void setApplicationClassName(const std::string& applicationClassName);
+//			const std::string& getApplicationClassName() const;
 
 			void setMaximumHeapSizeMegabytes(int maximumHeapSizeMegabytes);
 			int getMaximumHeapSizeMegabytes() const;

@@ -38,7 +38,7 @@ int main(int argc, const char** argv)
 		args.push_back(wav[i]);
 	}
 
-	feetStarter.setApplicationClassName(zetes::hands::applicationClass);
+	//feetStarter.setApplicationClassName(zetes::hands::applicationClass);
 
 #ifdef __MINGW32__
 	SetConsoleCP(65001);		// UTF-8

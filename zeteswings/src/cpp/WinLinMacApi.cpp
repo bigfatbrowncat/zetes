@@ -19,7 +19,7 @@ string simpleLocateResource(const string& path, const string& filename)
 #ifdef __APPLE__
 // MacOS X includes/methods
 
-#include </usr/include/sys/syslimits.h>
+#include <sys/syslimits.h>
 
 #include <CoreFoundation/CFBundle.h>
 
@@ -91,7 +91,7 @@ string WinLinMacApi::locateExecutable()
 			{
 				res = "./";
 			}
-			CFRelease(executablePath);
+			CFRelease(executablePathUrl);
 			CFRelease(executableURL);
 		}
 	}

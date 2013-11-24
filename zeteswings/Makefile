@@ -23,7 +23,7 @@ DEBUG_OPTIMIZE = -O0 -g
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_TAG = osx-x86_64
-  PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
   JNILIB_EXT=.jnilib
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_TAG = linux-x86_64

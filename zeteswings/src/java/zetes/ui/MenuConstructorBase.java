@@ -61,7 +61,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		public void windowOpened(final TVW window) {
 			
 			// Creating Fullscreen handler for the window just opened
-			if (fullscreenViewAction != null) {
+			if (window.supportsFullscreen()) {				
 				Handler<TVW> fullscreenHandler = new Handler<TVW>() {
 
 					@Override
@@ -69,30 +69,27 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 						window.toggleFullScreen();
 					}
 				};
-				
 				fullscreenViewAction.getHandlers().put(window, fullscreenHandler);
-			}
+			} 				
 
 			// Creating Minimize handler for the window just opened
-			if (minimizeWindowAction != null) {
-				Handler<TVW> minimizeHandler = new Handler<TVW>() {
+			Handler<TVW> minimizeHandler = new Handler<TVW>() {
 
-					@Override
-					public void execute(TVW window) {
-						window.toggleMinimized();
-					}
-					
-					@Override
-					public boolean isEnabled() {
-						return Display.getCurrent().getActiveShell() != null;
-					}
-					
-				};
-				minimizeWindowAction.getHandlers().put(window, minimizeHandler);
-			}
+				@Override
+				public void execute(TVW window) {
+					window.toggleMinimized();
+				}
+				
+				@Override
+				public boolean isEnabled() {
+					return Display.getCurrent().getActiveShell() != null;
+				}
+				
+			};
+			minimizeWindowAction.getHandlers().put(window, minimizeHandler);
 			
 			// Creating Zoom handler for the window just opened
-			if (zoomWindowAction != null) {
+			if (window.supportsMaximizing()) {
 				Handler<TVW> zoomHandler = new Handler<TVW>() {
 
 					@Override
@@ -243,6 +240,54 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 			aboutHelpAction = new Action<TVW>("&About");
 			helpActionCategory.addLastItem(aboutHelpAction);
 		}
+		
+		// Setting the default handlers
+		
+		Handler<TVW> noFullscreenHandler = new Handler<TVW>() {
+			@Override
+			public void execute(TVW window) {
+				// Do nothing
+			}
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
+		fullscreenViewAction.getHandlers().put(null, noFullscreenHandler);
+
+		Handler<TVW> noZoomHandler = new Handler<TVW>() {
+
+			@Override
+			public void execute(TVW window) {
+				// Do nothing
+			}
+			
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+
+			
+		};
+		zoomWindowAction.getHandlers().put(null, noZoomHandler);
+		
+		Handler<TVW> noPreferencesHandler = new Handler<TVW>() {
+			@Override
+			public void execute(TVW window) {
+				// Do nothing
+			}
+			
+			@Override
+			public boolean isEnabled() {
+				return false;
+			}
+			
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
+		setPreferencesGlobalHandler(noPreferencesHandler);
 	}
 
 	private boolean addMenusForActionList(final TVW window, ActionList<TVW> category, Menu currentMenu) {
@@ -389,6 +434,7 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 					});
 					break;
 				case OSX_SYSTEM_MENU_PREFERENCES:
+					item.setEnabled(preferencesGlobalHandler.isEnabled());
 					item.addSelectionListener(new SelectionListener() {
 						@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
 
@@ -522,15 +568,5 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 		return viewWindowsManager;
 	}
 
-//	public void setViewWindowsManager() {
-//		if (this.viewWindowsManager != null) {
-//			this.viewWindowsManager.removeListener(viewWindowsManagerListener);
-//		}
-//		
-//		this.viewWindowsManager = viewWindowsManager;
-//		
-//		if (this.viewWindowsManager != null) {
-//			viewWindowsManager.addListener(viewWindowsManagerListener);
-//		}
-//	}	
+
 }

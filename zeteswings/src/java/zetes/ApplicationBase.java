@@ -116,15 +116,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		
 	};
 	
-	private Handler<TVW> preferencesHandler = new Handler<TVW> () {
-
-		@Override
-		public void execute(TVW window) {
-			showPreferences();
-		}
-		
-	};
-	
 	boolean terminated = false;
 	
 	private void eventLoop()
@@ -199,7 +190,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			menuConstructor = createMenuConstructor(viewWindowsManager);
 			menuConstructor.setExitGlobalHandler(exitHandler);
 			menuConstructor.setAboutGlobalHandler(aboutHandler);
-			menuConstructor.setPreferencesGlobalHandler(preferencesHandler);
 			menuConstructor.updateMenus(null);
 			
 			// Adding OS X system menu handlers

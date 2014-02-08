@@ -145,12 +145,76 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd libavian; \
 	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libavian.a; \
 	)
+	
+	# Extracting libcrypto objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libcrypto; \
+	    cd libcrypto; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libcrypto.a; \
+	)
+	
+	# Extracting libssl objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libssl; \
+	    cd libssl; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libssl.a; \
+	)
+	
+	# Extracting libexpat objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libexpat; \
+	    cd libexpat; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libexpat.a; \
+	)
 
+	# Extracting libicui18n objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libicui18n; \
+	    cd libicui18n; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libicui18n.a; \
+	)
+
+	# Extracting libicuuc objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libicuuc; \
+	    cd libicuuc; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libicuuc.a; \
+	)
+
+	# Extracting libicudata objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libicudata; \
+	    cd libicudata; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libicudata.a; \
+	)
+	
+	# Extracting libfdm objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libfdm; \
+	    cd libfdm; \
+	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libfdm.a; \
+	)
+	
 	mkdir -p $(JAVA_LIBRARY_PATH)
 
 	# Making an object file from the java class library
 	
-	ar rvs $@ $(CPP_OBJECTS) $(OBJECTS_PATH)/libavian/*.o
+	ar rvs $@ $(CPP_OBJECTS) \
+	    $(OBJECTS_PATH)/libavian/*.o	\
+	    $(OBJECTS_PATH)/libcrypto/*.o	\
+	    $(OBJECTS_PATH)/libssl/*.o		\
+	    $(OBJECTS_PATH)/libexpat/*.o	\
+	    $(OBJECTS_PATH)/libicudata/*.o	\
+	    $(OBJECTS_PATH)/libicuuc/*.ao	\
+	    $(OBJECTS_PATH)/libicui18n/*.ao	\
+	    $(OBJECTS_PATH)/libfdm/*.o
 
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...

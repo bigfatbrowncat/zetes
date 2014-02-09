@@ -206,15 +206,15 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 
 	# Making an object file from the java class library
 	
-	ar rvs $@ $(CPP_OBJECTS) \
-	    $(OBJECTS_PATH)/libavian/*.o	\
-	    $(OBJECTS_PATH)/libcrypto/*.o	\
-	    $(OBJECTS_PATH)/libssl/*.o		\
-	    $(OBJECTS_PATH)/libexpat/*.o	\
-	    $(OBJECTS_PATH)/libicudata/*.o	\
-	    $(OBJECTS_PATH)/libicuuc/*.ao	\
-	    $(OBJECTS_PATH)/libicui18n/*.ao	\
-	    $(OBJECTS_PATH)/libfdm/*.o
+	ar rvs $@ $(CPP_OBJECTS)
+	ar rvs $@ $(OBJECTS_PATH)/libavian/*.o
+	ar rvs $@ $(OBJECTS_PATH)/libcrypto/*.o
+	ar rvs $@ $(OBJECTS_PATH)/libssl/*.o
+	ar rvs $@ $(OBJECTS_PATH)/libexpat/*.o
+	ar rvs $@ $(OBJECTS_PATH)/libicudata/*.o
+	ar rvs $@ $(OBJECTS_PATH)/libicuuc/*.ao
+	ar rvs $@ $(OBJECTS_PATH)/libicui18n/*.ao
+	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
 
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...

@@ -1,0 +1,3 @@
+[submodule "avian-pack"]
+	path = avian-pack
+	url = ../avian-pack.git

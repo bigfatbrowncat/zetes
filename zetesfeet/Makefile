@@ -19,22 +19,27 @@ DEBUG_OPTIMIZE = -O0 -g
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_TAG = osx-x86_64
+  AVIAN_PLATFORM_TAG = darwin-x86_64-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
   EXE_EXT=
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
   PLATFORM_TAG = linux-x86_64
+  AVIAN_PLATFORM_TAG = linux-x86_64-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
   EXE_EXT=
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
   PLATFORM_TAG = linux-armv6l
+  AVIAN_PLATFORM_TAG = linux-armv6l-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
   EXE_EXT=
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM_TAG = win-i386
+  AVIAN_PLATFORM_TAG = windows-i386-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   EXE_EXT=.exe
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   PLATFORM_TAG = win-x86_64
+  AVIAN_PLATFORM_TAG = windows-x86_64-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
   EXE_EXT=.exe
 endif
@@ -54,6 +59,28 @@ CPP_SOURCE_PATH = $(SRC)/cpp
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
+
+# C static libraries
+LIBAVIAN = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a
+LIBCRYPTO = $(CURDIR)/../avian-pack/android/openssl-upstream/libcrypto.a
+LIBSSL = $(CURDIR)/../avian-pack/android/openssl-upstream/libssl.a
+LIBEXPAT = $(CURDIR)/../avian-pack/android/external/expat/.libs/libexpat.a
+
+ifeq ($(OS), Windows_NT)
+LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuin.a
+LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuuc.a
+LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicudt.a
+else
+LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicui18n.a
+LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicuuc.a
+LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicudata.a
+endif
+
+LIBFDM = $(CURDIR)/../avian-pack/android/external/fdlibm/libfdm.a
+
+# Avian classpath
+CLASSPATHJAR = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/classpath.jar
+
 
 # Target paths
 LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
@@ -133,7 +160,7 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
 	mkdir -p $(OBJECTS_PATH);
@@ -143,7 +170,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libavian; \
 	    cd libavian; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libavian.a; \
+	    ar x $(LIBAVIAN); \
 	)
 	
 	# Extracting libcrypto objects
@@ -151,7 +178,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libcrypto; \
 	    cd libcrypto; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libcrypto.a; \
+	    ar x $(LIBCRYPTO); \
 	)
 	
 	# Extracting libssl objects
@@ -159,7 +186,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libssl; \
 	    cd libssl; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libssl.a; \
+	    ar x $(LIBSSL); \
 	)
 	
 	# Extracting libexpat objects
@@ -167,7 +194,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libexpat; \
 	    cd libexpat; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libexpat.a; \
+	    ar x $(LIBEXPAT); \
 	)
 
 	# Extracting libicui18n objects
@@ -175,7 +202,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libicui18n; \
 	    cd libicui18n; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libicui18n.a; \
+	    ar x $(LIBICUIN); \
 	)
 
 	# Extracting libicuuc objects
@@ -183,7 +210,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libicuuc; \
 	    cd libicuuc; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libicuuc.a; \
+	    ar x $(LIBICUUC); \
 	)
 
 	# Extracting libicudata objects
@@ -191,7 +218,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libicudata; \
 	    cd libicudata; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libicudata.a; \
+	    ar x $(LIBICUDATA); \
 	)
 	
 	# Extracting libfdm objects
@@ -199,7 +226,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	    cd $(OBJECTS_PATH); \
 	    mkdir -p libfdm; \
 	    cd libfdm; \
-	    ar x $(CURDIR)/lib/$(PLATFORM_TAG)/libfdm.a; \
+	    ar x $(LIBFDM); \
 	)
 	
 	mkdir -p $(JAVA_LIBRARY_PATH)
@@ -216,12 +243,12 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) lib/$(PLATFORM_TAG)/libavian.a
 	ar rvs $@ $(OBJECTS_PATH)/libicui18n/*.ao
 	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
 
-$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): lib/java/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
+$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(CLASSPATHJAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
 
 	# Making the java class library
-	cp -f lib/java/classpath.jar $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME); \
+	cp -f $(CLASSPATHJAR) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME); \
 	( \
 	    cd $(JAVA_LIBRARY_PATH); \
 	    "$(JAVA_HOME)/bin/jar" uf $(JAVA_LIBRARY_NAME) -C $(CURDIR)/$(JAVA_CLASSPATH) .; \

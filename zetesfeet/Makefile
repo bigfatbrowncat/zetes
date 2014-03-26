@@ -244,23 +244,23 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
 
 $(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
-	make -f $(CURDIR)/../avian-pack/Makefile avian
+	(cd $(CURDIR)/../avian-pack; make avian)
 
 $(LIBCRYPTO):
-	make -f $(CURDIR)/../avian-pack/Makefile openssl
+	(cd $(CURDIR)/../avian-pack; make openssl)
 
 $(LIBEXPAT):
-	make -f $(CURDIR)/../avian-pack/Makefile expat
+	(cd $(CURDIR)/../avian-pack; make expat)
 
 $(LIBICUIN):
-	make -f $(CURDIR)/../avian-pack/Makefile icu4c
+	(cd $(CURDIR)/../avian-pack; make icu4c)
 	
 $(LIBICUUC): $(LIBICUIN)
 
 $(LIBICUDATA): $(LIBICUIN)
 
 $(LIBFDM):
-	make -f $(CURDIR)/../avian-pack/Makefile fdlibm
+	(cd $(CURDIR)/../avian-pack; make fdlibm)
 
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(CLASSPATHJAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...

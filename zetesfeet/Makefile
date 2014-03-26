@@ -243,6 +243,25 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	ar rvs $@ $(OBJECTS_PATH)/libicui18n/*.ao
 	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
 
+$(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
+	make -f $(CURDIR)/../avian-pack/Makefile avian
+
+$(LIBCRYPTO):
+	make -f $(CURDIR)/../avian-pack/Makefile openssl
+
+$(LIBEXPAT):
+	make -f $(CURDIR)/../avian-pack/Makefile expat
+
+$(LIBICUIN):
+	make -f $(CURDIR)/../avian-pack/Makefile icu4c
+	
+$(LIBICUUC): $(LIBICUIN)
+
+$(LIBICUDATA): $(LIBICUIN)
+
+$(LIBFDM):
+	make -f $(CURDIR)/../avian-pack/Makefile fdlibm
+
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(CLASSPATHJAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
@@ -264,7 +283,6 @@ $(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/
 clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(TARGET)
-	
 
 .PHONY: all package help
 .SILENT:

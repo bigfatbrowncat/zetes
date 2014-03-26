@@ -170,9 +170,27 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	mkdir -p $(OBJECTS_PATH);
 	mkdir -p $(JAVA_OBJECTS_PATH)
 
-	# Creating an empty object list
-	rm -f $(OBJECTS_PATH)/list.txt
-	touch $(OBJECTS_PATH)/list.txt
+	# Making an object file from the java class library
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	
+	# Making an object file from the entry point class name string
+	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
+
+	# Linking the target
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) \
+	           $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
+	           $(CURDIR)/$(OBJECTS_PATH)/boot.jar.o \
+	           $(CURDIR)/$(OBJECTS_PATH)/entry.str.o \
+	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+
+$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) $(CPP_OBJECTS)
+	@echo [$(APPLICATION_NAME)] Linking $@...
+	mkdir -p $(BINARY_PATH);
+	mkdir -p $(OBJECTS_PATH);
+	mkdir -p $(JAVA_OBJECTS_PATH)
 
 	# Making an object file from the java class library
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
@@ -181,46 +199,13 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
 
-	( \
-	    rm -f $(OBJECTS_PATH)/script.txt; \
-	    touch $(OBJECTS_PATH)/script.txt; \
-	    echo "CREATE $(OBJECTS_PATH)/libsingle.a" >> $(OBJECTS_PATH)/script.txt; \
-		echo "ADDMOD $(OBJECTS_PATH)/boot.jar.o" >> $(OBJECTS_PATH)/script.txt; \
-	    echo "ADDLIB $(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY)" >> $(OBJECTS_PATH)/script.txt; \
-	    echo "ADDLIB $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY)" >> $(OBJECTS_PATH)/script.txt; \
-		echo "ADDMOD $(OBJECTS_PATH)/entry.str.o" >> $(OBJECTS_PATH)/script.txt; \
-		echo "SAVE" >> $(OBJECTS_PATH)/script.txt; \
-	)
-
-	rm -f $(OBJECTS_PATH)/libsingle.a
-	ar M < $(OBJECTS_PATH)/script.txt
-	
 	# Linking the target
-	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) $(OBJECTS_PATH)/libsingle.a $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
-
-$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) $(CPP_OBJECTS)
-	@echo [$(APPLICATION_NAME)] Linking $@...
-	mkdir -p $(BINARY_PATH);
-
-	# Extracting libavian objects
-	( \
-	    set -e; \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libzeteshands; \
-	    cd libzeteshands; \
-	    ar x $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY); \
-	)
-
-	mkdir -p $(JAVA_OBJECTS_PATH)
-
-	# Making an object file from the entry point class name string
-	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
-	
-	# Making an object file from the java class library
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH);
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/entry.str.o $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJECTS_PATH)/libzeteshands/*.o $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) \
+	           $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
+	           $(CURDIR)/$(OBJECTS_PATH)/boot.jar.o \
+	           $(CURDIR)/$(OBJECTS_PATH)/entry.str.o \
+	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
 

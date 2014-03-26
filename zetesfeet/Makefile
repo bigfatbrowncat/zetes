@@ -244,7 +244,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
 
 $(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
-	(cd $(CURDIR)/../avian-pack; make avian)
+	(cd $(CURDIR)/../avian-pack; make avian-static-lib)
 
 $(LIBCRYPTO):
 	(cd $(CURDIR)/../avian-pack; make openssl)

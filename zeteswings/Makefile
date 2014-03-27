@@ -1,9 +1,6 @@
 APPLICATION_NAME = ZetesWings
 
-UNAME := $(shell uname)
-ifndef ARCH
-  ARCH := $(shell uname -m)
-endif
+include ../common-scripts/globals.mk
 
 ifndef TARGET
   TARGET := ./target
@@ -22,26 +19,15 @@ DEBUG_OPTIMIZE = -O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
-  PLATFORM_TAG = osx-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
-  JNILIB_EXT=.jnilib
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
-  PLATFORM_TAG = linux-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  JNILIB_EXT=.so
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
-  PLATFORM_TAG = linux-armv6l
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  JNILIB_EXT=.so
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows
-  PLATFORM_TAG = win-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  JNILIB_EXT=.dll
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows
-  PLATFORM_TAG = win-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  EXE_EXT=.exe
-  JNILIB_EXT=.dll
 endif
 
 ZETES_FEET_INCLUDE = -I$(ZETES_FEET_PATH)/include

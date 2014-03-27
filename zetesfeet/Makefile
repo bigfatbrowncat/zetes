@@ -243,6 +243,9 @@ ifeq ($(CLASSPATH), android)
 	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
 endif
 
+$(CLASSPATHJAR):
+	(cd $(CURDIR)/../avian-pack; make avian-classpath)
+
 $(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
 	(cd $(CURDIR)/../avian-pack; make avian-static-lib)
 
@@ -285,6 +288,6 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: all package help
-#.SILENT:
+.SILENT:
 
 include ../common-scripts/ideconf/ideconf.mk

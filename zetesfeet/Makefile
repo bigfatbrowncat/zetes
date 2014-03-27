@@ -1,9 +1,6 @@
 APPLICATION_NAME = ZetesFeet
 
-UNAME := $(shell uname)
-ifndef ARCH
-  ARCH := $(shell uname -m)
-endif
+include ../common-scripts/globals.mk
 
 ifndef TARGET
   TARGET := ./target
@@ -18,31 +15,23 @@ DEBUG_OPTIMIZE = -O0 -g
 
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
-  PLATFORM_TAG = osx-x86_64
-  AVIAN_PLATFORM_TAG = darwin-x86_64-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
-  EXE_EXT=
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
-  PLATFORM_TAG = linux-x86_64
-  AVIAN_PLATFORM_TAG = linux-x86_64-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  EXE_EXT=
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
-  PLATFORM_TAG = linux-armv6l
-  AVIAN_PLATFORM_TAG = linux-armv6l-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-  EXE_EXT=
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
-  PLATFORM_TAG = win-i386
-  AVIAN_PLATFORM_TAG = windows-i386-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  EXE_EXT=.exe
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
-  PLATFORM_TAG = win-x86_64
-  AVIAN_PLATFORM_TAG = windows-x86_64-android
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
-  EXE_EXT=.exe
 endif
+
+ifeq ($(CLASSPATH), android)
+  AVIAN_PLATFORM_SUFFIX = -android
+else
+  AVIAN_PLATFORM_SUFFIX =
+endif
+AVIAN_PLATFORM_TAG = $(PLATFORM_TAG)$(AVIAN_PLATFORM_SUFFIX)
 
 # Java platform agnostic
 JAVA_SOURCE_PATH = $(SRC)/java
@@ -61,26 +50,35 @@ CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH)
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
 # C static libraries
-LIBAVIAN = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a
-LIBCRYPTO = $(CURDIR)/../avian-pack/android/openssl-upstream/libcrypto.a
-LIBSSL = $(CURDIR)/../avian-pack/android/openssl-upstream/libssl.a
-LIBEXPAT = $(CURDIR)/../avian-pack/android/external/expat/.libs/libexpat.a
+ifeq ($(CLASSPATH), android)
+  LIBAVIAN = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a
+  LIBCRYPTO = $(CURDIR)/../avian-pack/android/openssl-upstream/libcrypto.a
+  LIBSSL = $(CURDIR)/../avian-pack/android/openssl-upstream/libssl.a
+  LIBEXPAT = $(CURDIR)/../avian-pack/android/external/expat/.libs/libexpat.a
+  LIBFDM = $(CURDIR)/../avian-pack/android/external/fdlibm/libfdm.a
 
-ifeq ($(OS), Windows_NT)
-LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuin.a
-LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuuc.a
-LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicudt.a
+  ifeq ($(OS), Windows_NT)
+    LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuin.a
+    LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuuc.a
+    LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicudt.a
+  else
+    LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicui18n.a
+    LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicuuc.a
+    LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicudata.a
+  endif
 else
-LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicui18n.a
-LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicuuc.a
-LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicudata.a
+  LIBAVIAN = 
+  LIBCRYPTO = 
+  LIBSSL = 
+  LIBEXPAT = 
+  LIBFDM = 
+  LIBICUIN = 
+  LIBICUUC = 
+  LIBICUDATA = 
 endif
-
-LIBFDM = $(CURDIR)/../avian-pack/android/external/fdlibm/libfdm.a
 
 # Avian classpath
 CLASSPATHJAR = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/classpath.jar
-
 
 # Target paths
 LIBRARY_PATH = $(TARGET)/$(LIB)/$(PLATFORM_TAG)
@@ -143,8 +141,6 @@ all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $
 
 package: $(TARGET)/$(PACKAGE_NAME)
 
-include ../common-scripts/ideconf/ideconf.mk
-
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
@@ -173,6 +169,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	    ar x $(LIBAVIAN); \
 	)
 	
+ifeq ($(CLASSPATH), android)
 	# Extracting libcrypto objects
 	( \
 	    cd $(OBJECTS_PATH); \
@@ -228,6 +225,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	    cd libfdm; \
 	    ar x $(LIBFDM); \
 	)
+endif
 	
 	mkdir -p $(JAVA_LIBRARY_PATH)
 
@@ -235,6 +233,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	
 	ar rvs $@ $(CPP_OBJECTS)
 	ar rvs $@ $(OBJECTS_PATH)/libavian/*.o
+ifeq ($(CLASSPATH), android)
 	ar rvs $@ $(OBJECTS_PATH)/libcrypto/*.o
 	ar rvs $@ $(OBJECTS_PATH)/libssl/*.o
 	ar rvs $@ $(OBJECTS_PATH)/libexpat/*.o
@@ -242,6 +241,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEX
 	ar rvs $@ $(OBJECTS_PATH)/libicuuc/*.ao
 	ar rvs $@ $(OBJECTS_PATH)/libicui18n/*.ao
 	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
+endif
 
 $(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
 	(cd $(CURDIR)/../avian-pack; make avian-static-lib)
@@ -286,3 +286,5 @@ clean:
 
 .PHONY: all package help
 .SILENT:
+
+include ../common-scripts/ideconf/ideconf.mk

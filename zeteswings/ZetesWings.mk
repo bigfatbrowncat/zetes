@@ -20,7 +20,7 @@ DEBUG_OPTIMIZE = -O0  -g
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_ARCH = darwin x86_64
-  PLATFORM_TAG = osx-x86_64
+  PLATFORM_TAG = darwin-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
@@ -59,7 +59,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
-  PLATFORM_TAG = win-i386
+  PLATFORM_TAG = windows-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
@@ -72,7 +72,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_ARCH = windows x86_64
-  PLATFORM_TAG = win-x86_64
+  PLATFORM_TAG = windows-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app

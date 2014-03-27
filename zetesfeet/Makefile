@@ -50,8 +50,9 @@ CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH)
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 
 # C static libraries
+LIBAVIAN = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a
+
 ifeq ($(CLASSPATH), android)
-  LIBAVIAN = $(CURDIR)/../avian-pack/avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a
   LIBCRYPTO = $(CURDIR)/../avian-pack/android/openssl-upstream/libcrypto.a
   LIBSSL = $(CURDIR)/../avian-pack/android/openssl-upstream/libssl.a
   LIBEXPAT = $(CURDIR)/../avian-pack/android/external/expat/.libs/libexpat.a
@@ -67,7 +68,6 @@ ifeq ($(CLASSPATH), android)
     LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicudata.a
   endif
 else
-  LIBAVIAN = 
   LIBCRYPTO = 
   LIBSSL = 
   LIBEXPAT = 
@@ -285,6 +285,6 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: all package help
-.SILENT:
+#.SILENT:
 
 include ../common-scripts/ideconf/ideconf.mk

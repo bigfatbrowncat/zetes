@@ -28,6 +28,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
+  LOADALL=-Wl,-all_load
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
@@ -41,6 +42,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
+  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
@@ -54,6 +56,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
+  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
@@ -67,6 +70,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
+  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=;
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
@@ -80,6 +84,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
+  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=;
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 endif
@@ -178,7 +183,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
 
 	# Linking the target
-	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) $(LOADALL) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) \
 	           $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
 	           $(CURDIR)/$(OBJECTS_PATH)/boot.jar.o \
@@ -200,7 +205,7 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar 
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
 
 	# Linking the target
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) $(LOADALL) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) \
 	           $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
 	           $(CURDIR)/$(OBJECTS_PATH)/boot.jar.o \

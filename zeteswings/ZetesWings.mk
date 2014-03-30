@@ -29,6 +29,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
+  LOADALL=-Wl,-all_load
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/Resources
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
@@ -213,7 +214,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 
-	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
+	#strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...
@@ -236,8 +237,14 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar 
 
 	# Making an object file from the java class library
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) $(LOADALL) -Llib/$(PLATFORM_TAG) $(OBJECTS_PATH)/entry.str.o $(OBJECTS_PATH)/boot.jar.o $(CPP_OBJECTS) $(OBJECTS_PATH)/libzeteswings/*.o $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
+	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) $(LOADALL) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) \
+	           $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
+	           $(OBJECTS_PATH)/boot.jar.o \
+	           $(OBJECTS_PATH)/entry.str.o \
+	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	           
+	#strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
 
 $(JAVA_OBJECTS_PATH)/boot.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)

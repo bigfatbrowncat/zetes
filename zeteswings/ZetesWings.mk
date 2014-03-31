@@ -29,7 +29,6 @@ ifeq ($(UNAME), Darwin)	# OS X
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
-  LOADALL=-Wl,-all_load
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/Resources
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
@@ -43,7 +42,6 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
-  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
@@ -57,7 +55,6 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
-  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
@@ -71,7 +68,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
-  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=;
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
@@ -85,7 +81,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
-  LOADALL=-Wl,--whole-archive
   CLASSPATH_DELIM=;
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 endif
@@ -207,20 +202,16 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	# Making an object file from the java class library
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
 
-	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) $(LOADALL) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) \
-	           $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
-	           $(OBJECTS_PATH)/boot.jar.o \
-	           $(OBJECTS_PATH)/entry.str.o \
-	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+	# Extracting libzetesfeet objects
+	( \
+	    set -e; \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libzetesfeet; \
+	    cd libzetesfeet; \
+	    ar x $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY); \
+	)
 
-	#strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
-
-$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(CPP_OBJECTS)
-	@echo [$(APPLICATION_NAME)] Linking $@...
-	mkdir -p $(BINARY_PATH);
-
-	# Extracting libavian objects
+	# Extracting libzeteswings objects
 	( \
 	    set -e; \
 	    cd $(OBJECTS_PATH); \
@@ -229,22 +220,26 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(JAVA_OBJECTS_PATH)/boot.jar 
 	    ar x $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY); \
 	)
 
-	mkdir -p $(JAVA_OBJECTS_PATH)
+	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           $(OBJECTS_PATH)/libzetesfeet/*.o \
+	           $(OBJECTS_PATH)/libzeteswings/*.o \
+	           $(OBJECTS_PATH)/boot.jar.o \
+	           $(OBJECTS_PATH)/entry.str.o \
+	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 
-	# Making an object file from the entry point class name string
-	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
+	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
-	# Making an object file from the java class library
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) $(LOADALL) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) \
-	           $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) \
+$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
+	@echo [$(APPLICATION_NAME)] Linking $@...
+	
+	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           $(OBJECTS_PATH)/libzetesfeet/*.o \
+	           $(OBJECTS_PATH)/libzeteswings/*.o \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	           
-	#strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
+	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
 
 $(JAVA_OBJECTS_PATH)/boot.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)

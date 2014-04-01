@@ -1,6 +1,7 @@
 # This makefile should be included by every user of the ZetesFeet library
 
-# Attention! You should set ZETES_HANDS_PATH to the zeteshands library path
+# Attention! You should set ZETES_FEET_PATH to the zetesfeet library path and 
+# ZETES_HANDS_PATH to the zeteshands library path
 
 UNAME := $(shell uname)
 ifndef ARCH
@@ -20,7 +21,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_ARCH = darwin x86_64
   PLATFORM_TAG = darwin-x86_64
-  PLATFORM_GENERAL_INCLUDES = -I/System/Library/Frameworks/JavaVM.framework/Headers $(CUSTOM_INCLUDES)
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
@@ -66,7 +67,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   SH_LIB_EXT=.dll
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
-  RDYNAMIC=-static
+  RDYNAMIC=
   CLASSPATH_DELIM=;
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
@@ -171,7 +172,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	mkdir -p $(JAVA_OBJECTS_PATH)
 
 	# Making an object file from the java class library
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH);
 	
 	# Making an object file from the entry point class name string
 	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
@@ -180,22 +181,24 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	# Extracting libzetesfeet objects
 	( \
 	    set -e; \
-	    mkdir -p $(OBJECTS_PATH)/libzetesfeet; \
-	    cd $(OBJECTS_PATH)/libzetesfeet; \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libzetesfeet; \
+	    cd libzetesfeet; \
 	    ar x $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY); \
 	)
 	
 	# Extracting libzeteshands objects
 	( \
 	    set -e; \
-	    mkdir -p $(OBJECTS_PATH)/libzeteshands; \
-	    cd $(OBJECTS_PATH)/libzeteshands; \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libzeteshands; \
+	    cd libzeteshands; \
 	    ar x $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY); \
 	)
 
 	# Prepending path
-	awk '{print "$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/"$$0}' $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/liblist.txt > $(OBJECTS_PATH)/liblistpath.txt
-
+	awk '/.+/ {print "$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/"$$0}' $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/liblist.txt > $(OBJECTS_PATH)/liblistpath.txt
+	
 	# Linking the target
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           @$(OBJECTS_PATH)/liblistpath.txt \
@@ -208,7 +211,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 
 $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	@echo [$(APPLICATION_NAME)] Linking $@...
-
+	
 	# Linking the target
 	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           @$(OBJECTS_PATH)/liblistpath.txt \
@@ -240,11 +243,9 @@ $(JAVA_OBJECTS_PATH)/boot.jar: $(ZETES_HANDS_PATH)/$(LIB)/java/$(JAVA_ZETES_HAND
 	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(RES_PATH) .; \
 	)
 
-
-
 clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(TARGET)
 
 .PHONY: package clean
-#.SILENT:
+.SILENT:

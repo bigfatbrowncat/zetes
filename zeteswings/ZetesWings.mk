@@ -1,7 +1,7 @@
 # This makefile should be included by every user of the ZetesWings library
 
-# Attention! You should set ZETES_FEET_PATH and ZETES_WINGS_PATH 
-# to the zeteswings library path
+# Attention! You should set ZETES_FEET_PATH to the zetesfeet library path and 
+# ZETES_WINGS_PATH to the zeteswings library path
 
 UNAME := $(shell uname)
 ifndef ARCH
@@ -190,17 +190,16 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 
 $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...
-	mkdir -p $(OBJECTS_PATH);
 	mkdir -p $(BINARY_PATH);
-
+	mkdir -p $(OBJECTS_PATH);
 	mkdir -p $(JAVA_OBJECTS_PATH)
 
+	# Making an object file from the java class library
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH);
+	
 	# Making an object file from the entry point class name string
 	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
-
-	# Making an object file from the java class library
-	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(JAVA_OBJECTS_PATH)/boot.jar $(OBJECTS_PATH)/boot.jar.o _binary_boot_jar_start _binary_boot_jar_end $(PLATFORM_ARCH); \
 
 	# Extracting libzetesfeet objects
 	( \
@@ -220,27 +219,31 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	    ar x $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY); \
 	)
 
+	# Prepending path
+	awk '/.+/ {print "$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/"$$0}' $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/liblist.txt > $(OBJECTS_PATH)/liblistpath.txt
+
+	# Linking the target
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/libzetesfeet/*.o \
 	           $(OBJECTS_PATH)/libzeteswings/*.o \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	@echo [$(APPLICATION_NAME)] Linking $@...
 	
+	# Linking the target
 	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/libzetesfeet/*.o \
 	           $(OBJECTS_PATH)/libzeteswings/*.o \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	           
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
-
 
 $(JAVA_OBJECTS_PATH)/boot.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
@@ -268,4 +271,4 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: package clean
-#.SILENT:
+.SILENT:

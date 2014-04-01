@@ -210,8 +210,9 @@ $(LIBFDM):
 $(LIBRARY_PATH)/liblist.txt:
 	(echo "libcrypto.a" > $(LIBRARY_PATH)/liblist.txt)
 	(echo "libexpat.a" >> $(LIBRARY_PATH)/liblist.txt)
-	(echo "libicudata.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libicuuc.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libicui18n.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libicudata.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libfdm.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libssl.a" >> $(LIBRARY_PATH)/liblist.txt)
 		

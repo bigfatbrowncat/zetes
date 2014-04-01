@@ -208,6 +208,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	    mkdir -p libzetesfeet; \
 	    cd libzetesfeet; \
 	    ar x $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY); \
+	    ar t $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) | awk '/.*\.o/ {print "$(OBJECTS_PATH)/libzetesfeet/"$$0}' > liblistpath.txt; \
 	)
 
 	# Extracting libzeteswings objects
@@ -217,6 +218,7 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	    mkdir -p libzeteswings; \
 	    cd libzeteswings; \
 	    ar x $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY); \
+	    ar t $(CURDIR)/$(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) | awk '/.*\.o/ {print "$(OBJECTS_PATH)/libzeteswings/"$$0}' > liblistpath.txt; \
 	)
 
 	# Prepending path
@@ -225,8 +227,8 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	# Linking the target
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           @$(OBJECTS_PATH)/liblistpath.txt \
-	           $(OBJECTS_PATH)/libzetesfeet/*.o \
-	           $(OBJECTS_PATH)/libzeteswings/*.o \
+	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
+	           @$(OBJECTS_PATH)/libzeteshands/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
@@ -238,8 +240,8 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	# Linking the target
 	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           @$(OBJECTS_PATH)/liblistpath.txt \
-	           $(OBJECTS_PATH)/libzetesfeet/*.o \
-	           $(OBJECTS_PATH)/libzeteswings/*.o \
+	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
+	           @$(OBJECTS_PATH)/libzeteshands/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@

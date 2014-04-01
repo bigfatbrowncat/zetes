@@ -131,7 +131,7 @@ help:
 JUST_COPY_FILES = $(BIN_TO_OBJ) include/FeetStarter.h
 include ../common-scripts/just_copy.mk
 
-all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
+all: libzetesfeet $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
@@ -156,101 +156,43 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(OBJECTS_PATH)
 	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
-	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(LIBRARY_PATH);
-	mkdir -p $(OBJECTS_PATH);
-	
-	# Extracting libavian objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libavian; \
-	    cd libavian; \
-	    ar x $(LIBAVIAN); \
-	)
-	
+
 ifeq ($(CLASSPATH), android)
-	# Extracting libcrypto objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libcrypto; \
-	    cd libcrypto; \
-	    ar x $(LIBCRYPTO); \
-	)
+libzetesfeet: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(LIBRARY_PATH)/liblist.txt $(LIBRARY_PATH)/libcrypto.a $(LIBRARY_PATH)/libexpat.a $(LIBRARY_PATH)/libicui18n.a $(LIBRARY_PATH)/libicuuc.a $(LIBRARY_PATH)/libicudata.a $(LIBRARY_PATH)/libfdm.a $(LIBRARY_PATH)/libssl.a
 	
-	# Extracting libssl objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libssl; \
-	    cd libssl; \
-	    ar x $(LIBSSL); \
-	)
-	
-	# Extracting libexpat objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libexpat; \
-	    cd libexpat; \
-	    ar x $(LIBEXPAT); \
-	)
 
-	# Extracting libicui18n objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libicui18n; \
-	    cd libicui18n; \
-	    ar x $(LIBICUIN); \
-	)
+$(LIBRARY_PATH)/libcrypto.a: $(LIBCRYPTO)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
 
-	# Extracting libicuuc objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libicuuc; \
-	    cd libicuuc; \
-	    ar x $(LIBICUUC); \
-	)
+$(LIBRARY_PATH)/libexpat.a: $(LIBEXPAT)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
 
-	# Extracting libicudata objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libicudata; \
-	    cd libicudata; \
-	    ar x $(LIBICUDATA); \
-	)
-	
-	# Extracting libfdm objects
-	( \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libfdm; \
-	    cd libfdm; \
-	    ar x $(LIBFDM); \
-	)
-endif
-	
-	mkdir -p $(JAVA_LIBRARY_PATH)
+$(LIBRARY_PATH)/libicui18n.a: $(LIBICUIN)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
 
-	# Making an object file from the java class library
-	
-	ar rvs $@ $(CPP_OBJECTS)
-	ar rvs $@ $(OBJECTS_PATH)/libavian/*.o
-ifeq ($(CLASSPATH), android)
-	ar rvs $@ $(OBJECTS_PATH)/libcrypto/*.o
-	ar rvs $@ $(OBJECTS_PATH)/libssl/*.o
-	ar rvs $@ $(OBJECTS_PATH)/libexpat/*.o
-	ar rvs $@ $(OBJECTS_PATH)/libicudata/*.o
-	ar rvs $@ $(OBJECTS_PATH)/libicuuc/*.ao
-	ar rvs $@ $(OBJECTS_PATH)/libicui18n/*.ao
-	ar rvs $@ $(OBJECTS_PATH)/libfdm/*.o
-endif
+$(LIBRARY_PATH)/libicuuc.a: $(LIBICUUC)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
 
-$(CLASSPATHJAR):
-	(cd $(CURDIR)/../avian-pack; make avian-classpath)
+$(LIBRARY_PATH)/libicudata.a: $(LIBICUDATA)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
 
-$(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
-	(cd $(CURDIR)/../avian-pack; make avian-static-lib)
+$(LIBRARY_PATH)/libfdm.a: $(LIBFDM)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
+
+$(LIBRARY_PATH)/libssl.a: $(LIBSSL)
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
 
 $(LIBCRYPTO):
 	(cd $(CURDIR)/../avian-pack; make openssl)
+	
+$(LIBSSL): $(LIBCRYPTO)
 
 $(LIBEXPAT):
 	(cd $(CURDIR)/../avian-pack; make expat)
@@ -265,6 +207,49 @@ $(LIBICUDATA): $(LIBICUIN)
 $(LIBFDM):
 	(cd $(CURDIR)/../avian-pack; make fdlibm)
 
+$(LIBRARY_PATH)/liblist.txt:
+	(echo "libcrypto.a" > $(LIBRARY_PATH)/liblist.txt)
+	(echo "libexpat.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libicudata.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libicui18n.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libfdm.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libssl.a" >> $(LIBRARY_PATH)/liblist.txt)
+		
+else
+libzetesfeet: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(LIBRARY_PATH)/liblist.txt
+
+$(LIBRARY_PATH)/liblist.txt:
+	(echo "" > $(LIBRARY_PATH)/liblist.txt)
+
+endif
+	
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN) 
+	@echo [$(APPLICATION_NAME)] Constructing $@...
+	mkdir -p $(LIBRARY_PATH);
+	mkdir -p $(OBJECTS_PATH);
+	
+	# Extracting libavian objects
+	( \
+	    cd $(OBJECTS_PATH); \
+	    mkdir -p libavian; \
+	    cd libavian; \
+	    ar x $(LIBAVIAN); \
+	)
+
+	mkdir -p $(JAVA_LIBRARY_PATH)
+
+	# Making an object file from the java class library
+	
+	ar rvs $@ $(CPP_OBJECTS)
+	ar rvs $@ $(OBJECTS_PATH)/libavian/*.o
+
+
+$(CLASSPATHJAR):
+	(cd $(CURDIR)/../avian-pack; make avian-classpath)
+
+$(LIBAVIAN): $(LIBCRYPTO) $(LIBEXPAT) $(LIBICUIN) $(LIBICUUC) $(LIBICUDATA) $(LIBFDM)
+	(cd $(CURDIR)/../avian-pack; make avian-static-lib)
+
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(CLASSPATHJAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
@@ -276,11 +261,11 @@ $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(CLASSPATHJAR) $(JAVA_CLASSES) $(JAV
 	    "$(JAVA_HOME)/bin/jar" uf $(JAVA_LIBRARY_NAME) -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
 	)
 
-$(TARGET)/$(PACKAGE_NAME): $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
+$(TARGET)/$(PACKAGE_NAME): libzetesfeet $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo [$(APPLICATION_NAME)] Making package file $@...
 	( \
 	    cd $(TARGET); \
-	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)); \
+	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/* $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)); \
 	)
 
 clean:

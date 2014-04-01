@@ -180,42 +180,42 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	# Extracting libzetesfeet objects
 	( \
 	    set -e; \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libzetesfeet; \
-	    cd libzetesfeet; \
+	    mkdir -p $(OBJECTS_PATH)/libzetesfeet; \
+	    cd $(OBJECTS_PATH)/libzetesfeet; \
 	    ar x $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY); \
 	)
 	
 	# Extracting libzeteshands objects
 	( \
 	    set -e; \
-	    cd $(OBJECTS_PATH); \
-	    mkdir -p libzeteshands; \
-	    cd libzeteshands; \
+	    mkdir -p $(OBJECTS_PATH)/libzeteshands; \
+	    cd $(OBJECTS_PATH)/libzeteshands; \
 	    ar x $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY); \
 	)
 
-	echo $(OBJECTS_PATH)/libzetesfeet/*.o > $(OBJECTS_PATH)/list.txt
-	echo $(OBJECTS_PATH)/libzeteshands/*.o >> $(OBJECTS_PATH)/list.txt
+	# Prepending path
+	awk '{print "$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/"$$0}' $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/liblist.txt > $(OBJECTS_PATH)/liblistpath.txt
 
 	# Linking the target
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           @$(OBJECTS_PATH)/list.txt \
-	           $(CURDIR)/$(OBJECTS_PATH)/boot.jar.o \
-	           $(CURDIR)/$(OBJECTS_PATH)/entry.str.o \
+	           @$(OBJECTS_PATH)/liblistpath.txt \
+	           $(OBJECTS_PATH)/libzetesfeet/*.o \
+	           $(OBJECTS_PATH)/libzeteshands/*.o \
+	           $(OBJECTS_PATH)/boot.jar.o \
+	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	@echo [$(APPLICATION_NAME)] Linking $@...
 
-	
-
 	# Linking the target
 	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           @$(OBJECTS_PATH)/list.txt \
-	           $(CURDIR)/$(OBJECTS_PATH)/boot.jar.o \
-	           $(CURDIR)/$(OBJECTS_PATH)/entry.str.o \
+	           @$(OBJECTS_PATH)/liblistpath.txt \
+	           $(OBJECTS_PATH)/libzetesfeet/*.o \
+	           $(OBJECTS_PATH)/libzeteshands/*.o \
+	           $(OBJECTS_PATH)/boot.jar.o \
+	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 

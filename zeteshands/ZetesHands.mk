@@ -203,9 +203,9 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	
 	# Linking the target
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
 	           @$(OBJECTS_PATH)/libzeteshands/liblistpath.txt \
+	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
@@ -216,9 +216,9 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	
 	# Linking the target
 	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
 	           @$(OBJECTS_PATH)/libzeteshands/liblistpath.txt \
+	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@

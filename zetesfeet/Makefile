@@ -159,7 +159,6 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 
 ifeq ($(CLASSPATH), android)
 libzetesfeet: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(LIBRARY_PATH)/liblist.txt $(LIBRARY_PATH)/libcrypto.a $(LIBRARY_PATH)/libexpat.a $(LIBRARY_PATH)/libicui18n.a $(LIBRARY_PATH)/libicuuc.a $(LIBRARY_PATH)/libicudata.a $(LIBRARY_PATH)/libfdm.a $(LIBRARY_PATH)/libssl.a
-	
 
 $(LIBRARY_PATH)/libcrypto.a: $(LIBCRYPTO)
 	@echo [$(APPLICATION_NAME)] Copying $@...
@@ -208,13 +207,13 @@ $(LIBFDM):
 	(cd $(CURDIR)/../avian-pack; make fdlibm)
 
 $(LIBRARY_PATH)/liblist.txt:
-	(echo "libcrypto.a" > $(LIBRARY_PATH)/liblist.txt)
 	(echo "libexpat.a" >> $(LIBRARY_PATH)/liblist.txt)
-	(echo "libicuuc.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libicui18n.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libicuuc.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libicudata.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libfdm.a" >> $(LIBRARY_PATH)/liblist.txt)
 	(echo "libssl.a" >> $(LIBRARY_PATH)/liblist.txt)
+	(echo "libcrypto.a" >> $(LIBRARY_PATH)/liblist.txt)
 		
 else
 libzetesfeet: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(LIBRARY_PATH)/liblist.txt

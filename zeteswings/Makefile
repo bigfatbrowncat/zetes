@@ -3,11 +3,11 @@ APPLICATION_NAME = ZetesWings
 include ../common-scripts/globals.mk
 
 ifndef TARGET
-  TARGET := ./target
+  TARGET := ./target-$(CLASSPATH)
 endif
 
 ifndef ZETES_FEET_PATH
-  ZETES_FEET_PATH := ../zetesfeet/target
+  ZETES_FEET_PATH := ../zetesfeet/target-$(CLASSPATH)
 endif
 
 SRC = src

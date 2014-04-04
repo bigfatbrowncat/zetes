@@ -23,6 +23,12 @@ public abstract class ApplicationBase<TAB extends AboutBox,
                                       TMC extends MenuConstructorBase<TVW>,
                                       TVWM extends ViewWindowsManager<TD, TVW>> implements Application<TAB, TD, TVW, TMC, TVWM>
 {
+	static {
+		String exePath = WinLinMacApi.locateExecutable();
+		System.getProperties().put("swt.library.path", exePath);
+		System.getProperties().put("java.library.path", exePath);
+	}
+	
 	private AboutBox aboutBox = null;
 
 	private TMC menuConstructor;

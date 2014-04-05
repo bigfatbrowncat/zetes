@@ -7,8 +7,12 @@
 
 #include <string>
 
-#ifdef __MINGW32__
-#include "Windows.h"
+#if defined __MINGW32__
+	#include "Windows.h"
+#elif defined __APPLE__
+	// Nothing here
+#else
+	#include <stdio.h>
 #endif
 
 using namespace std;
@@ -20,6 +24,12 @@ using namespace std;
 #define ATTEMPTS		1000
 #define SERVER_WAIT		30000
 
+#ifdef __MINGW32__
+#define LOCK_HANDLE		HANDLE
+#else
+#define LOCK_HANDLE		int
+#endif
+
 class WinLinMacApi
 {
 public:
@@ -29,8 +39,8 @@ public:
 #ifndef __APPLE__
 	// We don't need pipes on OS X cause we have a default
 	// multi-document handling mechanism there
-	static HANDLE globalLock(string name);
-	static bool globalUnlock(HANDLE hMutex);
+	static LOCK_HANDLE globalLock(string name);
+	static bool globalUnlock(LOCK_HANDLE hMutex);
 	static bool isLocked(string name);
 
 	static string readFromPipe(string name);

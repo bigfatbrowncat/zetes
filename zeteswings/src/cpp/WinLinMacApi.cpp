@@ -282,11 +282,11 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 		NULL
 	);
 
-    if (hPipe == INVALID_HANDLE_VALUE)
-    {
-        printf("We have a problem while creating an outbound pipe: %d\n", GetLastError());
-        return false;
-    }
+	if (hPipe == INVALID_HANDLE_VALUE)
+	{
+		printf("We have a problem while creating an outbound pipe: %d\n", GetLastError());
+		return false;
+	}
 
 	unsigned long written = 0;
 
@@ -308,8 +308,11 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 // Linux includes/methods
 #include <unistd.h>
 #include <string.h>
-#include <stdio.h>
 #include <linux/limits.h>
+#include <sys/file.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 string WinLinMacApi::locateExecutable()
 {
@@ -340,6 +343,109 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 	ss << appDirectory << "/" << path << "/" << filename;
 
 	return ss.str();
+}
+
+LOCK_HANDLE WinLinMacApi::globalLock(string name)
+{
+	string fullName = (string)"/tmp/.lock_" + name;
+	int fd = open(fullName.c_str(), O_RDONLY);
+	if (fd == -1)
+	{
+		printf("Can't create file named %s. Error: %d\n", fullName.c_str(), errno);
+		return -1;
+	}
+
+	if (flock(fd, LOCK_EX) == -1)
+	{
+		printf("Can't lock file named %s. Error: %d\n", fullName.c_str(), errno);
+		return -1;
+	}
+
+	return fd;
+}
+
+bool WinLinMacApi::globalUnlock(LOCK_HANDLE hMutex)
+{
+	close(hMutex);
+}
+
+bool WinLinMacApi::isLocked(string name)
+{
+	string fullName = (string)"/tmp/.lock_" + name;
+	FILE* fd = fopen(fullName.c_str(), "w");
+	if (fd != NULL)
+	{
+		fclose(fd);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+string WinLinMacApi::readFromPipe(string name)
+{
+	string res = "";
+
+	string fullName = (string)"/tmp/.fifo_" + name;
+
+	int mf = mkfifo(fullName.c_str(), 0666);
+	if (mf != 0)
+	{
+		if (errno != EEXIST)
+		{
+			printf("Can't create fifo named %s. Error: %d\n", fullName.c_str(), errno);
+			return res;
+		}
+	}
+	
+	int fd = open(fullName.c_str(), O_RDONLY);
+	if (fd == -1)
+	{
+		printf("Can't open fifo named %s for reading. Error: %d\n", fullName.c_str(), errno);
+		return res;
+	}	
+
+	char bufferToReceive[BUFFER_SIZE + 1] = { 0 };
+	bufferToReceive[BUFFER_SIZE] = 0;
+	size_t bytesRead = 0;
+
+	do
+	{
+		bufferToReceive[bytesRead] = 0;
+		res += bufferToReceive;
+
+		bytesRead = read(fd, bufferToReceive, BUFFER_SIZE * sizeof(char));
+	}
+	while (bytesRead > 0);
+	
+	return res;
+}
+
+bool WinLinMacApi::writeToPipe(string name, string textToWrite)
+{
+	string fullName = (string)"/tmp/.fifo_" + name;
+
+	int mf = mkfifo(fullName.c_str(), 0666);
+	if (mf != 0)
+	{
+		if (errno != EEXIST)
+		{
+			printf("Can't create fifo named %s. Error: %d\n", fullName.c_str(), errno);
+			return false;
+		}
+	}
+
+	FILE* fd = fopen(fullName.c_str(), "w");
+	if (fd == NULL)
+	{
+		printf("Can't open fifo named %s for writing. Error: %d\n", fullName.c_str(), errno);
+		return false;
+	}
+	fprintf(fd, "%s", textToWrite.c_str());
+	fclose(fd);
+	return true;
 }
 
 #endif

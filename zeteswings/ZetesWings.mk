@@ -25,6 +25,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  PIC=
   SH_LIB_EXT=.so
   JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
@@ -38,6 +39,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  PIC=-fPIC
   SH_LIB_EXT=.so
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
@@ -51,6 +53,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   EXE_EXT=
+  PIC=-fPIC
   SH_LIB_EXT=.so
   JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
@@ -64,6 +67,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
+  PIC=
   SH_LIB_EXT=.dll
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
@@ -77,6 +81,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
+  PIC=
   SH_LIB_EXT=.dll
   JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
@@ -186,7 +191,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(ZETES_
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	mkdir -p $(dir $@)
-	g++ $(DEBUG_OPTIMIZE) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $(ZETES_INCLUDE) $< -o $@
+	g++ $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $(ZETES_INCLUDE) $< -o $@
 
 $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...
@@ -273,4 +278,4 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: package clean
-.SILENT:
+#.SILENT:

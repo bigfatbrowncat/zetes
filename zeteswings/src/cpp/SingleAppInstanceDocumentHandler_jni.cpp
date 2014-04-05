@@ -20,7 +20,7 @@ extern "C"
 
 	JNIEXPORT jboolean JNICALL Java_zetes_SingleAppInstanceDocumentHandler_globalUnlock(JNIEnv * env, jclass appClass, jlong hMutex)
 	{
-		return WinLinMacApi::globalUnlock((HANDLE)hMutex);
+		return WinLinMacApi::globalUnlock((LOCK_HANDLE)hMutex);
 	}
 
 	JNIEXPORT jboolean JNICALL Java_zetes_SingleAppInstanceDocumentHandler_isLocked(JNIEnv * env, jclass appClass, jstring name)

@@ -348,40 +348,92 @@ string WinLinMacApi::locateResource(const string& path, const string& filename)
 LOCK_HANDLE WinLinMacApi::globalLock(string name)
 {
 	string fullName = (string)"/tmp/.lock_" + name;
-	int fd = open(fullName.c_str(), O_RDONLY);
-	if (fd == -1)
-	{
-		printf("Can't create file named %s. Error: %d\n", fullName.c_str(), errno);
-		return -1;
+	int fd;
+	while (true) {
+		fd = open(fullName.c_str(), O_WRONLY | O_CREAT);
+		if (fd == -1) {
+			if (errno == EINTR) {
+				// interrupted, try again
+				continue;
+			}
+			printf("Can't create file named %s. Error: %d\n", fullName.c_str(), errno);
+			return -1;
+		}
+		break;
 	}
 
-	if (flock(fd, LOCK_EX) == -1)
-	{
-		printf("Can't lock file named %s. Error: %d\n", fullName.c_str(), errno);
-		return -1;
+	while (true) {
+		if (flock(fd, LOCK_EX | LOCK_NB) == -1) {
+			if (errno == EINTR) {
+				// syscall was interrupted, try again
+				continue;
+			}
+			printf("Can't lock file named %s. Error: %d\n", fullName.c_str(), errno);
+			return -1;
+		}
+		return fd;
 	}
+}
 
-	return fd;
+static bool retryingClose(int fd) {
+	int rc;
+	while (true) {
+		rc = close(fd);
+		if (rc != 0 && errno == EINTR) {
+			continue;
+		}
+		return rc == 0;
+	}
 }
 
 bool WinLinMacApi::globalUnlock(LOCK_HANDLE hMutex)
 {
-	close(hMutex);
+	return retryingClose(hMutex);
 }
 
 bool WinLinMacApi::isLocked(string name)
 {
 	string fullName = (string)"/tmp/.lock_" + name;
-	FILE* fd = fopen(fullName.c_str(), "w");
-	if (fd != NULL)
-	{
-		fclose(fd);
-		return true;
+	int fd;
+	while (true) {
+		fd = open(fullName.c_str(), O_RDONLY);
+		if (fd == -1) {
+			switch (errno) {
+				case EINTR:
+					// interrupted, try again
+					continue;
+				case ENOENT:
+					// lock file doesn't exist
+					return false;
+				default:
+					break;
+			}
+			printf("Can't open file named %s. Error: %d\n", fullName.c_str(), errno);
+			return false;
+		}
+		break;
 	}
-	else
-	{
-		return false;
+
+	while (true) {
+		if (flock(fd, LOCK_EX | LOCK_NB) == -1) {
+			switch (errno) {
+				case EINTR:
+					// syscall was interrupted, try again
+					continue;
+				case EWOULDBLOCK:
+					// file is locked
+					return true;
+				default:
+					break;
+			}
+			printf("Can't check lock on file named %s. Error: %d\n", fullName.c_str(), errno);
+			return false;
+		}
+		break;
 	}
+	// if we got here this means we were able to lock the file... release it, then
+	retryingClose(fd);
+	return false;
 }
 
 string WinLinMacApi::readFromPipe(string name)

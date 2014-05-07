@@ -64,7 +64,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
   PLATFORM_TAG = windows-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   PIC=
@@ -78,7 +78,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_ARCH = windows x86_64
   PLATFORM_TAG = windows-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   PIC=
@@ -229,6 +229,11 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	# Prepending path
 	awk '/.+/ {print "$(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/"$$0}' $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/liblist.txt > $(OBJECTS_PATH)/liblistpath.txt
 
+ifeq ($(OS), Windows_NT)	# Windows 32-bit
+	# Compiling resources
+	windres win-res/win.rc -O coff -o $(OBJECTS_PATH)/win.res
+endif
+	
 	# Linking the target
 	g++ $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
 	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \

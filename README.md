@@ -95,20 +95,45 @@ Notice this quote marks. They are necessary. As a response you should see a long
 
 Congratulations! You have configured your environment successfully.
 
+### Environment on Ubuntu-based Linux distro
+
+There are many deb-packaged distros out there and the preparation of the most part of them to build Zetes should be alike. I'm using Mint 16. First of all let's install all the dependencies:
+
+	sudo apt-get install git openjdk-7-jdk libglu-dev libz-dev g++
+	
+Here we are installing OpenJDK for Java, libGLU and libGL for graphic API (used in some example programs), zlib development package and GNU C++ compiler for building native bindings.
+
+Next step - setting Java Home location:
+
+	export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
+
 ### Building Zetes
 
 This part is much easier then the previous one.
 
-Open the MSYS terminal (with msys.bat). Enter your Projects folder. Now you should get Zetes source (you may already have got one with "Zetes Examples" source). Let's check for its existence:
+On Windows open the MSYS terminal (with msys.bat). On other platforms a simple terminal window would be sufficient. 
+
+Enter your Projects folder. Now you should get Zetes source (you may already have got one with "Zetes Examples" source). Let's check for its existence:
 
 	ls
 	
 If you see <code>zetes</code> folder, it's already here, so skip the next command. Otherwise input the following:
 
 	git clone https://github.com/bigfatbrowncat/zetes.git
+
+Wait till it ends downloading the repo and enter the newly created <code>zetes</code> folder.
+
+Now a very important step - we should choose which version of Java classpath we are using - Avian or Android. Avian classpath isn't complete, it lacks many useful features, but it's designed specially to work with Avian and it has a GPL-compatible BSD license. On the other hand, Android classpath is almost full and compatible with the original Oracle classpath. But it's not native for Avian and especially for Windows. Additionally, it's quite heavy - there is a high overhead (about 20 Megabytes of extra resulting binary size)
+
+For Avian classpath type:
+
+	export CLASSPATH=avian
 	
-Wait till it ends downloading the repo, enter newly created <code>zetes</code> folder and
-execute
+For Android classpath type:
+
+	export CLASSPATH=android
+
+Then finally execute
 
 	make all
 	

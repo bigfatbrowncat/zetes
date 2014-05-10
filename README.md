@@ -107,6 +107,44 @@ Next step - setting Java Home location:
 
 	export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
 
+### Environment on OS X (tested on 10.9)
+
+On OS X you should install Command Line Tools for Developers. Go to https://developer.apple.com/opensource/, click "Command Line Tools" there. Login with your Apple ID, select the latest version of the tools for your OS version (I selected April 2014 for Mavericks). When the image file is downloaded, mount it and install the package inside.
+
+Then go to the Oracle site for downloading JDK. Open http://www.oracle.com/technetwork/java/javase/downloads/index.html, select JDK 7 there, download it and install.
+
+#### Test 1 
+Enter this command in a terminal window:
+
+	gcc
+	
+You should see:
+
+	clang: error: no input files
+	
+Yeah, that's Clang pretending GCC. If the response is like "command not found", something's gone wrong - you need to check your Command Line Tools.
+
+#### Test 2
+Enter this command:
+
+	/usr/libexec/java_home
+	
+As a response you should receive something like 
+
+	/Library/Java/JavaVirtualMachines/jdk1.7.0_17.jdk/Contents/Home
+	
+That's your JDK path. If its name loocs suspicious, you could check its version by typing
+
+	`/usr/libexec/java_home`/bin/java -version
+	
+The answer should contain a line
+
+	java version "1.7.<something>"
+	
+If the version is 1.6 - you downloaded a wrong Java version, or install Apple Java instead of Oracle Java.
+
+If everything's ok, let's proceed.
+
 ### Building Zetes
 
 This part is much easier then the previous one.

@@ -176,3 +176,5 @@ Then finally execute
 	make all
 	
 Zetes will be built completely (if no errors occured during the building process).
+
+If you are building zetes-examples, proceed with the instruction published [here](https://github.com/bigfatbrowncat/zetes-examples#how-to-build). 

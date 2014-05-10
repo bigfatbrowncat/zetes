@@ -122,7 +122,7 @@ You should see:
 
 	clang: error: no input files
 	
-Yeah, that's Clang pretending GCC. If the response is like "command not found", something's gone wrong - you need to check your Command Line Tools.
+Yeah, that's Clang pretending being GCC. If the response is like "command not found", something's gone wrong - you need to check your Command Line Tools.
 
 #### Test 2
 Enter this command:
@@ -133,7 +133,7 @@ As a response you should receive something like
 
 	/Library/Java/JavaVirtualMachines/jdk1.7.0_17.jdk/Contents/Home
 	
-That's your JDK path. If its name loocs suspicious, you could check its version by typing
+That's your JDK path. If its name looks suspicious, you could check its version by typing
 
 	`/usr/libexec/java_home`/bin/java -version
 	

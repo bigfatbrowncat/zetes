@@ -70,7 +70,13 @@ For example, on my machine it looks like
 
 	export JAVA_HOME="C:\Program Files\Java\jdk1.7.0_17"
 	export ARCH=x86_64
+
+The last thing. The default Git configuration on Windows includes an option to change all line endings to CRLF (Windoes). But the native line ending for MSYS utils and text processors is LF (Unix). So if Git change the line endings on checkout, some files will be broken - that influences installation process. So we are turning the conversion option off.
+
+	git config --global core.autocrlf input
 	
+This is a global option. If you need to turn it back (for other tasks), just type <code>git config --global core.autocrlf true</code>.
+
 Now let's check the configuration. Make sure you've saved all the files you've edited recently. Go to your <code>msys</code> directory and run <code>msys.bat</code> script there. It will open a terminal window for you. This terminal isn't a simple one. It's an MSYS terminal. You will use it to work with Zetes framework and your projects dependent on it. 
 
 Let's do two tests to ensure everything's configured fine:

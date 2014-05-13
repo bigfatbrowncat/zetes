@@ -64,7 +64,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
   PLATFORM_TAG = windows-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   PIC=
@@ -78,7 +78,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_ARCH = windows x86_64
   PLATFORM_TAG = windows-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
   PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
   EXE_EXT=.exe
   PIC=

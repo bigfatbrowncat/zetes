@@ -100,7 +100,8 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 	@Override
 	public void closeAllWindows()
 	{
-		for (TD doc : views.keySet())
+		HashSet<TD> keys = new HashSet<TD>(views.keySet());
+		for (TD doc : keys)
 		{
 			closeDocument(doc);
 		}

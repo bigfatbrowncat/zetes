@@ -119,6 +119,7 @@ JAVA_BINARY_PATH = $(TARGET)/$(BIN)/java
 JAVA_LIBRARY_PATH = $(TARGET)/$(LIB)/java
 JAVA_OBJECTS_PATH = $(TARGET)/$(OBJ)/java
 JAVA_CLASSPATH = $(JAVA_OBJECTS_PATH)/classes
+JAVA_CLASSPATH_EXTERNAL = $(JAVA_OBJECTS_PATH)/classes_ext
 
 CUSTOM_JARS =  $(shell if [ -d "lib/java" ]; then find lib/java -name \*.jar; fi)
 BUILD_CLASSPATHS = $(shell echo "$(JAVA_CLASSPATH)$(CLASSPATH_DELIM)$(ZETES_HANDS_PATH)/$(LIB)/java/$(JAVA_ZETES_HANDS_LIBRARY)$(CLASSPATH_DELIM)$(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY)$(CLASSPATH_DELIM)$(CUSTOM_JARS)" | awk 'gsub(/ +/, "$(CLASSPATH_DELIM)"); 1';)
@@ -229,24 +230,36 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
-$(JAVA_OBJECTS_PATH)/boot.jar: $(ZETES_HANDS_PATH)/$(LIB)/java/$(JAVA_ZETES_HANDS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(CUSTOM_JARS)
+$(JAVA_OBJECTS_PATH)/classpath.jar: $(ZETES_HANDS_PATH)/$(LIB)/java/$(JAVA_ZETES_HANDS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(CUSTOM_JARS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
-	mkdir -p $(JAVA_CLASSPATH);
+	mkdir -p $(JAVA_CLASSPATH_EXTERNAL);
 
 	# Extracting custom jars
 	for cust_jar in $(CUSTOM_JARS); do \
 	    echo [$(APPLICATION_NAME)] Extracting $$cust_jar...; \
-	    (cd $(JAVA_CLASSPATH); "$(JAVA_HOME)/bin/jar" xvf $(CURDIR)/$$cust_jar ); \
+	    (cd $(JAVA_CLASSPATH_EXTERNAL); "$(JAVA_HOME)/bin/jar" xvf $(CURDIR)/$$cust_jar ); \
 	done
 	
 	# Making the java class library
 	( \
 	    set -e; \
-	    cd $(CURDIR)/$(JAVA_CLASSPATH); \
+	    cd $(CURDIR)/$(JAVA_CLASSPATH_EXTERNAL); \
 	    "$(JAVA_HOME)/bin/jar" xf $(CURDIR)/$(ZETES_HANDS_PATH)/$(LIB)/java/$(JAVA_ZETES_HANDS_LIBRARY); \
 	    "$(JAVA_HOME)/bin/jar" xf $(CURDIR)/$(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY); \
 	    cd $(CURDIR)/$(JAVA_OBJECTS_PATH); \
-	    "$(JAVA_HOME)/bin/jar" cf boot.jar -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
+	    "$(JAVA_HOME)/bin/jar" cf classpath.jar -C $(CURDIR)/$(JAVA_CLASSPATH_EXTERNAL) .; \
+	)
+	
+$(JAVA_OBJECTS_PATH)/boot.jar: $(JAVA_OBJECTS_PATH)/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
+	@echo [$(APPLICATION_NAME)] Constructing $@...
+	mkdir -p $(JAVA_CLASSPATH);
+
+	# Making the java class library
+	( \
+	    set -e; \
+	    cd $(CURDIR)/$(JAVA_OBJECTS_PATH); \
+		cp -f classpath.jar boot.jar; \
+	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
 	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(RES_PATH) .; \
 	)
 

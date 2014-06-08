@@ -350,7 +350,7 @@ LOCK_HANDLE WinLinMacApi::globalLock(string name)
 	string fullName = (string)"/tmp/.lock_" + name;
 	int fd;
 	while (true) {
-		fd = open(fullName.c_str(), O_WRONLY | O_CREAT);
+		fd = open(fullName.c_str(), O_RDWR | O_CREAT, 0600);
 		if (fd == -1) {
 			if (errno == EINTR) {
 				// interrupted, try again
@@ -442,7 +442,7 @@ string WinLinMacApi::readFromPipe(string name)
 
 	string fullName = (string)"/tmp/.fifo_" + name;
 
-	int mf = mkfifo(fullName.c_str(), 0666);
+	int mf = mkfifo(fullName.c_str(), 0600);
 	if (mf != 0)
 	{
 		if (errno != EEXIST)
@@ -479,7 +479,7 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 {
 	string fullName = (string)"/tmp/.fifo_" + name;
 
-	int mf = mkfifo(fullName.c_str(), 0666);
+	int mf = mkfifo(fullName.c_str(), 0600);
 	if (mf != 0)
 	{
 		if (errno != EEXIST)

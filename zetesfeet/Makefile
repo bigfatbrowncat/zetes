@@ -3,7 +3,7 @@ APPLICATION_NAME = ZetesFeet
 include ../common-scripts/globals.mk
 
 ifndef TARGET
-  TARGET := ./target-$(CLASSPATH)
+  TARGET := ./target-$(PLATFORM_TAG)-$(CLASSPATH)
 endif
 
 SRC = src

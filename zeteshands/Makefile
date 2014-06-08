@@ -3,11 +3,11 @@ APPLICATION_NAME = ZetesHands
 include ../common-scripts/globals.mk
 
 ifndef TARGET
-  TARGET := ./target-$(CLASSPATH)
+  TARGET := ./target-$(PLATFORM_TAG)-$(CLASSPATH)
 endif
 
 ifndef ZETES_FEET_PATH
-  ZETES_FEET_PATH := ../zetesfeet/target-$(CLASSPATH)
+  ZETES_FEET_PATH := ../zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)
 endif
 
 SRC = src

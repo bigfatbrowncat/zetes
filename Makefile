@@ -1,5 +1,8 @@
 APPLICATION_NAME = Zetes
-PACKAGE_NAME = zetes-$(CLASSPATH)-`git describe`
+
+include common-scripts/globals.mk
+
+PACKAGE_NAME = zetes-$(PLATFORM_TAG)-$(CLASSPATH)-`git describe`
 
 all: zetes package
 
@@ -9,7 +12,7 @@ zetesfeet:
 	$(MAKE) all -C zetesfeet
 	
 zeteswings: zetesfeet
-	$(MAKE) ZETES_FEET_PATH=../zetesfeet/target-$(CLASSPATH) all -C zeteswings
+	$(MAKE) all -C zeteswings
 
 zeteshands: zetesfeet
 	$(MAKE) all -C zeteshands
@@ -28,12 +31,12 @@ ideconf-eclipse:
 package: zetes
 	
 	@echo [$(APPLICATION_NAME)] Copying all built files to a temporary folder...
-	mkdir -p $(PACKAGE_NAME)/zetesfeet
+	mkdir -p $(PACKAGE_NAME)/zetesfeet/
 	mkdir -p $(PACKAGE_NAME)/zeteswings
 	mkdir -p $(PACKAGE_NAME)/zeteshands
-	cp -rf zetesfeet/target-$(CLASSPATH)/* $(PACKAGE_NAME)/zetesfeet/
-	cp -rf zeteswings/target-$(CLASSPATH)/* $(PACKAGE_NAME)/zeteswings/
-	cp -rf zeteshands/target-$(CLASSPATH)/* $(PACKAGE_NAME)/zeteshands/
+	cp -rf zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zetesfeet/
+	cp -rf zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zeteswings/
+	cp -rf zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zeteshands/
 	@echo [$(APPLICATION_NAME)] Removing unnecessary files from the temporary folder...
 	rm -rf $(PACKAGE_NAME)/zetesfeet/obj
 	rm -rf $(PACKAGE_NAME)/zeteswings/obj

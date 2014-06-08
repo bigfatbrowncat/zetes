@@ -1,5 +1,9 @@
 UNAME := $(shell uname)
 
+ifndef CLASSPATH
+  CLASSPATH := android
+endif
+
 ifndef ARCH
   ARCH := $(shell uname -m)
 endif

@@ -1,10 +1,8 @@
 APPLICATION_NAME = ZetesFeet
 
-include ../common-scripts/globals.mk
+ZETES_PATH = ..
 
-ifndef TARGET
-  TARGET := ./target-$(PLATFORM_TAG)-$(CLASSPATH)
-endif
+include ../common-scripts/globals.mk
 
 SRC = src
 BIN = bin
@@ -240,8 +238,8 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(LIBAVIAN)
 
 	# Making an object file from the java class library
 	
-	ar rvs $@ $(CPP_OBJECTS)
-	ar rvs $@ $(OBJECTS_PATH)/libavian/*.o
+	ar rs $@ $(CPP_OBJECTS)
+	ar rs $@ $(OBJECTS_PATH)/libavian/*.o
 
 
 $(CLASSPATHJAR):
@@ -272,7 +270,7 @@ clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(TARGET)
 
-.PHONY: all package help
+.PHONY: help all package clean
 .SILENT:
 
 include ../common-scripts/ideconf/ideconf.mk

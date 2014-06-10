@@ -3,11 +3,6 @@
 # Attention! You should set ZETES_FEET_PATH to the zetesfeet library path and 
 # ZETES_HANDS_PATH to the zeteshands library path
 
-UNAME := $(shell uname)
-ifndef ARCH
-  ARCH := $(shell uname -m)
-endif
-
 SRC = src
 INCLUDE = include
 BIN = bin
@@ -18,72 +13,51 @@ RESOURCES = resources
 DEBUG_OPTIMIZE = -O0  -g
 
 ifeq ($(UNAME), Darwin)	# OS X
-  JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_ARCH = darwin x86_64
-  PLATFORM_TAG = darwin-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
-  EXE_EXT=
-  PIC=
   SH_LIB_EXT=.so
-  JNILIB_EXT=.jnilib
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
-  PLATFORM_TAG = linux-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
-  EXE_EXT=
-  PIC=-fPIC
   SH_LIB_EXT=.so
-  JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_ARCH = linux arm
-  PLATFORM_TAG = linux-armv6l
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
-  PIC=-fPIC
-  EXE_EXT=
   SH_LIB_EXT=.so
-  JNILIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
-  PLATFORM_TAG = windows-i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
-  EXE_EXT=.exe
-  PIC=
   SH_LIB_EXT=.dll
-  JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
   CLASSPATH_DELIM=;
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_ARCH = windows x86_64
-  PLATFORM_TAG = windows-x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
-  EXE_EXT=.exe
-  PIC=
   SH_LIB_EXT=.dll
-  JNILIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
   CLASSPATH_DELIM=;

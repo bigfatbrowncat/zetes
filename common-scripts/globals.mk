@@ -1,5 +1,9 @@
 UNAME := $(shell uname)
 
+ZETES_FEET_PATH = $(ZETES_PATH)/zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)
+ZETES_HANDS_PATH = $(ZETES_PATH)/zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)
+ZETES_WINGS_PATH = $(ZETES_PATH)/zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)
+
 ifndef CLASSPATH
   CLASSPATH := android
 endif
@@ -34,4 +38,8 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   JNILIB_EXT=.dll
   EXE_EXT=.exe
   PIC=
+endif
+
+ifndef TARGET
+  TARGET = target-$(PLATFORM_TAG)-$(CLASSPATH)
 endif

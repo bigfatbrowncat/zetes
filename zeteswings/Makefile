@@ -1,14 +1,8 @@
 APPLICATION_NAME = ZetesWings
 
+ZETES_PATH = ..
+
 include ../common-scripts/globals.mk
-
-ifndef TARGET
-  TARGET := ./target-$(PLATFORM_TAG)-$(CLASSPATH)
-endif
-
-ifndef ZETES_FEET_PATH
-  ZETES_FEET_PATH := ../zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)
-endif
 
 SRC = src
 BIN = bin
@@ -136,7 +130,7 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
-	ar rvs $@ $(CPP_OBJECTS)
+	ar rs $@ $(CPP_OBJECTS)
 
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/$(LIB)/java/zetesfeet.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
@@ -177,5 +171,5 @@ clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(TARGET)
 
-.PHONY: all
+.PHONY: help all package clean
 .SILENT:

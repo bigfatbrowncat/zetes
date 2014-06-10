@@ -31,22 +31,24 @@ ideconf-eclipse:
 package: zetes
 	
 	@echo [$(APPLICATION_NAME)] Copying all built files to a temporary folder...
-	mkdir -p $(PACKAGE_NAME)/zetesfeet/
-	mkdir -p $(PACKAGE_NAME)/zeteswings
-	mkdir -p $(PACKAGE_NAME)/zeteshands
-	cp -rf zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zetesfeet/
-	cp -rf zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zeteswings/
-	cp -rf zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zeteshands/
+	mkdir -p $(PACKAGE_NAME)/zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/
+	mkdir -p $(PACKAGE_NAME)/zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/
+	mkdir -p $(PACKAGE_NAME)/zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)/
+	mkdir -p $(PACKAGE_NAME)/common-scripts
+	cp -rf zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/
+	cp -rf zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/
+	cp -rf zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)/ $(PACKAGE_NAME)/zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)/
+	cp -rf common-scripts/ $(PACKAGE_NAME)/common-scripts/
 	@echo [$(APPLICATION_NAME)] Removing unnecessary files from the temporary folder...
-	rm -rf $(PACKAGE_NAME)/zetesfeet/obj
-	rm -rf $(PACKAGE_NAME)/zeteswings/obj
-	rm -rf $(PACKAGE_NAME)/zeteshands/obj
+	rm -rf $(PACKAGE_NAME)/zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/obj
+	rm -rf $(PACKAGE_NAME)/zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/obj
+	rm -rf $(PACKAGE_NAME)/zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH)/obj
 	@echo [$(APPLICATION_NAME)] Archiving the package $(PACKAGE_NAME).tar.bz2...
 	( \
 	    cd $(PACKAGE_NAME); \
-	    tar -cvjf ../$(PACKAGE_NAME).tar.bz2 *;\
+	    tar -cjf ../$(PACKAGE_NAME).tar.bz2 *;\
 	)
 	rm -rf $(PACKAGE_NAME)
 	
-.PHONY: all zetes zeteswings zetesfeet zeteshands 
+.PHONY: all zetes zeteswings zetesfeet zeteshands package clean
 .SILENT:

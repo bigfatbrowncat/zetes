@@ -1,21 +1,21 @@
-package zetes;
+package zetes.wings.base;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import zetes.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
-import zetes.ApplicationBase;
-import zetes.SingleAppInstanceDocumentHandler;
-import zetes.abstracts.AboutBox;
-import zetes.abstracts.Application;
-import zetes.abstracts.Document;
-import zetes.abstracts.ViewWindow;
-import zetes.abstracts.ViewWindowsManager;
-import zetes.abstracts.ViewWindowsManagerListener;
-import zetes.ui.MenuConstructorBase;
-import zetes.ui.actions.Handler;
+import zetes.wings.SingleAppInstanceDocumentHandler;
+import zetes.wings.WinLinMacApi;
+import zetes.wings.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
+import zetes.wings.abstracts.AboutBox;
+import zetes.wings.abstracts.Application;
+import zetes.wings.abstracts.Document;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindowsManager;
+import zetes.wings.abstracts.ViewWindowsManagerListener;
+import zetes.wings.actions.Handler;
+import zetes.wings.base.ApplicationBase;
 
 public abstract class ApplicationBase<TAB extends AboutBox, 
                                       TD extends Document, 

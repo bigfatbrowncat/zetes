@@ -1,8 +1,8 @@
-package zetes.ui.actions;
+package zetes.wings.actions;
 
-import zetes.ui.actions.Action;
-import zetes.abstracts.ViewWindow;
-import zetes.ui.HotKey;
+import zetes.wings.HotKey;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.actions.Action;
 
 public abstract class Handler<TVW extends ViewWindow<?>> {
 

@@ -1,6 +1,6 @@
-package zetes;
+package zetes.wings;
 
-import zetes.abstracts.Document;
+import zetes.wings.abstracts.Document;
 
 public class NullDocument implements Document {
 

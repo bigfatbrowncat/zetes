@@ -1,9 +1,9 @@
-package zetes.abstracts;
+package zetes.wings.abstracts;
 
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Menu;
 
-import zetes.abstracts.Document;
+import zetes.wings.abstracts.Document;
 
 public interface ViewWindow<TD extends Document>
 {

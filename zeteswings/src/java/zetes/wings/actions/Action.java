@@ -1,14 +1,14 @@
-package zetes.ui.actions;
+package zetes.wings.actions;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import zetes.ui.actions.Action;
-import zetes.ui.actions.ActionHierarchyMember;
-import zetes.ui.actions.Handler;
 
-import zetes.abstracts.ViewWindow;
-import zetes.ui.HotKey;
+import zetes.wings.HotKey;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.actions.Action;
+import zetes.wings.actions.ActionHierarchyMember;
+import zetes.wings.actions.Handler;
 
 
 public class Action<TVW extends ViewWindow<?>> extends ActionHierarchyMember<TVW> {

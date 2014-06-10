@@ -9,7 +9,7 @@ using namespace std;
 
 extern "C"
 {
-	JNIEXPORT jlong JNICALL Java_zetes_SingleAppInstanceDocumentHandler_globalLock(JNIEnv * env, jclass appClass, jstring name)
+	JNIEXPORT jlong JNICALL Java_zetes_wings_SingleAppInstanceDocumentHandler_globalLock(JNIEnv * env, jclass appClass, jstring name)
 	{
 		const char *str= env->GetStringUTFChars(name, 0);
 		jlong res = (jlong)WinLinMacApi::globalLock(string(str));
@@ -18,12 +18,12 @@ extern "C"
 		return res;
 	}
 
-	JNIEXPORT jboolean JNICALL Java_zetes_SingleAppInstanceDocumentHandler_globalUnlock(JNIEnv * env, jclass appClass, jlong hMutex)
+	JNIEXPORT jboolean JNICALL Java_zetes_wings_SingleAppInstanceDocumentHandler_globalUnlock(JNIEnv * env, jclass appClass, jlong hMutex)
 	{
 		return WinLinMacApi::globalUnlock((LOCK_HANDLE)hMutex);
 	}
 
-	JNIEXPORT jboolean JNICALL Java_zetes_SingleAppInstanceDocumentHandler_isLocked(JNIEnv * env, jclass appClass, jstring name)
+	JNIEXPORT jboolean JNICALL Java_zetes_wings_SingleAppInstanceDocumentHandler_isLocked(JNIEnv * env, jclass appClass, jstring name)
 	{
 		const char *str= env->GetStringUTFChars(name, 0);
 		jboolean res = WinLinMacApi::isLocked(string(str));
@@ -32,7 +32,7 @@ extern "C"
 		return res;
 	}
 
-	JNIEXPORT jstring JNICALL Java_zetes_SingleAppInstanceDocumentHandler_readFromPipe(JNIEnv * env, jclass appClass, jstring name)
+	JNIEXPORT jstring JNICALL Java_zetes_wings_SingleAppInstanceDocumentHandler_readFromPipe(JNIEnv * env, jclass appClass, jstring name)
 	{
 		const char *str= env->GetStringUTFChars(name, 0);
 		string s = WinLinMacApi::readFromPipe(string(str));
@@ -42,7 +42,7 @@ extern "C"
 		return res;
 	}
 
-	JNIEXPORT jboolean JNICALL Java_zetes_SingleAppInstanceDocumentHandler_writeToPipe(JNIEnv * env, jclass appClass, jstring name, jstring data)
+	JNIEXPORT jboolean JNICALL Java_zetes_wings_SingleAppInstanceDocumentHandler_writeToPipe(JNIEnv * env, jclass appClass, jstring name, jstring data)
 	{
 		const char *str= env->GetStringUTFChars(name, 0);
 		const char *data_str= env->GetStringUTFChars(data, 0);

@@ -1,4 +1,4 @@
-package zetes.abstracts;
+package zetes.wings.abstracts;
 
 public interface Document
 {

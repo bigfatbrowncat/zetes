@@ -1,4 +1,4 @@
-package zetes.ui;
+package zetes.wings.base;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -11,8 +11,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
-import zetes.abstracts.Document;
-import zetes.abstracts.ViewWindow;
+import zetes.wings.abstracts.Document;
+import zetes.wings.abstracts.ViewWindow;
 
 
 public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>
@@ -21,7 +21,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	private TD document;
 	private String titleSuffix;
 	
-	protected Shell getShell() {
+	public Shell getShell() {
 		return shell;
 	}
 	
@@ -65,7 +65,6 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private void setCocoaFullscreenButton(boolean on)
 	{
 		try

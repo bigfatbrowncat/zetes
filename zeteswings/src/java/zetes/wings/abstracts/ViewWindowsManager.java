@@ -1,9 +1,9 @@
-package zetes.abstracts;
+package zetes.wings.abstracts;
 
-import zetes.abstracts.Application;
-import zetes.abstracts.Document;
-import zetes.abstracts.ViewWindow;
-import zetes.abstracts.ViewWindowsManagerListener;
+import zetes.wings.abstracts.Application;
+import zetes.wings.abstracts.Document;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindowsManagerListener;
 
 public interface ViewWindowsManager<TD extends Document, TVW extends ViewWindow<TD>> {
 

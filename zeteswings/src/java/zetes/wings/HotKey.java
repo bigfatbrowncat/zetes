@@ -1,4 +1,4 @@
-package zetes.ui;
+package zetes.wings;
 
 import org.eclipse.swt.SWT;
 

@@ -1,6 +1,6 @@
-package zetes.ui.actions;
+package zetes.wings.actions;
 
-import zetes.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindow;
 
 public abstract class ActionHierarchyMember<TVW extends ViewWindow<?>> {
 	

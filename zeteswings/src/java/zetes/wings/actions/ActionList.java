@@ -1,12 +1,12 @@
-package zetes.ui.actions;
+package zetes.wings.actions;
 
 import java.util.LinkedList;
 
-import zetes.ui.actions.Action;
-import zetes.ui.actions.ActionHierarchyMember;
-import zetes.ui.actions.ActionList;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.actions.Action;
+import zetes.wings.actions.ActionHierarchyMember;
+import zetes.wings.actions.ActionList;
 
-import zetes.abstracts.ViewWindow;
 
 
 public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {

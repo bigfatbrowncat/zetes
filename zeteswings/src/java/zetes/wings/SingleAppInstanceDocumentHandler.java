@@ -1,4 +1,4 @@
-package zetes;
+package zetes.wings;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;

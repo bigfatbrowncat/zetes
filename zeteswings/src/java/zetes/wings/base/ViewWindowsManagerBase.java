@@ -1,4 +1,4 @@
-package zetes.ui;
+package zetes.wings.base;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,10 +9,10 @@ import java.util.List;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 
-import zetes.abstracts.Document;
-import zetes.abstracts.ViewWindow;
-import zetes.abstracts.ViewWindowsManager;
-import zetes.abstracts.ViewWindowsManagerListener;
+import zetes.wings.abstracts.Document;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindowsManager;
+import zetes.wings.abstracts.ViewWindowsManagerListener;
 
 
 public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends ViewWindow<TD>> implements ViewWindowsManager<TD, TVW>

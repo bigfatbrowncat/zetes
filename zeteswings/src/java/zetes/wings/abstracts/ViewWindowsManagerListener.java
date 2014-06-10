@@ -1,6 +1,6 @@
-package zetes.abstracts;
+package zetes.wings.abstracts;
 
-import zetes.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindow;
 
 public interface ViewWindowsManagerListener<TVW extends ViewWindow<?>>
 {

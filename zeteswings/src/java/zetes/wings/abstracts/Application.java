@@ -1,10 +1,10 @@
-package zetes.abstracts;
+package zetes.wings.abstracts;
 
-import zetes.abstracts.AboutBox;
-import zetes.abstracts.Document;
-import zetes.abstracts.MenuConstructor;
-import zetes.abstracts.ViewWindow;
-import zetes.abstracts.ViewWindowsManager;
+import zetes.wings.abstracts.AboutBox;
+import zetes.wings.abstracts.Document;
+import zetes.wings.abstracts.MenuConstructor;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindowsManager;
 
 public interface Application<TAB extends AboutBox,
                              TD extends Document, 

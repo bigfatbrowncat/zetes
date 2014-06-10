@@ -1,4 +1,4 @@
-package zetes;
+package zetes.wings;
 
 public class WinLinMacApi {
 

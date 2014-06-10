@@ -1,4 +1,4 @@
-package zetes.ui;
+package zetes.wings;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import zetes.abstracts.AboutBox;
-
+import zetes.wings.abstracts.AboutBox;
+import zetes.wings.base.ViewWindowBase;
 
 public class DefaultAboutBox extends Dialog implements AboutBox
 {

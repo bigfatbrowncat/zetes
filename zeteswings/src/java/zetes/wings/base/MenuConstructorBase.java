@@ -1,4 +1,4 @@
-package zetes.ui;
+package zetes.wings.base;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +12,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import zetes.abstracts.MenuConstructor;
-import zetes.abstracts.ViewWindow;
-import zetes.abstracts.ViewWindowsManager;
-import zetes.abstracts.ViewWindowsManagerListener;
-import zetes.ui.actions.Action;
-import zetes.ui.actions.ActionList;
-import zetes.ui.actions.Handler;
-import zetes.ui.actions.Separator;
-import zetes.ui.HotKey;
+import zetes.wings.HotKey;
+import zetes.wings.abstracts.MenuConstructor;
+import zetes.wings.abstracts.ViewWindow;
+import zetes.wings.abstracts.ViewWindowsManager;
+import zetes.wings.abstracts.ViewWindowsManagerListener;
+import zetes.wings.actions.Action;
+import zetes.wings.actions.ActionList;
+import zetes.wings.actions.Handler;
+import zetes.wings.actions.Separator;
 
 public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConstructor<TVW>
 {

@@ -8,9 +8,9 @@
 using namespace std;
 
 #if (! defined __x86_64__) && (defined __MINGW32__)
-#  define UNIQUE_ID_SYMBOL(x)		unique_id_##x
+#  define UNIQUE_ID_SYMBOL(x)		app_id_##x
 #else
-#  define UNIQUE_ID_SYMBOL(x)		_unique_id_##x
+#  define UNIQUE_ID_SYMBOL(x)		_app_id_##x
 #endif
 
 

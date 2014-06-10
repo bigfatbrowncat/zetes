@@ -237,6 +237,7 @@ $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
 	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
+	           $(OBJECTS_PATH)/app_id.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 

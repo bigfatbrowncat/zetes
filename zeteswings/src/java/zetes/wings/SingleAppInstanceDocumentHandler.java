@@ -63,7 +63,7 @@ public class SingleAppInstanceDocumentHandler
 			while (!finishListening)
 			{
 				// TODO Change pipe name!!!
-				String res = readFromPipe("\\\\.\\pipe\\crossbase_namedpipe");
+				String res = readFromPipe("crossbase_namedpipe");
 				{
 					String[] resParsed = res.split("\n");
 					if (resParsed.length > 0 && resParsed[0].equals("FILES"))
@@ -114,7 +114,7 @@ public class SingleAppInstanceDocumentHandler
 			}
 
 			// TODO Change pipe name!!!
-			if (writeToPipe("\\\\.\\pipe\\crossbase_namedpipe", files))
+			if (writeToPipe("crossbase_namedpipe", files))
 			{
 				System.out.println("We have successfully sent the files. Bye.");
 			}
@@ -165,7 +165,7 @@ public class SingleAppInstanceDocumentHandler
 			// Stopping the server
 			finishListening = true;
 			// TODO Change pipe name!!!
-			writeToPipe("\\\\.\\pipe\\crossbase_namedpipe", "BOO!");	// This is to unblock reading
+			writeToPipe("crossbase_namedpipe", "BOO!");	// This is to unblock reading
 			globalUnlockX(hMutex);
 		}
 	}

@@ -203,7 +203,9 @@ string WinLinMacApi::readFromPipe(string name)
 {
 	string res = "";
 
-	HANDLE hPipe = CreateNamedPipe(name.c_str(),             // pipe name
+	string prefixedName = (string)"\\\\.\\pipe\\" + name;
+
+	HANDLE hPipe = CreateNamedPipe(prefixedName.c_str(),             // pipe name
 			PIPE_ACCESS_DUPLEX,       // read/write access
 			PIPE_TYPE_MESSAGE |       // message type pipe
 					PIPE_READMODE_MESSAGE |   // message-read mode
@@ -260,10 +262,12 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 {
 	bool res = true;
 
+	string prefixedName = (string)"\\\\.\\pipe\\" + name;
+
 	bool waitSuccess = false;
 	for (int attempt = 0; attempt < ATTEMPTS; attempt++)
 	{
-		if (WaitNamedPipe(name.c_str(), 0))
+		if (WaitNamedPipe(prefixedName.c_str(), 0))
 		{
 			waitSuccess = true;
 			break;
@@ -273,7 +277,7 @@ bool WinLinMacApi::writeToPipe(string name, string textToWrite)
 	if (!waitSuccess) return false;
 
 	HANDLE hPipe = CreateFile(
-		name.c_str(),
+		prefixedName.c_str(),
 		GENERIC_WRITE, // only need read access
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		NULL,

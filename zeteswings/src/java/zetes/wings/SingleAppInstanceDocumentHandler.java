@@ -6,6 +6,9 @@ import org.eclipse.swt.widgets.Listener;
 
 public class SingleAppInstanceDocumentHandler
 {
+	private static final String pipeName = WinLinMacApi.getAppId() + "_pipe";
+	private static final String mutexName = WinLinMacApi.getAppId() + "_mutex";
+
 	@SuppressWarnings("serial")
 	public class MutexError extends Error
 	{
@@ -63,7 +66,7 @@ public class SingleAppInstanceDocumentHandler
 			while (!finishListening)
 			{
 				// TODO Change pipe name!!!
-				String res = readFromPipe("crossbase_namedpipe");
+				String res = readFromPipe(pipeName);
 				{
 					String[] resParsed = res.split("\n");
 					if (resParsed.length > 0 && resParsed[0].equals("FILES"))
@@ -102,7 +105,7 @@ public class SingleAppInstanceDocumentHandler
 		this.fileHandler = fileHandler;
 
 		// TODO Change mutex name!!!
-		if (isLocked("crossbase_mutex"))
+		if (isLocked(mutexName))
 		{
 			isServer = false;
 			
@@ -114,7 +117,7 @@ public class SingleAppInstanceDocumentHandler
 			}
 
 			// TODO Change pipe name!!!
-			if (writeToPipe("crossbase_namedpipe", files))
+			if (writeToPipe(pipeName, files))
 			{
 				System.out.println("We have successfully sent the files. Bye.");
 			}
@@ -130,7 +133,7 @@ public class SingleAppInstanceDocumentHandler
 
 			System.out.println("We are the first instance...");
 			// TODO Change mutex name!!!
-			hMutex = globalLockX("crossbase_mutex");
+			hMutex = globalLockX(mutexName);
 	
 			filesListener.start();
 
@@ -165,7 +168,7 @@ public class SingleAppInstanceDocumentHandler
 			// Stopping the server
 			finishListening = true;
 			// TODO Change pipe name!!!
-			writeToPipe("crossbase_namedpipe", "BOO!");	// This is to unblock reading
+			writeToPipe(pipeName, "BOO!");	// This is to unblock reading
 			globalUnlockX(hMutex);
 		}
 	}

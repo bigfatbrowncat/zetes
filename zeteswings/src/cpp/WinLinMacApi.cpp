@@ -7,6 +7,24 @@
 
 using namespace std;
 
+#if (! defined __x86_64__) && (defined __MINGW32__)
+#  define UNIQUE_ID_SYMBOL(x)		unique_id_##x
+#else
+#  define UNIQUE_ID_SYMBOL(x)		_unique_id_##x
+#endif
+
+
+extern const char UNIQUE_ID_SYMBOL(start)[];
+extern const char UNIQUE_ID_SYMBOL(end)[];
+
+string WinLinMacApi::getAppId() {
+	size_t size = UNIQUE_ID_SYMBOL(end) - UNIQUE_ID_SYMBOL(start);
+	char* str = new char[size];
+	memcpy(str, UNIQUE_ID_SYMBOL(start), size);
+	str[size - 1] = 0;
+	return string(str);
+}
+
 string simpleLocateResource(const string& path, const string& filename)
 {
 	stringstream ss;

@@ -26,4 +26,11 @@ extern "C"
 
 		return env->NewStringUTF(res.c_str());
 	}
+
+	JNIEXPORT jstring JNICALL Java_zetes_wings_WinLinMacApi_getAppId(JNIEnv * env, jclass appClass)
+	{
+		 string s = WinLinMacApi::getAppId();
+		 jstring res = env->NewStringUTF(s.c_str());
+		 return res;
+	}
 }

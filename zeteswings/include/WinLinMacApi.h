@@ -35,6 +35,7 @@ class WinLinMacApi
 public:
 	static string locateResource(const string& path, const string& filename);
 	static string locateExecutable();
+	static string getAppId();
 
 #ifndef __APPLE__
 	// We don't need pipes on OS X cause we have a default

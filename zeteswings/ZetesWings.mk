@@ -64,6 +64,8 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 endif
 
+APP_ID = $(BINARY_NAME)
+
 ZETES_FEET_INCLUDE = -I$(ZETES_FEET_PATH)/include
 ZETES_WINGS_INCLUDE = -I$(ZETES_WINGS_PATH)/include
 ZETES_INCLUDE = $(ZETES_FEET_INCLUDE) $(ZETES_WINGS_INCLUDE)
@@ -181,6 +183,11 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)
 	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
 
+
+	# Making an object file from the unique app id string
+	echo $(APP_ID) > $(OBJECTS_PATH)/app_id.str
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/app_id.str $(OBJECTS_PATH)/app_id.str.o _app_id_start _app_id_end $(PLATFORM_ARCH);
+
 	# Extracting libzetesfeet objects
 	( \
 	    set -e; \
@@ -216,6 +223,7 @@ endif
 	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
+	           $(OBJECTS_PATH)/app_id.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 

@@ -55,7 +55,7 @@ namespace zetes
 	{
 		string extractEntryClassName() {
 			size_t size = ENTRY_CLASS_NAME_SYMBOL(end) - ENTRY_CLASS_NAME_SYMBOL(start);
-			char* str = new char[size];
+			char str[size];
 			memcpy(str, ENTRY_CLASS_NAME_SYMBOL(start), size);
 			str[size - 1] = 0;
 			return string(str);

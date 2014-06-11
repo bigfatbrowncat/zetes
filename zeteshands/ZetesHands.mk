@@ -172,7 +172,7 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	mkdir -p $(dir $@)
 	g++ $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $(ZETES_INCLUDE) $< -o $@
 
-$(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
+$(BINARY_PATH)/$(BINARY_NAME): native-deps $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_HANDS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...
 	mkdir -p $(BINARY_PATH);
 	mkdir -p $(OBJECTS_PATH);
@@ -255,5 +255,8 @@ clean:
 	@echo [$(APPLICATION_NAME)] Cleaning all...
 	rm -rf $(TARGET)
 
-.PHONY: package clean
+native-deps::
+	@echo [$(APPLICATION_NAME)] Building custom native dependencies...
+
+.PHONY: package clean native-deps
 .SILENT:

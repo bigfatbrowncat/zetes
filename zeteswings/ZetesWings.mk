@@ -21,7 +21,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
-  RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/Resources
+  RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/Resources
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_ARCH = linux x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
@@ -122,8 +122,10 @@ ZETES_FEET_LIBRARY = libzetesfeet.a
 
 ifeq ($(UNAME), Darwin)	# OS X
 package: app
-	@echo [$(APPLICATION_NAME)] Creating image $(TARGET)/package/$(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg...
-	hdiutil create $(TARGET)/package/$(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).dmg -srcfolder $(BINARY_PATH)/bundle -ov
+	@echo [$(APPLICATION_NAME)] Creating image $(TARGET)/package/$(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).dmg...
+	mkdir -p $(TARGET)/package/$(APPLICATION_NAME)
+	cp -rf $(BINARY_PATH)/* $(TARGET)/package/$(APPLICATION_NAME)
+	hdiutil create $(TARGET)/package/$(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).dmg -srcfolder $(TARGET)/package/$(APPLICATION_NAME) -ov
 
 app: $(BINARY_PATH)/$(APPLICATION_NAME).app
 

@@ -118,8 +118,35 @@ JAVA_ZETES_FEET_LIBRARY = zetesfeet.jar
 ZETES_HANDS_LIBRARY = libzeteshands.a
 ZETES_FEET_LIBRARY = libzetesfeet.a
 
+ifeq ($(OS), Windows_NT)	# Windows 
+
 package: app
-app: $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+	@echo [$(APPLICATION_NAME)] Packaging zip archive for Windows...
+	mkdir -p $(TARGET)/package/$(APPLICATION_NAME)
+	cp -rf $(BINARY_PATH)/* $(TARGET)/package/$(APPLICATION_NAME)
+	( \
+	    cd $(TARGET)/package; \
+	    zip -r $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).zip $(APPLICATION_NAME); \
+	)
+		
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+
+else
+
+package: app
+	@echo [$(APPLICATION_NAME)] Packaging tar.bz2 archive...
+	mkdir -p $(TARGET)/package/$(APPLICATION_NAME)
+	cp -rf $(BINARY_PATH)/* $(TARGET)/package/$(APPLICATION_NAME)
+	( \
+	    cd $(TARGET)/package; \
+		tar -cjf $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).tar.bz2 $(APPLICATION_NAME); \
+	)
+
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+
+endif
+
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
 
 $(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_HANDS_PATH)/$(BIN)/$(PLATFORM_TAG)/%
 	@echo [$(APPLICATION_NAME)] Copying library $<...
@@ -190,19 +217,6 @@ $(BINARY_PATH)/$(BINARY_NAME): $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_HANDS_PATH)
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
-
-$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
-	@echo [$(APPLICATION_NAME)] Linking $@...
-	
-	# Linking the target
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
-	           @$(OBJECTS_PATH)/libzeteshands/liblistpath.txt \
-	           @$(OBJECTS_PATH)/liblistpath.txt \
-	           $(OBJECTS_PATH)/boot.jar.o \
-	           $(OBJECTS_PATH)/entry.str.o \
-	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
 $(JAVA_OBJECTS_PATH)/classpath.jar: $(ZETES_HANDS_PATH)/$(LIB)/java/$(JAVA_ZETES_HANDS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(CUSTOM_JARS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...

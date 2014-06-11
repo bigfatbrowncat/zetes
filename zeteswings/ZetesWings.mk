@@ -122,28 +122,45 @@ ZETES_FEET_LIBRARY = libzetesfeet.a
 
 ifeq ($(UNAME), Darwin)	# OS X
 package: app
-	@echo [$(APPLICATION_NAME)] Creating DMG image $(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg...
-	hdiutil create $(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg -srcfolder $(BINARY_PATH)/$(APPLICATION_NAME) -ov
+	@echo [$(APPLICATION_NAME)] Creating image $(TARGET)/package/$(BINARY_PATH)/$(BINARY_NAME)-darwin-universal.dmg...
+	hdiutil create $(TARGET)/package/$(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).dmg -srcfolder $(BINARY_PATH)/bundle -ov
 
 app: $(BINARY_PATH)/$(APPLICATION_NAME).app
-	@echo "*** ["$(APPLICATION_NAME)"] building process completed successfully. ***"
-	@echo "You can find the result in folders:"
-	@echo
-	@echo "  $(BINARY_PATH)"
-	@echo "  $(BIN)/java"
-	@echo
 
 $(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
-	@echo [$(APPLICATION_NAME)] Packaging OS X bundle...
-	mkdir -p $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
-	mkdir -p $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/Resources
-	cp -r osx-bundle/* $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app
-	cp $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
-	cp $(ZETES_JNI_LIBS_TARGET) $(BINARY_PATH)/$(APPLICATION_NAME)/$(APPLICATION_NAME).app/Contents/MacOS
+	@echo [$(APPLICATION_NAME)] Creating OS X bundle...
+	mkdir -p $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/MacOS
+	mkdir -p $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/Resources
+	cp -r osx-bundle/* $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app
+	cp $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/MacOS
+	cp $(ZETES_JNI_LIBS_TARGET) $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/MacOS
+
+else ifeq ($(OS), Windows_NT)	# Windows 
+
+package: app
+	@echo [$(APPLICATION_NAME)] Packaging archive $(TARGET)/package/$(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).zip...
+	mkdir -p $(TARGET)/package/$(APPLICATION_NAME)
+	cp -rf $(BINARY_PATH)/* $(TARGET)/package/$(APPLICATION_NAME)
+	( \
+	    cd $(TARGET)/package; \
+	    zip -r $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).zip $(APPLICATION_NAME); \
+	)
+		
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
 
 else
+
 package: app
-app: $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+	@echo [$(APPLICATION_NAME)] Packaging archive $(TARGET)/package/$(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).tar.bz2...
+	mkdir -p $(TARGET)/package/$(APPLICATION_NAME)
+	cp -rf $(BINARY_PATH)/* $(TARGET)/package/$(APPLICATION_NAME)
+	( \
+	    cd $(TARGET)/package; \
+		tar -cjf $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).tar.bz2 $(APPLICATION_NAME); \
+	)
+
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+
 endif
 
 $(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_WINGS_PATH)/$(BIN)/$(PLATFORM_TAG)/%
@@ -226,20 +243,6 @@ endif
 	           $(OBJECTS_PATH)/app_id.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
-
-$(BINARY_PATH)/$(BINARY_NAME).debug$(SH_LIB_EXT): $(BINARY_PATH)/$(BINARY_NAME)
-	@echo [$(APPLICATION_NAME)] Linking $@...
-	
-	# Linking the target
-	g++ -shared $(RDYNAMIC) $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
-	           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
-	           @$(OBJECTS_PATH)/libzeteswings/liblistpath.txt \
-	           @$(OBJECTS_PATH)/liblistpath.txt \
-	           $(OBJECTS_PATH)/boot.jar.o \
-	           $(OBJECTS_PATH)/entry.str.o \
-	           $(OBJECTS_PATH)/app_id.str.o \
-	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
-	strip -o $@.tmp $(STRIP_OPTIONS) $@ && mv $@.tmp $@
 
 $(JAVA_OBJECTS_PATH)/classpath.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(CUSTOM_JARS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...

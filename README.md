@@ -1,6 +1,10 @@
 Zetes
 =========
 
+![Zetes demo applications](https://rawgit.com/bigfatbrowncat/zetes/master/doc/images/tinyviewer_about.png)
+![Zetes demo applications](https://rawgit.com/bigfatbrowncat/zetes/master/doc/images/tinyviewer_menu.png)
+![Zetes demo applications](https://rawgit.com/bigfatbrowncat/zetes/master/doc/images/tinyviewer_window.png)
+
 Zetes is a crossplatform lightweight framework which allows the user to develop console or native-looking GUI programs, written in Java, that could run on a machine without any JVM installed.
 
 The core of Zetes is built upon Avian Java machine implementation which would be embedded into every target binary thus your program <i>could run without any dependencies except the system API</i>. Imagine your program that has been written in Java and it even could run external jars, but it doesn't need any JRE or JDK installed at all. Really. It's just an exe file. And in addition it has a beautiful GUI (based upon SWT). 
@@ -8,6 +12,8 @@ The core of Zetes is built upon Avian Java machine implementation which would be
 The main feature of the library is that it makes a thin wrapper on SWT and basic system libraries that makes it possible to make an app which has a native look-and-feel under different platforms. For example, the "Exit" item is in system menu on OS X, but in "File" menu under Windows; about box has "OK" button in Windows, but doesn't have any on OS X and so on... 
 
 The user of the library shouldn't think about such differences. That's why Zetes could be useful.
+
+If you want to see some demo applications that show up zetes features, take a look at [zetes-examples](https://github.com/bigfatbrowncat/zetes-examples) project.
 
 ## Supported OSes
 

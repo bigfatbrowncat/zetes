@@ -4,6 +4,7 @@ Zetes
 ![Zetes demo applications](https://rawgit.com/bigfatbrowncat/zetes/master/doc/images/tinyviewer_about.png)
 ![Zetes demo applications](https://rawgit.com/bigfatbrowncat/zetes/master/doc/images/tinyviewer_menu.png)
 ![Zetes demo applications](https://rawgit.com/bigfatbrowncat/zetes/master/doc/images/tinyviewer_window.png)
+<em>(these pictures show an example application made upon Zetes framework)</em>
 
 Zetes is a crossplatform lightweight framework which allows the user to develop console or native-looking GUI programs, written in Java, that could run on a machine without any JVM installed.
 

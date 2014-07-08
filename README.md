@@ -174,7 +174,17 @@ If you see <code>zetes</code> folder, it's already here, so skip the next comman
 
 Wait till it ends downloading the repo and enter the newly created <code>zetes</code> folder.
 
-Now a very important step - we should choose which version of Java classpath we are using - Avian or Android. Avian classpath isn't complete, it lacks many useful features, but it's designed specially to work with Avian and it has a GPL-compatible BSD license. On the other hand, Android classpath is almost full and compatible with the original Oracle classpath. But it's not native for Avian and especially for Windows. Additionally, it's quite heavy - there is a high overhead (about 20 Megabytes of extra resulting binary size).
+Enter it
+
+	cd zetes
+
+Now let's clone every dependent repository with:
+
+	git submodule update --init --recursive
+
+That will take a couple of minutes.
+
+Then a very important step - we should choose which version of Java classpath we are using - Avian or Android. Avian classpath isn't complete, it lacks many useful features, but it's designed specially to work with Avian and it has a GPL-compatible BSD license. On the other hand, Android classpath is almost full and compatible with the original Oracle classpath. But it's not native for Avian and especially for Windows (but we are working on its better integration). Additionally, it's quite heavy - there is a pretty high overhead (about 20 Megabytes of extra resulting binary size).
 
 If you are building the demo applications, Avian classpath would be enough (and recommended).
 

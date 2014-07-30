@@ -24,13 +24,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
 endif
 
-ifeq ($(CLASSPATH), android)
-  AVIAN_PLATFORM_SUFFIX = -android
-else
-  AVIAN_PLATFORM_SUFFIX =
-endif
-AVIAN_PLATFORM_TAG = $(PLATFORM_TAG)$(AVIAN_PLATFORM_SUFFIX)
-
 # Java platform agnostic
 JAVA_SOURCE_PATH = $(SRC)/java
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1')

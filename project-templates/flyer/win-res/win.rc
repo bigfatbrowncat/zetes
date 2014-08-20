@@ -1,0 +1,24 @@
+MainIcon ICON "win-res/flyer.ico"
+1 VERSIONINFO
+FILEVERSION 0,1,0,0
+PRODUCTVERSION 0,1,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "Your company\0"
+      VALUE "FileDescription", "A description of your ZetesWings application"
+      VALUE "FileVersion", "0.1\0"
+      VALUE "InternalName", "Flyer\0"
+      VALUE "LegalCopyright", "John Smith\0"
+      VALUE "OriginalFilename", "flyer.exe\0"
+      VALUE "ProductName", "Flyer\0"
+      VALUE "ProductVersion", "0.1\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1251
+  END
+END

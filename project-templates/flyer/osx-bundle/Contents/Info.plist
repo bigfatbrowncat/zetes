@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleGetInfoString</key>
+	<string>A description of your ZetesWings application</string>
+	<key>CFBundleExecutable</key>
+	<string>flyer</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.flyer</string>
+	<key>CFBundleName</key>
+	<string>Flyer</string>
+	<key>CFBundleIconFile</key>
+	<string>flyer.icns</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © John Smith, 2014</string>
+	<key>CFBundleDocumentTypes</key>
+	<key>CFBundleSignature</key>
+	<string>twflr</string>
+</dict>
+</plist>

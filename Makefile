@@ -38,7 +38,7 @@ package: zetes
 	cp -rf zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH) $(PACKAGE_NAME)/zetesfeet/
 	cp -rf zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH) $(PACKAGE_NAME)/zeteswings/
 	cp -rf zeteshands/target-$(PLATFORM_TAG)-$(CLASSPATH) $(PACKAGE_NAME)/zeteshands/
-	cp -rf common-scripts/ $(PACKAGE_NAME)/common-scripts/
+	cp -rf common-scripts/* $(PACKAGE_NAME)/common-scripts/
 	@echo [$(APPLICATION_NAME)] Removing unnecessary files from the temporary folder...
 	rm -rf $(PACKAGE_NAME)/zetesfeet/target-$(PLATFORM_TAG)-$(CLASSPATH)/obj
 	rm -rf $(PACKAGE_NAME)/zeteswings/target-$(PLATFORM_TAG)-$(CLASSPATH)/obj

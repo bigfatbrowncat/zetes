@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -15,7 +16,7 @@ import zetes.wings.abstracts.Document;
 import zetes.wings.abstracts.ViewWindow;
 
 
-public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>
+public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<TD>, DisposeListener
 {
 	private Shell shell;
 	private TD document;
@@ -158,6 +159,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		shell.setFullScreen(!shell.getFullScreen());
 	}
 
+	@Override
 	public void widgetDisposed(DisposeEvent arg0)
 	{
 		TD doc = getDocument();
@@ -178,6 +180,8 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 		{
 			setCocoaFullscreenButton(supportsFullscreen());
 		}
+		
+		shell.addDisposeListener(this);
 	}
 
 	public String getTitleSuffix() {

@@ -50,8 +50,8 @@ ifeq ($(CLASSPATH), android)
   LIBFDM = $(CURDIR)/../avian-pack/android/external/fdlibm/libfdm.a
 
   ifeq ($(OS), Windows_NT)
-    LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuin.a
-    LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicuuc.a
+    LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libsicuin.a
+    LIBICUUC = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libsicuuc.a
     LIBICUDATA = $(CURDIR)/../avian-pack/android/external/icu4c/lib/sicudt.a
   else
     LIBICUIN = $(CURDIR)/../avian-pack/android/external/icu4c/lib/libicui18n.a

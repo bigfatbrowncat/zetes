@@ -85,7 +85,8 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 	@Override
 	public void closeDocument(TD document)
 	{
-		for (TVW view : views.get(document))
+		ArrayList<TVW> viewsForDoc = new ArrayList<TVW>(views.get(document));
+		for (TVW view : viewsForDoc)
 		{
 			closeWindow(view);
 		}

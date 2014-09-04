@@ -389,78 +389,83 @@ public class MenuConstructorBase<TVW extends ViewWindow<?>> implements MenuConst
 	}
 	
 	@Override
-	public void updateMenus(TVW window) {
-		Menu windowMenu;
+	public void updateMenus(final TVW window) {
+		Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
 		
-		if (window != null)
-		{
-			windowMenu = window.getMenu();
-		} else {
-			Display display = Display.getDefault();
-			windowMenu = display.getMenuBar();
-		}
-
-		if (windowMenu != null) {
-			while (windowMenu.getItems().length > 0) {
-				windowMenu.getItems()[0].dispose();
-			}
-			
-			addMenusForActionList(window, actionsRoot, windowMenu);
-		}
-		
-		final int OSX_SYSTEM_MENU_ABOUT = -1;
-		final int OSX_SYSTEM_MENU_PREFERENCES = -2;
-		final int OSX_SYSTEM_MENU_QUIT = -6;
-		
-		// Adding OS X system menu handlers
-		if (SWT.getPlatform().equals("cocoa"))
-		{
-			for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
-			{
-				MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
+				Menu windowMenu;
 				
-				switch (item.getID())
+				if (window != null)
 				{
-				case OSX_SYSTEM_MENU_ABOUT:
-					item.addSelectionListener(new SelectionListener() {
-						@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
-						
-						@Override
-						public void widgetSelected(SelectionEvent arg0) {
-							aboutGlobalHandler.execute(viewWindowsManager.getActiveWindow());
-							
-						}
-						
-					});
-					break;
-				case OSX_SYSTEM_MENU_PREFERENCES:
-					item.setEnabled(preferencesGlobalHandler.isEnabled());
-					item.addSelectionListener(new SelectionListener() {
-						@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
-
-						@Override
-						public void widgetSelected(SelectionEvent arg0) {
-							preferencesGlobalHandler.execute(viewWindowsManager.getActiveWindow());
-							
-						}
-						
-					});
-					break;
-				case OSX_SYSTEM_MENU_QUIT:
-					item.addSelectionListener(new SelectionListener() {
-						@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
-
-						@Override
-						public void widgetSelected(SelectionEvent arg0) {
-							exitGlobalHandler.execute(viewWindowsManager.getActiveWindow());
-							
-						}
-						
-					});
-					break;
+					windowMenu = window.getMenu();
+				} else {
+					Display display = Display.getDefault();
+					windowMenu = display.getMenuBar();
 				}
-			}
-		}
+		
+				if (windowMenu != null) {
+					while (windowMenu.getItems().length > 0) {
+						windowMenu.getItems()[0].dispose();
+					}
+					
+					addMenusForActionList(window, actionsRoot, windowMenu);
+				}
+				
+				final int OSX_SYSTEM_MENU_ABOUT = -1;
+				final int OSX_SYSTEM_MENU_PREFERENCES = -2;
+				final int OSX_SYSTEM_MENU_QUIT = -6;
+				
+				// Adding OS X system menu handlers
+				if (SWT.getPlatform().equals("cocoa"))
+				{
+					for (int i = 0; i < Display.getDefault().getSystemMenu().getItems().length; i++)
+					{
+						MenuItem item = Display.getDefault().getSystemMenu().getItems()[i];
+						
+						switch (item.getID())
+						{
+						case OSX_SYSTEM_MENU_ABOUT:
+							item.addSelectionListener(new SelectionListener() {
+								@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
+								
+								@Override
+								public void widgetSelected(SelectionEvent arg0) {
+									aboutGlobalHandler.execute(viewWindowsManager.getActiveWindow());
+									
+								}
+								
+							});
+							break;
+						case OSX_SYSTEM_MENU_PREFERENCES:
+							item.setEnabled(preferencesGlobalHandler.isEnabled());
+							item.addSelectionListener(new SelectionListener() {
+								@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
+		
+								@Override
+								public void widgetSelected(SelectionEvent arg0) {
+									preferencesGlobalHandler.execute(viewWindowsManager.getActiveWindow());
+									
+								}
+								
+							});
+							break;
+						case OSX_SYSTEM_MENU_QUIT:
+							item.addSelectionListener(new SelectionListener() {
+								@Override public void widgetDefaultSelected(SelectionEvent arg0) {}
+		
+								@Override
+								public void widgetSelected(SelectionEvent arg0) {
+									exitGlobalHandler.execute(viewWindowsManager.getActiveWindow());
+									
+								}
+								
+							});
+							break;
+						}
+					}
+				}
+            }
+		});
 	}
 
 	

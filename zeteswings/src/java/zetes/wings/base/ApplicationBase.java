@@ -129,15 +129,17 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		Display display = Display.getDefault();
 		try
 		{
-			while (!terminated && !display.isDisposed())
+			while (!terminated /*&& !display.isDisposed()*/)
 			{
 				if (!display.readAndDispatch())
 				{
 					onIdle();
 				}
 			}
-		}
-		finally
+		} catch (Exception e) {
+			System.err.println("Event loop has been broken due to exception:");
+			e.printStackTrace();
+		} finally
 		{
 			display.dispose();
 		}

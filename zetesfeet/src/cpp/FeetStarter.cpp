@@ -47,6 +47,15 @@ extern "C"
 		return BOOT_JAR_SYMBOL(start);
 	}
 
+	JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
+		printf("Loading the program as an agent. This means you are possibly debugging...\n");
+		return 0;
+	}
+
+	JNIEXPORT void JNICALL Agent_OnUnload(JavaVM *vm) {
+		printf("Unloading agent\n");
+	}
+
 } // extern "C"
 
 namespace zetes

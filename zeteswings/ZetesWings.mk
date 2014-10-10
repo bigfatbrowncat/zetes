@@ -283,7 +283,7 @@ $(JAVA_OBJECTS_PATH)/boot.jar: $(JAVA_OBJECTS_PATH)/classpath.jar $(JAVA_CLASSES
 	    cd $(CURDIR)/$(JAVA_OBJECTS_PATH); \
 		cp -f classpath.jar boot.jar; \
 	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
-	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(RES_PATH) .; \
+	    if [ -d $(CURDIR)/$(RES_PATH) ]; then "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(RES_PATH) .; fi; \
 	)
 
 clean:

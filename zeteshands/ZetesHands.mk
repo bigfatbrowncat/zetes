@@ -17,7 +17,6 @@ ifeq ($(UNAME), Darwin)	# OS X
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
-  SH_LIB_EXT=.so
   STRIP_OPTIONS=-S -x
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
@@ -27,7 +26,6 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)	# linux on PC
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
-  SH_LIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
@@ -37,7 +35,6 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
-  SH_LIB_EXT=.so
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
@@ -47,7 +44,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
-  SH_LIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
   CLASSPATH_DELIM=;
@@ -57,7 +53,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
-  SH_LIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
   CLASSPATH_DELIM=;
@@ -109,6 +104,13 @@ ZETES_JNI_LIBS = \
     
 ZETES_JNI_LIBS_TARGET = $(addprefix $(BINARY_PATH)/,$(addsuffix $(JNILIB_EXT),$(basename $(ZETES_JNI_LIBS))))
 
+# Copying shared and JNI libraries
+SHARED_LIB_PATH = $(BIN)/$(PLATFORM_TAG)
+SHARED_LIBS = $(shell if [ -d "$(SHARED_LIB_PATH)" ]; then cd $(SHARED_LIB_PATH); find . -type f -name \*$(SHLIB_EXT) | awk '{ sub(/.\//,"") }; 1'; fi)
+JNI_LIBS = $(shell if [ -d "$(SHARED_LIB_PATH)" ]; then cd $(SHARED_LIB_PATH); find . -type f -name \*$(JNILIB_EXT) | awk '{ sub(/.\//,"") }; 1'; fi)
+JUST_COPY_FILES = $(addprefix $(SHARED_LIB_PATH)/, $(SHARED_LIBS)) $(addprefix $(SHARED_LIB_PATH)/, $(JNI_LIBS))
+include $(ZETES_PATH)/common-scripts/just_copy.mk
+
 RESOURCE_FILES = $(shell if [ -d "$(RESOURCES)" ]; then cd $(RESOURCES); find . -type f -name \* | awk '{ sub(/.\//,"") }; 1'; fi)
 RESOURCE_FILES_TARGET = $(addprefix $(RESOURCE_FILES_TARGET_PATH)/, $(RESOURCE_FILES))
 
@@ -129,8 +131,6 @@ package: app
 	    zip -r $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).zip $(APPLICATION_NAME); \
 	)
 		
-app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
-
 else
 
 package: app
@@ -142,11 +142,9 @@ package: app
 		tar -cjf $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).tar.bz2 $(APPLICATION_NAME); \
 	)
 
-app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
-
 endif
 
-app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET) $(JUST_COPY_FILES_TARGET)
 
 $(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_HANDS_PATH)/$(BIN)/$(PLATFORM_TAG)/%
 	@echo [$(APPLICATION_NAME)] Copying library $<...
@@ -185,6 +183,10 @@ $(BINARY_PATH)/$(BINARY_NAME): native-deps $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES
 	echo $(ENTRY_CLASS) > $(OBJECTS_PATH)/entry.str
 	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/entry.str $(OBJECTS_PATH)/entry.str.o _boot_class_name_start _boot_class_name_end $(PLATFORM_ARCH);
 
+	# Making an object file from the unique app id string
+	echo $(APP_ID) > $(OBJECTS_PATH)/app_id.str
+	$(ZETES_FEET_PATH)/tools/$(PLATFORM_TAG)/binaryToObject $(OBJECTS_PATH)/app_id.str $(OBJECTS_PATH)/app_id.str.o _app_id_start _app_id_end $(PLATFORM_ARCH);
+
 	# Extracting libzetesfeet objects
 	( \
 	    set -e; \
@@ -215,6 +217,7 @@ $(BINARY_PATH)/$(BINARY_NAME): native-deps $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES
 	           @$(OBJECTS_PATH)/liblistpath.txt \
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
+	           $(OBJECTS_PATH)/app_id.str.o \
 	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 

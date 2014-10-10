@@ -1,5 +1,7 @@
 package zetes.wings;
 
+import zetes.feet.WinLinMacApi;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;

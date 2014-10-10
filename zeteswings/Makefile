@@ -46,6 +46,8 @@ CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES
 SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
 SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
 
+ZETES_FEET_JAR = $(ZETES_FEET_PATH)/$(LIB)/java/zetesfeet.jar
+
 USER_MK = ZetesWings.mk
 
 # Target paths
@@ -96,11 +98,11 @@ help:
 	@echo
 
 # Other files that should just be copied to the target folder 
-JUST_COPY_FILES = include/WinLinMacApi.h $(USER_MK)
+JUST_COPY_FILES = $(USER_MK)
 include ../common-scripts/just_copy.mk
 	
 
-all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS) $(TARGET)/$(USER_MK) $(TARGET)/include/WinLinMacApi.h
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS) $(JUST_COPY_FILES_TARGET)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
@@ -112,15 +114,15 @@ package: $(TARGET)/$(PACKAGE_NAME)
 
 include ../common-scripts/ideconf/ideconf.mk
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES) $(ZETES_FEET_JAR)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -encoding utf8 -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -encoding utf8 -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(ZETES_FEET_JAR)$(CLASSPATH_DELIM)$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES) $(ZETES_FEET_JAR)
 	@echo [$(APPLICATION_NAME)] Compiling platform specific $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javac" -encoding utf8 -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
+	"$(JAVA_HOME)/bin/javac" -encoding utf8 -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(ZETES_FEET_JAR)$(CLASSPATH_DELIM)$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
@@ -132,7 +134,7 @@ $(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLAT
 	mkdir -p $(LIBRARY_PATH);
 	ar rs $@ $(CPP_OBJECTS)
 
-$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_PATH)/$(LIB)/java/zetesfeet.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
+$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(JAVA_LIBRARY_PATH)
 	# Making the java class library

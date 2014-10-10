@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 
+#include "WinLinMacApi.h"
 #include "FeetStarter.h"
 #include "ZetesHands.h"
 
@@ -37,6 +38,8 @@ int main(int argc, const char** argv)
 	{
 		args.push_back(wav[i]);
 	}
+	
+	feetStarter.setDefinition("java.library.path", WinLinMacApi::locateExecutable());
 
 	//feetStarter.setApplicationClassName(zetes::hands::applicationClass);
 

@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#include "WinLinMacApi.h"
+#include <WinLinMacApi.h>
 
 #ifndef __APPLE__
 

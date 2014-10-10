@@ -111,6 +111,13 @@ ZETES_JNI_LIBS = \
     
 ZETES_JNI_LIBS_TARGET = $(addprefix $(BINARY_PATH)/,$(addsuffix $(JNILIB_EXT),$(basename $(ZETES_JNI_LIBS))))
 
+# Copying shared and JNI libraries
+SHARED_LIB_PATH = $(BIN)/$(PLATFORM_TAG)
+SHARED_LIBS = $(shell if [ -d "$(SHARED_LIB_PATH)" ]; then cd $(SHARED_LIB_PATH); find . -type f -name \*$(SHLIB_EXT) | awk '{ sub(/.\//,"") }; 1'; fi)
+JNI_LIBS = $(shell if [ -d "$(SHARED_LIB_PATH)" ]; then cd $(SHARED_LIB_PATH); find . -type f -name \*$(JNILIB_EXT) | awk '{ sub(/.\//,"") }; 1'; fi)
+JUST_COPY_FILES = $(addprefix $(SHARED_LIB_PATH)/, $(SHARED_LIBS)) $(addprefix $(SHARED_LIB_PATH)/, $(JNI_LIBS))
+include $(ZETES_PATH)/common-scripts/just_copy.mk
+
 RESOURCE_FILES = $(shell if [ -d "$(RESOURCES)" ]; then cd $(RESOURCES); find . -type f -name \* | awk '{ sub(/.\//,"") }; 1'; fi)
 RESOURCE_FILES_TARGET = $(addprefix $(RESOURCE_FILES_TARGET_PATH)/, $(RESOURCE_FILES))
 
@@ -129,7 +136,7 @@ package: app
 
 app: $(BINARY_PATH)/$(APPLICATION_NAME).app
 
-$(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+$(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET) $(JUST_COPY_FILES_TARGET)
 	@echo [$(APPLICATION_NAME)] Creating OS X bundle...
 	mkdir -p $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/MacOS
 	mkdir -p $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/Resources
@@ -148,7 +155,7 @@ package: app
 	    zip -r $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).zip $(APPLICATION_NAME); \
 	)
 		
-app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET) $(JUST_COPY_FILES_TARGET)
 
 else
 
@@ -161,7 +168,7 @@ package: app
 		tar -cjf $(BINARY_NAME)-$(PLATFORM_TAG)-$(CLASSPATH).tar.bz2 $(APPLICATION_NAME); \
 	)
 
-app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET)
+app: $(BINARY_PATH)/$(BINARY_NAME) $(ZETES_JNI_LIBS_TARGET) $(RESOURCE_FILES_TARGET) $(JUST_COPY_FILES_TARGET)
 
 endif
 

@@ -5,8 +5,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import zetes.feet.WinLinMacApi;
+
 import zetes.wings.SingleAppInstanceDocumentHandler;
-import zetes.wings.WinLinMacApi;
 import zetes.wings.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import zetes.wings.abstracts.AboutBox;
 import zetes.wings.abstracts.Application;
@@ -26,7 +27,6 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	static {
 		String exePath = WinLinMacApi.locateExecutable();
 		System.getProperties().put("swt.library.path", exePath);
-		System.getProperties().put("java.library.path", exePath);
 	}
 	
 	private AboutBox aboutBox = null;

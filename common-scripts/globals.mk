@@ -16,31 +16,41 @@ ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME=$(shell /usr/libexec/java_home)
   PLATFORM=darwin
   PLATFORM_TAG = darwin-x86_64
+  CLASSPATH_DELIM=:
   JNILIB_EXT=.jnilib
+  SHLIB_EXT=.dylib
   EXE_EXT=
   PIC=
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
   PLATFORM=linux
   PLATFORM_TAG = linux-x86_64
+  CLASSPATH_DELIM=:
   JNILIB_EXT=.so
+  SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
   PLATFORM=linux
   PLATFORM_TAG = linux-armv6l
+  CLASSPATH_DELIM=:
   JNILIB_EXT=.so
+  SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM=windows
   PLATFORM_TAG = windows-i386
+  CLASSPATH_DELIM=;
   JNILIB_EXT=.dll
+  SHLIB_EXT=.dll
   EXE_EXT=.exe
   PIC=
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   PLATFORM=windows
   PLATFORM_TAG = windows-x86_64
+  CLASSPATH_DELIM=;
   JNILIB_EXT=.dll
+  SHLIB_EXT=.dll
   EXE_EXT=.exe
   PIC=
 endif

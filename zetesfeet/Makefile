@@ -119,7 +119,7 @@ help:
 	@echo
 
 # Other files that should just be copied to the target folder 
-JUST_COPY_FILES = $(BIN_TO_OBJ) include/FeetStarter.h
+JUST_COPY_FILES = $(BIN_TO_OBJ) include/FeetStarter.h include/WinLinMacApi.h
 include ../common-scripts/just_copy.mk
 
 all: libzetesfeet $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)

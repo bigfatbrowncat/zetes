@@ -72,9 +72,11 @@ ZETES_INCLUDE = $(ZETES_FEET_INCLUDE) $(ZETES_WINGS_INCLUDE)
 
 # Java platform agnostic
 JAVA_SOURCE_PATH = $(SRC)/java
-RES_PATH = $(SRC)/res
+JAVA_RES_PATH = $(SRC)/res
 JAVA_FILES = $(shell cd $(JAVA_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1')
 JAVA_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
+JAVA_RES_FILES = $(shell if [ -d "$(JAVA_RES_PATH)" ]; then cd $(JAVA_RES_PATH); find . -type f -name \* | awk '{ sub(/.\//,"") }; 1'; fi)
+JAVA_RES_FILES_TARGET = $(addprefix $(JAVA_CLASSPATH)/, $(JAVA_RES_FILES))
 
 # Java platform specific
 JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
@@ -181,6 +183,11 @@ $(RESOURCE_FILES_TARGET) : $(RESOURCE_FILES_TARGET_PATH)/% : $(RESOURCES)/%
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	cp -f $< $@
 
+$(JAVA_RES_FILES_TARGET) : $(JAVA_CLASSPATH)/% : $(JAVA_RES_PATH)/%
+	@echo [$(APPLICATION_NAME)] Copying Java resources $<...
+	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
+	cp -f $< $@
+
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
@@ -273,7 +280,7 @@ $(JAVA_OBJECTS_PATH)/classpath.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES
 	    "$(JAVA_HOME)/bin/jar" cf classpath.jar -C $(CURDIR)/$(JAVA_CLASSPATH_EXTERNAL) .; \
 	)
 	
-$(JAVA_OBJECTS_PATH)/boot.jar: $(JAVA_OBJECTS_PATH)/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES)
+$(JAVA_OBJECTS_PATH)/boot.jar: $(JAVA_OBJECTS_PATH)/classpath.jar $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(JAVA_RES_FILES_TARGET)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(JAVA_CLASSPATH);
 
@@ -283,7 +290,6 @@ $(JAVA_OBJECTS_PATH)/boot.jar: $(JAVA_OBJECTS_PATH)/classpath.jar $(JAVA_CLASSES
 	    cd $(CURDIR)/$(JAVA_OBJECTS_PATH); \
 		cp -f classpath.jar boot.jar; \
 	    "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
-	    if [ -d $(CURDIR)/$(RES_PATH) ]; then "$(JAVA_HOME)/bin/jar" uf boot.jar -C $(CURDIR)/$(RES_PATH) .; fi; \
 	)
 
 clean:

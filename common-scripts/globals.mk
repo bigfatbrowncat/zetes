@@ -12,26 +12,36 @@ ifndef ARCH
   ARCH := $(shell uname -m)
 endif
 
+AVIAN_ARCH=$(ARCH)
+ifeq ($(AVIAN_ARCH), armv6l)   # Raspberry Pi
+  AVIAN_ARCH=arm
+endif
+
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME=$(shell /usr/libexec/java_home)
   PLATFORM=darwin
   PLATFORM_TAG = darwin-x86_64
+  AVIAN_PLATFORM_TAG_PART = macosx-x86_64      # In Avian Darwin is now macosx or ios. We use macosx
   CLASSPATH_DELIM=:
   JNILIB_EXT=.jnilib
   SHLIB_EXT=.dylib
   EXE_EXT=
   PIC=
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
+  export JAVA_HOME=$(readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
   PLATFORM_TAG = linux-x86_64
+  AVIAN_PLATFORM_TAG_PART = linux-x86_64
   CLASSPATH_DELIM=:
   JNILIB_EXT=.so
   SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
+  export JAVA_HOME=$(readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
   PLATFORM_TAG = linux-armv6l
+  AVIAN_PLATFORM_TAG_PART = linux-arm
   CLASSPATH_DELIM=:
   JNILIB_EXT=.so
   SHLIB_EXT=.so
@@ -40,6 +50,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM=windows
   PLATFORM_TAG = windows-i386
+  AVIAN_PLATFORM_TAG_PART = windows-i386
   CLASSPATH_DELIM=;
   JNILIB_EXT=.dll
   SHLIB_EXT=.dll
@@ -48,6 +59,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   PLATFORM=windows
   PLATFORM_TAG = windows-x86_64
+  AVIAN_PLATFORM_TAG_PART = windows-x86_64
   CLASSPATH_DELIM=;
   JNILIB_EXT=.dll
   SHLIB_EXT=.dll
@@ -62,12 +74,7 @@ else
 endif
 
 # In Avian Darwin is now macosx or ios. We use macosx
-ifeq ($(UNAME), Darwin)
-  AVIAN_PLATFORM_TAG = macosx-x86_64$(AVIAN_PLATFORM_SUFFIX)
-else
-  AVIAN_PLATFORM_TAG = $(PLATFORM_TAG)$(AVIAN_PLATFORM_SUFFIX)
-endif
-
+AVIAN_PLATFORM_TAG = $(AVIAN_PLATFORM_TAG_PART)$(AVIAN_PLATFORM_SUFFIX)
 
 ifndef TARGET
   TARGET = target-$(PLATFORM_TAG)-$(CLASSPATH)

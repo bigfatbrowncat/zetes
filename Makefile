@@ -59,4 +59,4 @@ endif
 	rm -rf $(PACKAGE_NAME)
 	
 .PHONY: all zetes zeteswings zetesfeet zeteshands package clean
-.SILENT:
+#.SILENT:

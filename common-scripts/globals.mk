@@ -21,7 +21,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME=$(shell /usr/libexec/java_home)
   PLATFORM=darwin
   PLATFORM_TAG = darwin-x86_64
-  AVIAN_PLATFORM_TAG_PART = macosx-x86_64      # In Avian Darwin is now macosx or ios. We use macosx
+  AVIAN_PLATFORM_TAG_PART = macosx-x86_64
   CLASSPATH_DELIM=:
   JNILIB_EXT=.jnilib
   SHLIB_EXT=.dylib
@@ -74,7 +74,7 @@ else
 endif
 
 # In Avian Darwin is now macosx or ios. We use macosx
-AVIAN_PLATFORM_TAG = $(AVIAN_PLATFORM_TAG_PART)$(AVIAN_PLATFORM_SUFFIX)
+AVIAN_PLATFORM_TAG := $(AVIAN_PLATFORM_TAG_PART)$(AVIAN_PLATFORM_SUFFIX)
 
 ifndef TARGET
   TARGET = target-$(PLATFORM_TAG)-$(CLASSPATH)

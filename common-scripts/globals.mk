@@ -28,7 +28,7 @@ ifeq ($(UNAME), Darwin)	# OS X
   EXE_EXT=
   PIC=
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
-  export JAVA_HOME=$(readlink -f `which javac` | sed "s:bin/javac::")
+  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
   PLATFORM_TAG = linux-x86_64
   AVIAN_PLATFORM_TAG_PART = linux-x86_64
@@ -38,7 +38,7 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
   EXE_EXT=
   PIC=-fPIC
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
-  export JAVA_HOME=$(readlink -f `which javac` | sed "s:bin/javac::")
+  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
   PLATFORM_TAG = linux-armv6l
   AVIAN_PLATFORM_TAG_PART = linux-arm

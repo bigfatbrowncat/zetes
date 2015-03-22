@@ -264,6 +264,6 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: help all package clean
-.SILENT:
+#.SILENT:
 
 include ../common-scripts/ideconf/ideconf.mk

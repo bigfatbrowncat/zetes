@@ -42,7 +42,7 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi -lphlpapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++
   PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=

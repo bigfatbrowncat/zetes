@@ -47,6 +47,16 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
   SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
+else ifeq ($(UNAME) $(ARCH), Linux armv7l)              # linux on ARM v7
+  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
+  PLATFORM=linux
+  PLATFORM_TAG = linux-armv7l
+  AVIAN_PLATFORM_TAG_PART = linux-arm
+  CLASSPATH_DELIM=:
+  JNILIB_EXT=.so
+  SHLIB_EXT=.so
+  EXE_EXT=
+  PIC=-fPIC
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM=windows
   PLATFORM_TAG = windows-i386

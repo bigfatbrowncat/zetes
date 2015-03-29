@@ -27,7 +27,6 @@ ifeq ($(UNAME), Darwin)	# OS X
   SHLIB_EXT=.dylib
   EXE_EXT=
   PIC=
-  BUILD_WINGS=1
 else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
   JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
@@ -38,7 +37,6 @@ else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
   SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
-  BUILD_WINGS=1
 else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
   JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
@@ -49,7 +47,6 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
   SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
-  BUILD_WINGS=0
 else ifeq ($(UNAME) $(ARCH), Linux armv7l)              # linux on ARM v7
   JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
@@ -60,7 +57,6 @@ else ifeq ($(UNAME) $(ARCH), Linux armv7l)              # linux on ARM v7
   SHLIB_EXT=.so
   EXE_EXT=
   PIC=-fPIC
-  BUILD_WINGS=0
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM=windows
   PLATFORM_TAG = windows-i386
@@ -70,7 +66,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   SHLIB_EXT=.dll
   EXE_EXT=.exe
   PIC=
-  BUILD_WINGS=1
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   PLATFORM=windows
   PLATFORM_TAG = windows-x86_64
@@ -80,7 +75,6 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   SHLIB_EXT=.dll
   EXE_EXT=.exe
   PIC=
-  BUILD_WINGS=1
 endif
 
 ifeq ($(CLASSPATH), android)

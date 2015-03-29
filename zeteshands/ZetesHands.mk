@@ -39,6 +39,15 @@ else ifeq ($(UNAME) $(ARCH), Linux armv6l)	# linux on Raspberry Pi
   RDYNAMIC=-rdynamic
   CLASSPATH_DELIM=:
   RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
+else ifeq ($(UNAME) $(ARCH), Linux armv7l)      # linux on ARM v7
+  PLATFORM_ARCH = linux arm
+  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" $(CUSTOM_INCLUDES)
+  PLATFORM_GENERAL_LINKER_OPTIONS = -lpthread -ldl $(CUSTOM_LIBS)
+  PLATFORM_CONSOLE_OPTION =
+  STRIP_OPTIONS=--strip-all
+  RDYNAMIC=-rdynamic
+  CLASSPATH_DELIM=:
+  RESOURCE_FILES_TARGET_PATH = $(BINARY_PATH)
 else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
@@ -268,4 +277,4 @@ native-deps::
 	@echo [$(APPLICATION_NAME)] Building custom native dependencies...
 
 .PHONY: package clean native-deps
-.SILENT:
+#.SILENT:

@@ -310,4 +310,4 @@ native-deps::
 	@echo [$(APPLICATION_NAME)] Building custom native dependencies...
 
 .PHONY: package clean native-deps
-#.SILENT:
+.SILENT:

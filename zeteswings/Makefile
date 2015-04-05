@@ -38,11 +38,13 @@ JAVA_PLATFORM_SPECIFIC_SOURCE_PATH = $(SRC)/$(PLATFORM_TAG)/java
 JAVA_PLATFORM_SPECIFIC_FILES = $(shell if [ -d "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" ]; then cd $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH); find . -type f -name \*.java | awk '{ sub(/.\//,"") }; 1'; fi)
 JAVA_PLATFORM_SPECIFIC_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(addsuffix .class,$(basename $(JAVA_PLATFORM_SPECIFIC_FILES))))
 
-# C++ Platform agnostic
+# C/C++ Platform agnostic
 CPP_SOURCE_PATH = $(SRC)/cpp
 CPP_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.cpp | awk '{ sub(/.\//,"") }; 1')
+C_FILES = $(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.c | awk '{ sub(/.\//,"") }; 1')
 CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH); find . -type f -name \*.h | awk '{ sub(/.\//,"") }; 1'))
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
+C_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(C_FILES))))
 
 # SWT binaries
 SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
@@ -128,13 +130,18 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CL
 
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
-	mkdir -p $(OBJECTS_PATH)
-	g++ $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c -Iinclude $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
+	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
+	g++ -std=c++0x $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c -Iinclude -I"$(SRC)/cpp" $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(LIBRARY_PATH)/$(LIBRARY_NAME): $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
+$(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.c $(CPP_HEADER_FILES)
+	@echo [$(APPLICATION_NAME)] Compiling $<...
+	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
+	gcc -std=c99 $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c -Iinclude -I"$(SRC)/cpp" $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
+
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(C_OBJECTS) $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
-	ar rs $@ $(CPP_OBJECTS)
+	ar rs $@ $(CPP_OBJECTS) $(C_OBJECTS)
 
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...

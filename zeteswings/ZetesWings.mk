@@ -211,7 +211,7 @@ $(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(ZETES_
 $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.cpp $(CPP_HEADER_FILES)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	mkdir -p $(dir $@)
-	g++ $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $(ZETES_INCLUDE) $< -o $@
+	g++ -std=c++0x $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c $(PLATFORM_GENERAL_INCLUDES) -I$(INCLUDE) $(ZETES_INCLUDE) $< -o $@
 
 $(BINARY_PATH)/$(BINARY_NAME): native-deps $(JAVA_OBJECTS_PATH)/boot.jar $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/$(ZETES_FEET_LIBRARY) $(CPP_OBJECTS)
 	@echo [$(APPLICATION_NAME)] Linking $@...
@@ -310,4 +310,4 @@ native-deps::
 	@echo [$(APPLICATION_NAME)] Building custom native dependencies...
 
 .PHONY: package clean native-deps
-#.SILENT:
+.SILENT:

@@ -114,7 +114,7 @@ private:
 	JNIEnv* env;
 	jobject javaLiteHTMLDocumentContainer_weak;
 
-	char* buffer = NULL;
+	char* buffer;
 public:
 	JNI_LiteHTMLDocumentContainer(JNIEnv* env, jobject javaContainer) {
 		this->env = env;

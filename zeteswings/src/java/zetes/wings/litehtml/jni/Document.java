@@ -2,11 +2,14 @@ package zetes.wings.litehtml.jni;
 
 public class Document {	
 	private long nativeObject;
-	
+
+	private DocumentContainer container;
+
 	private native long createNativeFromString(String html, String masterCSS, long container);
 	private static native void destroyNative(long ptr);
 	
 	public Document(String html, String masterCSS, DocumentContainer container) {
+		this.container = container;
 		nativeObject = createNativeFromString(html, masterCSS, container.nativeObject);
 	}
 	

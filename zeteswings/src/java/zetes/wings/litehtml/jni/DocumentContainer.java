@@ -22,11 +22,7 @@ public abstract class DocumentContainer {
 	protected abstract FontMetrics getFontMetrics(long hFont);
 	protected abstract void deleteFont(long hFont);
 	protected abstract Position getClientRect();
-	
-	protected abstract int ptToPx(int pt);/* {
-		return pt / 0.75;
-	}*/
-
+	protected abstract int ptToPx(int pt);
 	protected abstract int getDefaultFontSize();
 	protected abstract String getDefaultFontName();
 	protected abstract void drawBackground(long hdc, BackgroundPaint bg);

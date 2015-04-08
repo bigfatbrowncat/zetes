@@ -119,6 +119,7 @@ public:
 	JNI_LiteHTMLDocumentContainer(JNIEnv* env, jobject javaContainer) {
 		this->env = env;
 		this->javaLiteHTMLDocumentContainer_weak = env->NewWeakGlobalRef(javaContainer);
+		buffer = NULL;
 	}
 
 	virtual ~JNI_LiteHTMLDocumentContainer() {
@@ -182,7 +183,7 @@ public:
 	virtual const tchar_t* get_default_font_name() {
 		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
 		if (buffer != NULL) {
-			delete [] buffer;
+			free(buffer);
 		}
 		jstring jfns = (jstring)env->CallObjectMethod(javaLiteHTMLDocumentContainer, getGetDefaultFontNameMethod(env));
 		const char* tmp = env->GetStringUTFChars(jfns, NULL);

@@ -24,6 +24,7 @@ public class LiteHTMLView extends Composite {
 	public class Container extends zetes.wings.litehtml.jni.DocumentContainer {
 		private long latestFontId = -1;
 		private HashMap<Long, Font> loadedFonts = new HashMap<Long, Font>();
+		private HashMap<Integer, Color> loadedColors = new HashMap<>();
 		
 		@Override
 		protected long createFont(String faceName, int size, int weight, boolean italic) {
@@ -51,8 +52,11 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void deleteFont(long hFont) {
-			loadedFonts.get(hFont).dispose();
-			loadedFonts.put(hFont, null);
+			Font font = loadedFonts.get(hFont);
+			if (font != null) {
+				font.dispose();
+				loadedFonts.put(hFont, null);
+			}
 		}
 		
 		@Override
@@ -70,14 +74,20 @@ public class LiteHTMLView extends Composite {
 		protected void drawText(long hdc, String text, long hFont, WebColor color, Position pos) {
 			gc.setFont(loadedFonts.get(hFont));
 
-			Color swtColor = new Color(gc.getDevice(), color.red & 0xFF, color.green & 0xFF, color.blue & 0xFF);
+			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
+			Color swtColor = loadedColors.get(index);
+			if (swtColor != null) {
+				swtColor = new Color(gc.getDevice(), color.red & 0xFF, color.green & 0xFF, color.blue & 0xFF);
+				loadedColors.put(index, swtColor);
+			}
 			if (gc.getAlpha() != (color.alpha & 0xFF)) {
 				gc.setAlpha(color.alpha & 0xFF);
 			}
-			gc.setForeground(swtColor);
+			if (gc.getForeground() != swtColor) {
+				gc.setForeground(swtColor);
+			}
 			
-			gc.drawString(text, pos.x, pos.y, true);
-			swtColor.dispose();
+			gc.drawText(text, pos.x, pos.y, SWT.DRAW_TRANSPARENT);
 		}
 		
 		@Override

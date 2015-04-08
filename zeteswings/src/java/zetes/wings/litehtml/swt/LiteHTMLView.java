@@ -76,7 +76,7 @@ public class LiteHTMLView extends Composite {
 
 			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
 			Color swtColor = loadedColors.get(index);
-			if (swtColor != null) {
+			if (swtColor == null) {
 				swtColor = new Color(gc.getDevice(), color.red & 0xFF, color.green & 0xFF, color.blue & 0xFF);
 				loadedColors.put(index, swtColor);
 			}

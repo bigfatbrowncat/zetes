@@ -72,7 +72,10 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void drawText(long hdc, String text, long hFont, WebColor color, Position pos) {
-			gc.setFont(loadedFonts.get(hFont));
+			Font font = loadedFonts.get(hFont);
+			if (!gc.getFont().equals(font)) {
+				gc.setFont(font);
+			}
 
 			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
 			Color swtColor = loadedColors.get(index);
@@ -83,7 +86,7 @@ public class LiteHTMLView extends Composite {
 			if (gc.getAlpha() != (color.alpha & 0xFF)) {
 				gc.setAlpha(color.alpha & 0xFF);
 			}
-			if (gc.getForeground() != swtColor) {
+			if (!gc.getForeground().equals(swtColor)) {
 				gc.setForeground(swtColor);
 			}
 			

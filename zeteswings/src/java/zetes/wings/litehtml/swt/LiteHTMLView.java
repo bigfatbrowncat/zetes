@@ -118,6 +118,18 @@ public class LiteHTMLView extends Composite {
 			gc.fillRectangle(bg.borderBox.toRectangle());
 			bgColor.dispose();
 		}
+		
+		
+		@Override
+		protected void finalize() throws Throwable {
+			for (Font f: loadedFonts.values()) {
+				f.dispose();
+			}
+			for (Color c : loadedColors.values()) {
+				c.dispose();
+			}
+		}
+
 	}
 	
 	private Container container = new Container();

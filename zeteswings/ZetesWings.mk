@@ -191,12 +191,12 @@ $(ZETES_JNI_LIBS_TARGET) : $(BINARY_PATH)/% : $(ZETES_WINGS_PATH)/$(BIN)/$(PLATF
 $(RESOURCE_FILES_TARGET) : $(RESOURCE_FILES_TARGET_PATH)/% : $(RESOURCES)/%
 	@echo [$(APPLICATION_NAME)] Copying resource file $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	cp -f $< $@
+	cp -f $< "$@"
 
 $(JAVA_RES_FILES_TARGET) : $(JAVA_CLASSPATH)/% : $(JAVA_RES_PATH)/%
 	@echo [$(APPLICATION_NAME)] Copying Java resources $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	cp -f $< $@
+	cp -f $< "$@"
 
 $(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY)
 	@echo [$(APPLICATION_NAME)] Compiling $<...

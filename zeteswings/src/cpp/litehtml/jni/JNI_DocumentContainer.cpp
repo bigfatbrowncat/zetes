@@ -11,6 +11,7 @@
 #include "JNI_FontMetrics.h"
 #include "JNI_WebColor.h"
 #include "JNI_BackgroundPaint.h"
+#include "JNI_Size.h"
 
 using namespace litehtml;
 
@@ -24,6 +25,8 @@ static jmethodID ptToPx = NULL;
 static jmethodID getDefaultFontSize = NULL;
 static jmethodID getDefaultFontName = NULL;
 static jmethodID getDrawBackground = NULL;
+static jmethodID loadImage = NULL;
+static jmethodID getImageSize = NULL;
 
 jclass getLiteHTMLDocumentContainerClass(JNIEnv* env) {
 	return env->FindClass(LITEHTML_PACKAGE "/DocumentContainer");
@@ -80,7 +83,7 @@ jmethodID getGetClientRectMethod(JNIEnv* env) {
 jmethodID getPtToPxMethod(JNIEnv* env) {
 	jclass lhdcc = getLiteHTMLDocumentContainerClass(env);
 	if (ptToPx == NULL) {
-		ptToPx = env->GetMethodID(lhdcc, "ptToPx", "()I");
+		ptToPx = env->GetMethodID(lhdcc, "ptToPx", "(I)I");
 	}
 	return ptToPx;
 }
@@ -107,6 +110,22 @@ jmethodID getDrawBackgroundMethod(JNIEnv* env) {
 		getDrawBackground = env->GetMethodID(lhdcc, "drawBackground", "(JL" LITEHTML_PACKAGE "/BackgroundPaint;)V");
 	}
 	return getDrawBackground;
+}
+
+jmethodID getLoadImageMethod(JNIEnv* env) {
+	jclass lhdcc = getLiteHTMLDocumentContainerClass(env);
+	if (loadImage == NULL) {
+		loadImage = env->GetMethodID(lhdcc, "loadImage", "(Ljava/lang/String;Ljava/lang/String;Z)V");
+	}
+	return loadImage;
+}
+
+jmethodID getGetImageSizeMethod(JNIEnv* env) {
+	jclass lhdcc = getLiteHTMLDocumentContainerClass(env);
+	if (getImageSize == NULL) {
+		getImageSize = env->GetMethodID(lhdcc, "getImageSize", "(Ljava/lang/String;Ljava/lang/String;)L" LITEHTML_PACKAGE "/Size;");
+	}
+	return getImageSize;
 }
 
 class JNI_LiteHTMLDocumentContainer : public litehtml::document_container {
@@ -172,7 +191,7 @@ public:
 	virtual int	pt_to_px(int pt) {
 		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
 
-		return env->CallIntMethod(javaLiteHTMLDocumentContainer, getPtToPxMethod(env));
+		return env->CallIntMethod(javaLiteHTMLDocumentContainer, getPtToPxMethod(env), pt);
 	}
 
 	virtual int get_default_font_size() {
@@ -195,10 +214,23 @@ public:
 		// TODO Implement
 	}
 	virtual void				load_image(const tchar_t* src, const tchar_t* baseurl, bool redraw_on_ready) {
-		// TODO Implement
+		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
+
+		jstring jsrcUrl = env->NewStringUTF(src);
+		jstring jbaseUrl = env->NewStringUTF(baseurl);
+
+		env->CallVoidMethod(javaLiteHTMLDocumentContainer, getLoadImageMethod(env), jsrcUrl, jbaseUrl, redraw_on_ready);
 	}
 	virtual void				get_image_size(const tchar_t* src, const tchar_t* baseurl, litehtml::size& sz) {
-		// TODO Implement
+		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
+
+		jstring jsrcUrl = env->NewStringUTF(src);
+		jstring jbaseUrl = env->NewStringUTF(baseurl);
+
+		jobject jsize = env->CallObjectMethod(javaLiteHTMLDocumentContainer, getGetImageSizeMethod(env), jsrcUrl, jbaseUrl);
+		if (jsize != NULL) {
+			sz = sizeToNative(env, jsize);
+		}
 	}
 	virtual void draw_background(uint_ptr hdc, const litehtml::background_paint& bg) {
 		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
@@ -206,7 +238,7 @@ public:
 		jlong hdcPtr = (jlong)hdc;
 		jobject backgroundObj = backgroundPaintFromNative(env, bg);
 
-		return env->CallVoidMethod(javaLiteHTMLDocumentContainer, getDrawBackgroundMethod(env), hdcPtr, backgroundObj);
+		env->CallVoidMethod(javaLiteHTMLDocumentContainer, getDrawBackgroundMethod(env), hdcPtr, backgroundObj);
 	}
 	virtual void				draw_borders(uint_ptr hdc, const css_borders& borders, const litehtml::position& draw_pos, bool root) {
 		// TODO Implement
@@ -242,7 +274,9 @@ public:
 		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
 
 		jobject jpos = env->CallObjectMethod(javaLiteHTMLDocumentContainer, getGetClientRectMethod(env));
-		client = positionToNative(env, jpos);
+		if (jpos != NULL) {
+			client = positionToNative(env, jpos);
+		}
 	}
 	virtual litehtml::element*	create_element(const tchar_t* tag_name, const string_map& attributes) {
 		return NULL;

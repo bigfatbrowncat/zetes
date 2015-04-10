@@ -1,5 +1,8 @@
 package zetes.wings.litehtml.swt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
@@ -8,6 +11,9 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
@@ -15,16 +21,36 @@ import zetes.wings.litehtml.jni.BackgroundPaint;
 import zetes.wings.litehtml.jni.Document;
 import zetes.wings.litehtml.jni.FontMetrics;
 import zetes.wings.litehtml.jni.Position;
+import zetes.wings.litehtml.jni.Size;
 import zetes.wings.litehtml.jni.WebColor;
 
 public class LiteHTMLView extends Composite {
 
 	private GC gc;
+	
+	private String basePath; 
 
 	public class Container extends zetes.wings.litehtml.jni.DocumentContainer {
 		private long latestFontId = -1;
 		private HashMap<Long, Font> loadedFonts = new HashMap<Long, Font>();
 		private HashMap<Integer, Color> loadedColors = new HashMap<>();
+		private HashMap<String, ImageData> loadedImages = new HashMap<>();
+		
+		private ImageData getImage(String name) {
+			if (loadedImages.containsKey(name)) {
+				return loadedImages.get(name);
+			} else {
+				try {
+					FileInputStream imageFIS = new FileInputStream(new File(basePath + File.separator + name));
+					ImageData img = new ImageData(imageFIS);
+					
+					loadedImages.put(name, img);
+					return img;
+				} catch (FileNotFoundException e) {
+					return null;
+				}
+			}
+		}
 		
 		@Override
 		protected long createFont(String faceName, int size, int weight, boolean italic) {
@@ -73,9 +99,7 @@ public class LiteHTMLView extends Composite {
 		@Override
 		protected void drawText(long hdc, String text, long hFont, WebColor color, Position pos) {
 			Font font = loadedFonts.get(hFont);
-			if (!gc.getFont().equals(font)) {
-				gc.setFont(font);
-			}
+			gc.setFont(font);
 
 			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
 			Color swtColor = loadedColors.get(index);
@@ -83,12 +107,8 @@ public class LiteHTMLView extends Composite {
 				swtColor = new Color(gc.getDevice(), color.red & 0xFF, color.green & 0xFF, color.blue & 0xFF);
 				loadedColors.put(index, swtColor);
 			}
-			if (gc.getAlpha() != (color.alpha & 0xFF)) {
-				gc.setAlpha(color.alpha & 0xFF);
-			}
-			if (!gc.getForeground().equals(swtColor)) {
-				gc.setForeground(swtColor);
-			}
+			gc.setAlpha(color.alpha & 0xFF);
+			gc.setForeground(swtColor);
 			
 			gc.drawText(text, pos.x, pos.y, SWT.DRAW_TRANSPARENT);
 		}
@@ -109,13 +129,31 @@ public class LiteHTMLView extends Composite {
 		}
 		
 		@Override
-		protected void drawBackground(long hdc, BackgroundPaint bg) {			
+		protected void drawBackground(long hdc, BackgroundPaint bg) {
 			Color bgColor = new Color(gc.getDevice(), bg.color.red & 0xFF, bg.color.green & 0xFF, bg.color.blue & 0xFF);
 			gc.setAlpha(bg.color.alpha & 0xFF);
 
 			gc.setBackground(bgColor);
-			
+
 			gc.fillRectangle(bg.borderBox.toRectangle());
+			if (!bg.image.equals("")) {
+				gc.setAlpha(0xFF);
+				
+				Image img = new Image(gc.getDevice(), getImage(bg.image));
+				
+				int imageSourceWidth = img.getImageData().width;
+				int imageSourceHeight = img.getImageData().height;
+				
+				int imageWidth = imageSourceWidth;
+				int imageHeight = imageSourceHeight;
+				if (bg.imageSize.width != 0) imageWidth = bg.imageSize.width; 
+				if (bg.imageSize.height != 0) imageHeight = bg.imageSize.height; 
+				
+				gc.drawImage(img, 0, 0, img.getImageData().width, img.getImageData().height, 
+				                  bg.positionX, bg.positionY, imageWidth, imageHeight);
+				img.dispose();
+			}
+
 			bgColor.dispose();
 		}
 		
@@ -130,36 +168,54 @@ public class LiteHTMLView extends Composite {
 			}
 		}
 
+		public void clearLoadedImages() {
+			loadedImages.clear();
+		}
+		
+		@Override
+		protected void loadImage(String src, String baseUrl, boolean redrawOnReady) {
+			getImage(src);
+		}
+
+		@Override
+		protected Size getImageSize(String src, String baseUrl) {
+			ImageData img = getImage(src);
+			return new Size(img.width, img.height);
+		}
 	}
 	
 	private Container container = new Container();
 	private Document document = null;
 
+	private Point latestSize;
 	@Override
 	public Point computeSize(int widthHint, int heightHint, boolean changed) {
-		int width = 0, height = 0;
-		if (document != null) {
-			if (widthHint == SWT.DEFAULT) {
-				document.render(1000000);	// A million pixels... I hope that isn't possible on a PC
-			} else {
-				document.render(widthHint);
+		if (changed) {
+			int width = 0, height = 0;
+			if (document != null) {
+				if (widthHint == SWT.DEFAULT) {
+					document.render(1000000);	// A million pixels... I hope that isn't possible on a PC
+				} else {
+					document.render(widthHint);
+				}
+				width = document.width();
+	
+				if (heightHint == SWT.DEFAULT) {
+					height = document.height();
+				} else {
+					height = heightHint;
+				}
 			}
-			width = document.width();
-
-			if (heightHint == SWT.DEFAULT) {
-				height = document.height();
-			} else {
-				height = heightHint;
-			}
+			
+			latestSize = new Point(width, height);
 		}
-		
-		return new Point(width, height);
+		return latestSize;
 	}
 	
 	
 
 	public LiteHTMLView(Composite parent, int style) {
-		super(parent, style);
+		super(parent, style | SWT.TRANSPARENT);
 		
 		addPaintListener(new PaintListener() {
 			
@@ -179,5 +235,17 @@ public class LiteHTMLView extends Composite {
 		this.document = new Document(html, masterCSS, container);
 		gc.dispose();
 		redraw();
+	}
+	
+	public void setBasePath(String basePath) {
+		this.basePath = basePath;
+		if (container != null) {
+			container.clearLoadedImages();
+		}
+		
+	}
+	
+	public String getBasePath() {
+		return basePath;
 	}
 }

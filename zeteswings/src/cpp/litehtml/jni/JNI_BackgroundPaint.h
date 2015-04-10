@@ -4,6 +4,6 @@
 #include <jni.h>
 
 jobject backgroundPaintFromNative(JNIEnv* env, const litehtml::background_paint& bp);
-litehtml::background_paint backgroundPaintToNative(JNIEnv* env, jobject jbp);
+//litehtml::background_paint backgroundPaintToNative(JNIEnv* env, jobject jbp);
 
 #endif

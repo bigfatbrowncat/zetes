@@ -1,11 +1,5 @@
-/*
- * JNI_Position.cpp
- *
- *  Created on: 02 апр. 2015 г.
- *      Author: imizus
- */
-
 #include <stdlib.h>
+#include <iostream>
 #include <litehtml.h>
 
 #include "JNI_LiteHTML.h"
@@ -36,6 +30,7 @@ litehtml::position positionToNative(JNIEnv* env, jobject jpos) {
 	jfieldID y = env->GetFieldID(posClass, "y", "I");
 	jfieldID width = env->GetFieldID(posClass, "width", "I");
 	jfieldID height = env->GetFieldID(posClass, "height", "I");
+
 	return litehtml::position(env->GetIntField(jpos, x),
 	                          env->GetIntField(jpos, y),
 							  env->GetIntField(jpos, width),

@@ -11,7 +11,6 @@ import org.eclipse.swt.events.ShellListener;
 
 import zetes.wings.abstracts.Document;
 import zetes.wings.abstracts.DocumentListener;
-import zetes.wings.abstracts.ViewWindow;
 import zetes.wings.abstracts.ViewWindowsManager;
 import zetes.wings.abstracts.ViewWindowsManagerListener;
 
@@ -46,7 +45,7 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 		if (!views.containsKey(document))
 		{
 			views.put(document, new ArrayList<TVW>());
-			document.addListener(documentListener);
+			if (document != null) document.addListener(documentListener);
 		}
 		
 		views.get(document).add(window);

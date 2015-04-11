@@ -59,7 +59,7 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 		if (views.get(doc).size() == 0)
 		{
 			views.remove(doc);
-			doc.removeListener(documentListener);
+			if (doc != null) doc.removeListener(documentListener);
 		}
 	}
 	

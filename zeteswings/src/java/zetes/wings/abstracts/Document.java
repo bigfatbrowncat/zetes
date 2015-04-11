@@ -13,4 +13,7 @@ public interface Document
 	 * to the document
 	 */
 	void dispose();
+	
+	void addListener(DocumentListener listener);
+	void removeListener(DocumentListener listener);
 }

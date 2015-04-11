@@ -59,11 +59,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	public void setDocument(TD document)
 	{
 		this.document = document;
-		if (document != null && document.getTitle() != null) {
-			getShell().setText(getDocument().getTitle() + " \u2013 " + getTitleSuffix());
-		} else {
-			getShell().setText(getTitleSuffix());
-		}
+		updateTitle();
 	}
 	
 	private void setCocoaFullscreenButton(boolean on)
@@ -190,5 +186,13 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 
 	public void setTitleSuffix(String titleSuffix) {
 		this.titleSuffix = titleSuffix;
+	}
+	
+	void updateTitle() {
+		if (document != null && document.getTitle() != null) {
+			getShell().setText(getDocument().getTitle() + " \u2013 " + getTitleSuffix());
+		} else {
+			getShell().setText(getTitleSuffix());
+		}
 	}
 }

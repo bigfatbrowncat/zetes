@@ -27,6 +27,7 @@ static jmethodID getDefaultFontName = NULL;
 static jmethodID getDrawBackground = NULL;
 static jmethodID loadImage = NULL;
 static jmethodID getImageSize = NULL;
+static jmethodID setCaption = NULL;
 
 jclass getLiteHTMLDocumentContainerClass(JNIEnv* env) {
 	return env->FindClass(LITEHTML_PACKAGE "/DocumentContainer");
@@ -126,6 +127,14 @@ jmethodID getGetImageSizeMethod(JNIEnv* env) {
 		getImageSize = env->GetMethodID(lhdcc, "getImageSize", "(Ljava/lang/String;Ljava/lang/String;)L" LITEHTML_PACKAGE "/Size;");
 	}
 	return getImageSize;
+}
+
+jmethodID getSetCaptionMethod(JNIEnv* env) {
+	jclass lhdcc = getLiteHTMLDocumentContainerClass(env);
+	if (setCaption == NULL) {
+		setCaption = env->GetMethodID(lhdcc, "setCaption", "(Ljava/lang/String;)V");
+	}
+	return setCaption;
 }
 
 class JNI_LiteHTMLDocumentContainer : public litehtml::document_container {
@@ -244,7 +253,11 @@ public:
 		// TODO Implement
 	}
 	virtual	void set_caption(const tchar_t* caption) {
-		// TODO Implement
+		jobject javaLiteHTMLDocumentContainer = env->NewLocalRef(javaLiteHTMLDocumentContainer_weak);
+
+		jstring jcstr = env->NewStringUTF(caption);
+
+		env->CallVoidMethod(javaLiteHTMLDocumentContainer, getSetCaptionMethod(env), jcstr);
 	}
 	virtual	void				set_base_url(const tchar_t* base_url) {
 		// TODO Implement

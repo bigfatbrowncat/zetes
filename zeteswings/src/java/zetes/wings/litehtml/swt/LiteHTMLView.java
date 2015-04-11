@@ -29,6 +29,7 @@ public class LiteHTMLView extends Composite {
 	private GC gc;
 	
 	private String basePath; 
+	private LiteHTMLViewListener listener;
 
 	public class Container extends zetes.wings.litehtml.jni.DocumentContainer {
 		private long latestFontId = -1;
@@ -182,6 +183,13 @@ public class LiteHTMLView extends Composite {
 			ImageData img = getImage(src);
 			return new Size(img.width, img.height);
 		}
+		
+		@Override
+		protected void setCaption(String caption) {
+			if (listener != null) {
+				listener.setCaption(LiteHTMLView.this, caption);
+			}
+		}
 	}
 	
 	private Container container = new Container();
@@ -247,5 +255,9 @@ public class LiteHTMLView extends Composite {
 	
 	public String getBasePath() {
 		return basePath;
+	}
+	
+	public void setListener(LiteHTMLViewListener listener) {
+		this.listener = listener;
 	}
 }

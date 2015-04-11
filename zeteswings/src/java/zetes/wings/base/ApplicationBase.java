@@ -6,11 +6,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import zetes.feet.WinLinMacApi;
-
 import zetes.wings.SingleAppInstanceDocumentHandler;
 import zetes.wings.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import zetes.wings.abstracts.AboutBox;
 import zetes.wings.abstracts.Application;
+import zetes.wings.abstracts.ApplicationListener;
 import zetes.wings.abstracts.Document;
 import zetes.wings.abstracts.ViewWindow;
 import zetes.wings.abstracts.ViewWindowsManager;
@@ -33,6 +33,8 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 
 	private TMC menuConstructor;
 	private TVWM viewWindowsManager;
+	
+	private ApplicationListener listener;
 
 	public abstract String getTitle();
 	
@@ -159,7 +161,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	{
 	}
 	
-	ViewWindowsManagerListener<TVW> viewWindowsManagerListener = new ViewWindowsManagerListener<TVW>()
+	private ViewWindowsManagerListener<TVW> viewWindowsManagerListener = new ViewWindowsManagerListener<TVW>()
 	{
 		@Override
 		public void lastWindowClosed()
@@ -235,7 +237,9 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 				viewWindowsManager.ensureThereIsOpenedWindow();
 			}
 			
+			if (listener != null) listener.started(this);
 			eventLoop();
+			if (listener != null) listener.stopped(this);
 			
 			viewWindowsManager.removeListener(viewWindowsManagerListener);
 		}
@@ -251,5 +255,10 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 	public TVWM getViewWindowsManager()
 	{
 		return viewWindowsManager;
+	}
+	
+	@Override
+	public void setListener(ApplicationListener listener) {
+		this.listener = listener;
 	}
 }

@@ -28,5 +28,6 @@ public abstract class DocumentContainer {
 	protected abstract void drawBackground(long hdc, BackgroundPaint bg);
 	protected abstract void loadImage(String src, String baseUrl, boolean redrawOnReady);
 	protected abstract Size getImageSize(String src, String baseUrl);
+	protected abstract void setCaption(String caption);
 	
 }

@@ -10,12 +10,13 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 
 import zetes.wings.abstracts.Document;
+import zetes.wings.abstracts.DocumentListener;
 import zetes.wings.abstracts.ViewWindow;
 import zetes.wings.abstracts.ViewWindowsManager;
 import zetes.wings.abstracts.ViewWindowsManagerListener;
 
 
-public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends ViewWindow<TD>> implements ViewWindowsManager<TD, TVW>
+public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends ViewWindowBase<TD>> implements ViewWindowsManager<TD, TVW>
 {
 	private String applicationTitle;
 	private HashMap<TD, ArrayList<TVW>> views = new HashMap<TD, ArrayList<TVW>>();
@@ -29,11 +30,23 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 		this.applicationTitle = applicationTitle;
 	}
 
+	private DocumentListener documentListener = new DocumentListener() {
+		
+		@Override
+		public void titleChanged(Document document) {
+			for (TVW viewWindow : views.get(document)) {
+				viewWindow.updateTitle();
+			}
+			
+		}
+	};
+	
 	private void addWindowForDocument(TD document, TVW window)
 	{
 		if (!views.containsKey(document))
 		{
 			views.put(document, new ArrayList<TVW>());
+			document.addListener(documentListener);
 		}
 		
 		views.get(document).add(window);
@@ -47,6 +60,7 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 		if (views.get(doc).size() == 0)
 		{
 			views.remove(doc);
+			doc.removeListener(documentListener);
 		}
 	}
 	
@@ -128,12 +142,12 @@ public abstract class ViewWindowsManagerBase<TD extends Document, TVW extends Vi
 		
 		newWindow.open();
 		
+		addWindowForDocument(document, newWindow);
+
 		if (document != null)
 		{
 			newWindow.setDocument(document);
 		}
-		
-		addWindowForDocument(document, newWindow);
 		
 		newWindow.addShellListener(new ShellListener() {
 			

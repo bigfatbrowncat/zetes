@@ -58,4 +58,6 @@ public interface Application<TAB extends AboutBox,
 	 * (not necessarily the same) is closed, the application will be terminated (yes, even on OS X).
 	 */
 	boolean needsAtLeastOneView();
+	
+	void setListener(ApplicationListener listener);
 }

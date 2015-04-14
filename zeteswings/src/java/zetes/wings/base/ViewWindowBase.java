@@ -93,7 +93,7 @@ public abstract class ViewWindowBase<TD extends Document> implements ViewWindow<
 	@Override
 	public final Menu getMenu()
 	{
-		return shell.getMenuBar();
+		return shell.isDisposed() ? null : shell.getMenuBar();
 	}
 	
 	@Override

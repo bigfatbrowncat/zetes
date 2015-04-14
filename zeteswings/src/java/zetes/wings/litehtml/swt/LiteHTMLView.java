@@ -144,30 +144,41 @@ public class LiteHTMLView extends Composite {
 			
 			imgGc.dispose();
 
-			imgDt = (ImageData) img.getImageData().clone();
+			imgDt = (ImageData) img.getImageData();
 			img.dispose();
 			
 			for (int i = 0; i < te.x * te.y; i++) {
-				imgDt.alphaData[i] = (byte)imgDt.data[i * 4];
-				imgDt.data[i * 4 + 0] = (byte) gc.getForeground().getRed();
-				imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getGreen();
-				imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getBlue();
-				imgDt.data[i * 4 + 3] = 0;
+				imgDt.alphaData[i] = imgDt.data[i * 4 + 1];
+				imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getRed();
+				imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getGreen();
+				imgDt.data[i * 4 + 3] = (byte) gc.getForeground().getBlue();
 			}
 			return imgDt;
 		}
 		
 		private void drawFast(ImageData target, ImageData source, int x, int y) {
+			int tc, sc, sa, sr, sg, sb, tr, tg, tb;
 			for (int i = 0; i < source.width; i++) {
 				for (int j = 0; j < source.height; j++) {
 					if (j + y < target.height && i + x < target.width) {
-						int tc = ((j + y) * target.width + (i + x));
-						int sc = ((j + 0) * source.width + (i + 0));
-						float a = (float)source.alphaData[sc] / 255;
-						target.data[tc * 4 + 0] = (byte) (target.data[tc * 4 + 0] * (1 - a) + source.data[sc * 4 + 0] * a);
-						target.data[tc * 4 + 1] = (byte) (target.data[tc * 4 + 1] * (1 - a) + source.data[sc * 4 + 1] * a);
-						target.data[tc * 4 + 2] = (byte) (target.data[tc * 4 + 2] * (1 - a) + source.data[sc * 4 + 2] * a);
-						target.data[tc * 4 + 3] = (byte) (target.data[tc * 4 + 3] * (1 - a) + source.data[sc * 4 + 3] * a);
+						tc = ((j + y) * target.width + (i + x));
+						sc = ((j + 0) * source.width + (i + 0));
+						
+						sa = source.alphaData[sc] & 0xff;
+						
+						sr = source.data[sc * 4 + 1] & 0xff;
+						sg = source.data[sc * 4 + 2] & 0xff;
+						sb = source.data[sc * 4 + 3] & 0xff;
+
+						tr = target.data[tc * 4 + 1] & 0xff;
+						tg = target.data[tc * 4 + 2] & 0xff;
+						tb = target.data[tc * 4 + 3] & 0xff;
+						
+						
+						float a = ((float)sa) / 255;
+						target.data[tc * 4 + 1] = (byte) (tr * (1 - a) + sr * a);
+						target.data[tc * 4 + 2] = (byte) (tg * (1 - a) + sg * a);
+						target.data[tc * 4 + 3] = (byte) (tb * (1 - a) + sb * a);
 					}
 				}
 			}
@@ -176,8 +187,6 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void drawText(long hdc, String text, long hFont, WebColor color, Position pos) {
-			try {
-			//gc.setAdvanced(true);
 			Font font = loadedFonts.get(hFont);
 
 			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
@@ -190,16 +199,7 @@ public class LiteHTMLView extends Composite {
 
 			TextCacheItemKey cik = new TextCacheItemKey(font, swtColor, text);
 			if (cachedTextImages.containsKey(cik)) {
-				Image img = new Image(getDisplay(), cachedTextImages.get(cik));
-				Image bufferImage = new Image(getDisplay(), buffer);
-				GC gc = new GC(bufferImage);
-				gc.drawImage(img, pos.x, pos.y);
-				img.dispose();
-				gc.dispose();
-				buffer = bufferImage.getImageData();
-				bufferImage.dispose();
-				
-				//drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
+				drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
 			} else {
 				GC gc = new GC(getDisplay());
 				gc.setForeground(swtColor);
@@ -207,13 +207,6 @@ public class LiteHTMLView extends Composite {
 				cachedTextImages.put(cik, bufferStringImage(gc, text));
 				gc.dispose();
 			}
-			
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw e;
-			}
-			/*gc.drawText(text, pos.x, pos.y, SWT.DRAW_TRANSPARENT);*/
-			
 		}
 		
 		@Override
@@ -233,7 +226,6 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void drawBackground(long hdc, BackgroundPaint bg) {
-			try {
 			Image bufferImage = new Image(getDisplay(), buffer);
 			GC gc = new GC(bufferImage);
 			
@@ -246,10 +238,11 @@ public class LiteHTMLView extends Composite {
 			if (!bg.image.equals("")) {
 				gc.setAlpha(0xFF);
 				
-				Image img = new Image(gc.getDevice(), getImage(bg.image));
+				ImageData data = getImage(bg.image);
+				Image img = new Image(gc.getDevice(), data);
 				
-				int imageSourceWidth = img.getImageData().width;
-				int imageSourceHeight = img.getImageData().height;
+				int imageSourceWidth = data.width;
+				int imageSourceHeight = data.height;
 				
 				int imageWidth = imageSourceWidth;
 				int imageHeight = imageSourceHeight;
@@ -265,10 +258,6 @@ public class LiteHTMLView extends Composite {
 			gc.dispose();
 			buffer = bufferImage.getImageData();
 			bufferImage.dispose();
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw e;
-			}
 		}
 		
 		
@@ -294,7 +283,11 @@ public class LiteHTMLView extends Composite {
 		@Override
 		protected Size getImageSize(String src, String baseUrl) {
 			ImageData img = getImage(src);
-			return new Size(img.width, img.height);
+			if (img != null) {
+				return new Size(img.width, img.height);
+			} else {
+				return new Size(0, 0);
+			}
 		}
 		
 		@Override

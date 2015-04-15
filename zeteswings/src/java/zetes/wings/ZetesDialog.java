@@ -14,7 +14,7 @@ public abstract class ZetesDialog extends Dialog {
 		super(new Object() {
 					
 					public Shell getShell() {
-						if (SWT.getPlatform().equals("cocoa")) {
+						if (SWT.getPlatform().equals("cocoa") || parent == null) {
 							if (emptyShell == null) emptyShell = new Shell(Display.getCurrent());
 							return emptyShell;
 						} else {

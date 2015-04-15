@@ -9,13 +9,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
@@ -32,6 +30,8 @@ public class LiteHTMLView extends Composite {
 	private LiteHTMLViewListener listener;
 
 	public class Container extends zetes.wings.litehtml.jni.DocumentContainer {
+		private GC gc;
+		
 		private long latestFontId = -1;
 		private HashMap<Long, Font> loadedFonts = new HashMap<Long, Font>();
 		private HashMap<Integer, Color> loadedColors = new HashMap<>();
@@ -61,7 +61,7 @@ public class LiteHTMLView extends Composite {
 				}
 			}
 		}
-		private HashMap<TextCacheItemKey, ImageData> cachedTextImages = new HashMap<>();
+		private HashMap<TextCacheItemKey, Image> cachedTextImages = new HashMap<>();
 		
 		private ImageData getImage(String name) {
 			if (loadedImages.containsKey(name)) {
@@ -128,10 +128,10 @@ public class LiteHTMLView extends Composite {
 			return new Position(getClientArea());
 		}
 		
-		private ImageData bufferStringImage(GC gc, String string) {
+		private Image bufferStringImage(GC gc, String string) {
 			Point te = gc.textExtent(string, SWT.TRANSPARENT);
 			
-			ImageData imgDt = new ImageData(te.x, te.y, 32, new PaletteData(0xff0000, 0x00ff00, 0x0000ff));
+			ImageData imgDt = new ImageData(te.x, te.y, 32, new PaletteData(0xff000000, 0x00ff0000, 0x0000ff00));
 			imgDt.setAlpha(0, 0, 0);
 			Image img = new Image(gc.getDevice(), imgDt);
 			
@@ -143,21 +143,19 @@ public class LiteHTMLView extends Composite {
 			imgGc.drawText(string, 0, 0, SWT.TRANSPARENT);
 			
 			imgGc.dispose();
+			imgDt = img.getImageData();
 
-			imgDt = (ImageData) img.getImageData();
-			img.dispose();
-			
 			for (int i = 0; i < te.x * te.y; i++) {
 				imgDt.alphaData[i] = imgDt.data[i * 4 + 1];
-				imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getRed();
-				imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getGreen();
-				imgDt.data[i * 4 + 3] = (byte) gc.getForeground().getBlue();
+				imgDt.data[i * 4 + 0] = (byte) gc.getForeground().getRed();
+				imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getGreen();
+				imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getBlue();
 			}
-			return imgDt;
+			return new Image(gc.getDevice(), imgDt);
 		}
 		
-		private void drawFast(ImageData target, ImageData source, int x, int y) {
-			int tc, sc, sa, sr, sg, sb, tr, tg, tb;
+		/*private void drawFast(ImageData target, ImageData source, int x, int y) {
+			int tc, sc, s0, sa, sr, sg, sb, t0, tr, tg, tb;
 			for (int i = 0; i < source.width; i++) {
 				for (int j = 0; j < source.height; j++) {
 					if (j + y < target.height && i + x < target.width) {
@@ -166,23 +164,26 @@ public class LiteHTMLView extends Composite {
 						
 						sa = source.alphaData[sc] & 0xff;
 						
+						s0 = source.data[sc * 4 + 0] & 0xff;
 						sr = source.data[sc * 4 + 1] & 0xff;
 						sg = source.data[sc * 4 + 2] & 0xff;
 						sb = source.data[sc * 4 + 3] & 0xff;
 
+						t0 = target.data[tc * 4 + 0] & 0xff;
 						tr = target.data[tc * 4 + 1] & 0xff;
 						tg = target.data[tc * 4 + 2] & 0xff;
 						tb = target.data[tc * 4 + 3] & 0xff;
 						
 						
 						float a = ((float)sa) / 255;
+						target.data[tc * 4 + 0] = (byte) (t0 * (1 - a) + s0 * a);
 						target.data[tc * 4 + 1] = (byte) (tr * (1 - a) + sr * a);
 						target.data[tc * 4 + 2] = (byte) (tg * (1 - a) + sg * a);
 						target.data[tc * 4 + 3] = (byte) (tb * (1 - a) + sb * a);
 					}
 				}
 			}
-		}
+		}*/
 
 		
 		@Override
@@ -200,13 +201,12 @@ public class LiteHTMLView extends Composite {
 
 			TextCacheItemKey cik = new TextCacheItemKey(font, swtColor, text);
 			if (!cachedTextImages.containsKey(cik)) {
-				GC gc = new GC(getDisplay());
 				gc.setForeground(swtColor);
 				gc.setFont(font);
 				cachedTextImages.put(cik, bufferStringImage(gc, text));
-				gc.dispose();
 			}
-			drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
+			gc.drawImage(cachedTextImages.get(cik), pos.x, pos.y);
+			//drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
 
 		}
 		
@@ -227,9 +227,6 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void drawBackground(long hdc, BackgroundPaint bg) {
-			
-			Image bufferImage = new Image(getDisplay(), buffer);
-			GC gc = new GC(bufferImage);
 			
 			Color bgColor = new Color(gc.getDevice(), bg.color.red & 0xFF, bg.color.green & 0xFF, bg.color.blue & 0xFF);
 			gc.setAlpha(bg.color.alpha & 0xFF);
@@ -257,9 +254,7 @@ public class LiteHTMLView extends Composite {
 			}
 
 			bgColor.dispose();
-			gc.dispose();
-			buffer = bufferImage.getImageData();
-			bufferImage.dispose();
+
 		}
 		
 		
@@ -299,14 +294,6 @@ public class LiteHTMLView extends Composite {
 			}
 		}
 
-		private ImageData buffer;
-		public void updateBuffer() {
-			buffer = new ImageData(getClientRect().width, getClientRect().height, 32, new PaletteData(0xff0000, 0x00ff00, 0x0000ff));
-		}
-		
-		public ImageData getBuffer() {
-			return buffer;
-		}
 	}
 	
 	private Container container = new Container();
@@ -330,7 +317,7 @@ public class LiteHTMLView extends Composite {
 				} else {
 					height = heightHint;
 				}
-				container.updateBuffer();
+				//container.updateBuffer();
 			}
 			
 			latestSize = new Point(width, height);
@@ -347,11 +334,8 @@ public class LiteHTMLView extends Composite {
 			@Override
 			public void paintControl(PaintEvent arg0) {
 				if (document != null) {
+					container.gc = arg0.gc;
 					document.draw(123, 0, 0, container.getClientRect());
-					
-					Image img = new Image(getDisplay(), container.getBuffer());
-					arg0.gc.drawImage(img, 0, 0);
-					img.dispose();
 				}
 			}
 		});
@@ -359,7 +343,7 @@ public class LiteHTMLView extends Composite {
 	}
 	
 	public void setContent(String html, String masterCSS) {
-		container.updateBuffer();
+		//container.updateBuffer();
 		this.document = new Document(html, masterCSS, container);
 		redraw();
 	}

@@ -23,7 +23,6 @@ import org.eclipse.swt.events.SelectionEvent;
 public class UnhandledExceptionBox extends ZetesDialog {
 
 	private String iconResourceName;
-	private static Shell emptyShell;
 	protected Object result;
 	protected Shell shlZetesFalls;
 	private Text text;
@@ -36,20 +35,7 @@ public class UnhandledExceptionBox extends ZetesDialog {
 	 * @param style
 	 */
 	public UnhandledExceptionBox(final Shell parent) {
-		super(new Object() {
-			
-			public Shell getShell() {
-				if (SWT.getPlatform().equals("cocoa")) {
-					if (emptyShell == null) emptyShell = new Shell(Display.getCurrent());
-					return emptyShell;
-				} else {
-					return parent.getShell();
-				}
-			}
-
-		}.getShell(), SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
-
-		setText("SWT Dialog");
+		super(parent, SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
 	}
 	
 	public void setException(Throwable e) {
@@ -68,21 +54,7 @@ public class UnhandledExceptionBox extends ZetesDialog {
 		shlZetesFalls.open();
 		shlZetesFalls.layout();
 		centerWindow(shlZetesFalls);
-		new Label(shlZetesFalls, SWT.NONE);
-		new Label(shlZetesFalls, SWT.NONE);
-		new Label(shlZetesFalls, SWT.NONE);
 		
-		Button button = new Button(shlZetesFalls, SWT.NONE);
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				shlZetesFalls.close();
-			}
-		});
-		GridData gd_button = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-		gd_button.widthHint = 78;
-		button.setLayoutData(gd_button);
-		button.setText("Close");
 		Display display = getParent().getDisplay();
 		while (!shlZetesFalls.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -120,7 +92,10 @@ public class UnhandledExceptionBox extends ZetesDialog {
 		lblStackTrace.setText("Stack trace:");
 		
 		text = new Text(shlZetesFalls, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
-		text.setFont(SWTResourceManager.getFont("Courier New", 11, SWT.NORMAL));
+		
+		int size = shlZetesFalls.getDisplay().getSystemFont().getFontData()[0].getHeight();
+		text.setFont(SWTResourceManager.getFont("Courier New", size, SWT.NORMAL));
+		
 		text.setEditable(false);
 		text.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
 		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
@@ -132,6 +107,21 @@ public class UnhandledExceptionBox extends ZetesDialog {
 		exception.printStackTrace(pw);
 		text.setText(sw.toString());
 
+		new Label(shlZetesFalls, SWT.NONE);
+		new Label(shlZetesFalls, SWT.NONE);
+		new Label(shlZetesFalls, SWT.NONE);
+		
+		Button button = new Button(shlZetesFalls, SWT.NONE);
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				shlZetesFalls.close();
+			}
+		});
+		GridData gd_button = new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1);
+		gd_button.widthHint = 78;
+		button.setLayoutData(gd_button);
+		button.setText("Close");
 	}
 
 }

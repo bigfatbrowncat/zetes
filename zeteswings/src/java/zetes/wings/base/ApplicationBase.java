@@ -132,6 +132,7 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 		Display display = Display.getDefault();
 		try
 		{
+			if (listener != null) listener.started(this);
 			while (!terminated /*&& !display.isDisposed()*/)
 			{
 				if (!display.readAndDispatch())
@@ -139,11 +140,12 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 					onIdle();
 				}
 			}
-		} catch (Exception e) {
-			System.err.println("Event loop has been broken due to exception:");
-			e.printStackTrace();
-		} finally
-		{
+			if (listener != null) listener.stopped(this);
+		} catch (Throwable e) {
+			UnhandledExceptionBox box = new UnhandledExceptionBox(null);
+			box.setException(e);
+			box.open();
+		} finally {
 			display.dispose();
 		}
 		
@@ -238,16 +240,10 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 				viewWindowsManager.ensureThereIsOpenedWindow();
 			}
 			
-			if (listener != null) listener.started(this);
 			eventLoop();
-			if (listener != null) listener.stopped(this);
 			
 			viewWindowsManager.removeListener(viewWindowsManagerListener);
 			
-		} catch (Throwable e) {
-			UnhandledExceptionBox box = new UnhandledExceptionBox(null);
-			box.setException(e);
-			box.open();
 		} finally {
 			if (!SWT.getPlatform().equals("cocoa"))
 			{

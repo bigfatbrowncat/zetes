@@ -21,10 +21,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import zetes.wings.abstracts.AboutBox;
 import zetes.wings.base.ViewWindowBase;
 
-public class DefaultAboutBox extends Dialog implements AboutBox
+public class DefaultAboutBox extends ZetesDialog implements AboutBox
 {
-	private static Shell emptyShell;
-	protected Shell aboutBoxShell;
+	private Shell aboutBoxShell;
 	private String applicationName = "", descriptionText = "", copyrightText = "", iconResourceName = "";
 	private Point windowSize = new Point(370, 160);
 
@@ -35,48 +34,9 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 	public DefaultAboutBox(final ViewWindowBase<?> parent)
 	{
 		// Here we are creating a new shell if it's 
-		
-		super(new Object() {
-			
-			public Shell getShell() {
-				if (SWT.getPlatform().equals("cocoa")) {
-					if (emptyShell == null) emptyShell = new Shell(Display.getCurrent());
-					return emptyShell;
-				} else {
-					return parent.getShell();
-				}
-			}
-
-		}.getShell(), SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
+		super(null, SWT.DIALOG_TRIM | SWT.CENTER | SWT.DOUBLE_BUFFERED);
 	}
 
-	private void centerWindow()
-	{
-		Rectangle shellBounds;
-	
-		if (SWT.getPlatform().equals("cocoa"))
-		{
-			// Move the dialog to he center horizontally and 1/4 vertically
-			shellBounds = getParent().getDisplay().getBounds();
-			shellBounds.y -= shellBounds.height / 6;
-		}
-		else if (getParent().isVisible())
-		{
-			// Move the dialog to the center of the parent shell.
-			shellBounds = getParent().getBounds();
-		}
-		else
-		{
-			// Move the dialog to the center of the display
-			shellBounds = getParent().getDisplay().getBounds();
-		}
-		
-        Point dialogSize = aboutBoxShell.getSize();
-
-        aboutBoxShell.setLocation(shellBounds.x + (shellBounds.width - dialogSize.x) / 2,
-        					shellBounds.y + (shellBounds.height - dialogSize.y) / 2);	
-   	}
-	
 	private void fixButtonFont(Control button)
 	{
 		if (SWT.getPlatform().equals("cocoa"))
@@ -134,19 +94,11 @@ public class DefaultAboutBox extends Dialog implements AboutBox
 			{
 				createContentsCocoa();
 			}
-			centerWindow();
+			centerWindow(aboutBoxShell);
 	
 			aboutBoxShell.layout();
 			aboutBoxShell.open();
-			/*Display display = getParent().getDisplay();
-			while (!aboutBoxShell.isDisposed())
-			{
-				if (!display.readAndDispatch())
-				{
-					display.sleep();
-				}
-			}
-			aboutBoxShell = null;*/
+
 			return true;
 		}
 		else

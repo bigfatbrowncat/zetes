@@ -187,6 +187,7 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void drawText(long hdc, String text, long hFont, WebColor color, Position pos) {
+			
 			Font font = loadedFonts.get(hFont);
 
 			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
@@ -198,15 +199,15 @@ public class LiteHTMLView extends Composite {
 			//gc.setAlpha(color.alpha & 0xFF);
 
 			TextCacheItemKey cik = new TextCacheItemKey(font, swtColor, text);
-			if (cachedTextImages.containsKey(cik)) {
-				drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
-			} else {
+			if (!cachedTextImages.containsKey(cik)) {
 				GC gc = new GC(getDisplay());
 				gc.setForeground(swtColor);
 				gc.setFont(font);
 				cachedTextImages.put(cik, bufferStringImage(gc, text));
 				gc.dispose();
 			}
+			drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
+
 		}
 		
 		@Override
@@ -226,6 +227,7 @@ public class LiteHTMLView extends Composite {
 		
 		@Override
 		protected void drawBackground(long hdc, BackgroundPaint bg) {
+			
 			Image bufferImage = new Image(getDisplay(), buffer);
 			GC gc = new GC(bufferImage);
 			

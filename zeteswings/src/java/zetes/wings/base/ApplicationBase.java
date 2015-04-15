@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import zetes.feet.WinLinMacApi;
 import zetes.wings.SingleAppInstanceDocumentHandler;
+import zetes.wings.UnhandledExceptionBox;
 import zetes.wings.SingleAppInstanceDocumentHandler.FileNamesSendingFailed;
 import zetes.wings.abstracts.AboutBox;
 import zetes.wings.abstracts.Application;
@@ -242,9 +243,12 @@ public abstract class ApplicationBase<TAB extends AboutBox,
 			if (listener != null) listener.stopped(this);
 			
 			viewWindowsManager.removeListener(viewWindowsManagerListener);
-		}
-		finally
-		{
+			
+		} catch (Throwable e) {
+			UnhandledExceptionBox box = new UnhandledExceptionBox(null);
+			box.setException(e);
+			box.open();
+		} finally {
 			if (!SWT.getPlatform().equals("cocoa"))
 			{
 				if (mdiHelper != null) mdiHelper.stop();

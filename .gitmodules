@@ -1,3 +1,6 @@
 [submodule "avian-pack"]
 	path = avian-pack
 	url = ../avian-pack.git
+[submodule "zeteswings/swt-static"]
+	path = zeteswings/swt-static
+	url = ../swt-static.git

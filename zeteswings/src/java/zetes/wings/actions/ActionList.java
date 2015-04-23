@@ -44,6 +44,14 @@ public class ActionList<TVW extends ViewWindow<?>> extends Action<TVW> {
 		items.add(i, item);
 	}
 	
+	public void addItemAfter(ActionHierarchyMember<TVW> base, ActionHierarchyMember<TVW> item) {
+		addItem(items.indexOf(base) + 1, item);
+	}
+	
+	public void addItemBefore(ActionHierarchyMember<TVW> base, ActionHierarchyMember<TVW> item) {
+		addItem(items.indexOf(base), item);
+	}
+	
 	public void removeItem(ActionHierarchyMember<TVW> item) {
 		items.remove(item);
 	}

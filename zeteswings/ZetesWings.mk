@@ -56,7 +56,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
   PLATFORM_ARCH = windows i386
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
   PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
-  PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
+  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   SH_LIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
@@ -65,8 +65,15 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)	# Windows 32-bit
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64-bit
   PLATFORM_ARCH = windows x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
-  PLATFORM_CONSOLE_OPTION = #-mconsole     # <-- Uncomment this for console app
+  
+  # Basic Windows libraries
+  WGUILIBS := -lkernel32 -ladvapi32 -luser32 -lgdi32 -lcomdlg32 -lwinspool
+  WOLELIBS := -lole32 -luuid -loleaut32
+  # Windows libraries used by SWT
+  SWTLIBS := -lcomctl32 -lshell32 -limm32 -loleacc -lusp10 -lwininet -lcrypt32 -lshlwapi -lgdiplus -lopengl32
+
+  PLATFORM_GENERAL_LINKER_OPTIONS = -static -lmingw32 -lmingwthrd -lws2_32 -lshlwapi $(WGUILIBS) $(WOLELIBS) $(SWTLIBS) $(CUSTOM_LIBS) -mwindows -static-libgcc -static-libstdc++ $(OBJECTS_PATH)/win.res
+  PLATFORM_CONSOLE_OPTION = -mconsole     # <-- Uncomment this for console app
   SH_LIB_EXT=.dll
   STRIP_OPTIONS=--strip-all
   RDYNAMIC=
@@ -267,7 +274,8 @@ endif
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(OBJECTS_PATH)/app_id.str.o \
-	           $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) -lm -lz -o $@
+			   $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) \
+			   -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
 $(JAVA_OBJECTS_PATH)/classpath.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(CUSTOM_JARS)
@@ -310,4 +318,4 @@ native-deps::
 	@echo [$(APPLICATION_NAME)] Building custom native dependencies...
 
 .PHONY: package clean native-deps
-.SILENT:
+#.SILENT:

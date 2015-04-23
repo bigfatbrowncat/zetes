@@ -47,8 +47,8 @@ CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES
 C_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(C_FILES))))
 
 # SWT binaries
-SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep .class))
-SWT_LIBS = $(addprefix $(BINARY_PATH)/,$(shell "$(JAVA_HOME)/bin/jar" -tf lib/$(PLATFORM_TAG)/swt.jar | grep $(JNILIB_EXT)))
+SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell cd swt-static/$(PLATFORM_TAG)/target/classes; find . | grep .class))
+SWT_OBJECTS = $(addprefix swt-static/$(PLATFORM_TAG)/target/obj/,$(shell cd swt-static/$(PLATFORM_TAG)/target/obj; find . | grep .o))
 
 ZETES_FEET_JAR = $(ZETES_FEET_PATH)/$(LIB)/java/zetesfeet.jar
 
@@ -106,7 +106,7 @@ JUST_COPY_FILES = $(USER_MK)
 include ../common-scripts/just_copy.mk
 	
 
-all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS) $(JUST_COPY_FILES_TARGET)
+all: $(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(JUST_COPY_FILES_TARGET)
 	@echo "*** $(APPLICATION_NAME) building process completed successfully. ***"
 	@echo You can find the result in folders:
 	@echo
@@ -138,10 +138,10 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.c $(CPP_HEADER_FILES)
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	gcc -std=c99 $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c -Iinclude -I"$(SRC)/cpp" $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(LIBRARY_PATH)/$(LIBRARY_NAME): $(C_OBJECTS) $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(C_OBJECTS) $(CPP_OBJECTS) $(SWT_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
-	ar rs $@ $(CPP_OBJECTS) $(C_OBJECTS)
+	ar rs $@ $(CPP_OBJECTS) $(C_OBJECTS) $(SWT_OBJECTS)
 
 $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
@@ -156,25 +156,17 @@ $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(J
 	    ) \
 	)
 
-$(SWT_CLASSES) $(SWT_LIBS): %:
-	@echo [$(APPLICATION_NAME)] Extracting SWT library...
-	mkdir -p $(BINARY_PATH);
-	mkdir -p $(JAVA_OBJECTS_PATH)/swt;
-	mkdir -p $(JAVA_CLASSPATH);
+$(SWT_CLASSES) : $(JAVA_CLASSPATH)/%: swt-static/$(PLATFORM_TAG)/target/classes/%
+	@echo [$(APPLICATION_NAME)] Copying SWT class '$<'...
+	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	# Extracting swt
-	( \
-	    cd $(JAVA_OBJECTS_PATH)/swt; \
-	    "$(JAVA_HOME)/bin/jar" xf $(CURDIR)/lib/$(PLATFORM_TAG)/swt.jar; \
-	    cp -rf org $(CURDIR)/$(JAVA_CLASSPATH); \
-	    cp -rf *$(JNILIB_EXT) $(CURDIR)/$(BINARY_PATH)/; \
-	)
-
+	cp -rf '$<' '$@'
 
 $(TARGET)/$(PACKAGE_NAME): all
-	@echo [$(APPLICATION_NAME)] Making package file $@...
+	@echo [$(APPLICATION_NAME)] Making package file '$@'...
 	( \
 	    cd $(TARGET); \
-	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME) $(SWT_LIBS)); \
+	    zip $(PACKAGE_NAME) $(subst $(TARGET)/,,$(LIBRARY_PATH)/$(LIBRARY_NAME) $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME)); \
 	)
 
 
@@ -183,4 +175,4 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: help all package clean
-#.SILENT:
+.SILENT:

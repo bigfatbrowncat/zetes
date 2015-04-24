@@ -274,6 +274,7 @@ endif
 	           $(OBJECTS_PATH)/boot.jar.o \
 	           $(OBJECTS_PATH)/entry.str.o \
 	           $(OBJECTS_PATH)/app_id.str.o \
+			   $(ZETES_WINGS_PATH)/$(LIB)/$(PLATFORM_TAG)/swt.a
 			   $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) \
 			   -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 

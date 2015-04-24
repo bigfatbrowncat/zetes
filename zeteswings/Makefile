@@ -46,10 +46,6 @@ CPP_HEADER_FILES = $(addprefix $(CPP_SOURCE_PATH)/,$(shell cd $(CPP_SOURCE_PATH)
 CPP_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(CPP_FILES))))
 C_OBJECTS = $(addprefix $(OBJECTS_PATH)/,$(addsuffix .o,$(basename $(C_FILES))))
 
-# SWT binaries
-SWT_CLASSES = $(addprefix $(JAVA_CLASSPATH)/,$(shell cd swt-static/$(PLATFORM_TAG)/target/classes; find . | grep .class))
-SWT_OBJECTS = $(addprefix swt-static/$(PLATFORM_TAG)/target/obj/,$(shell cd swt-static/$(PLATFORM_TAG)/target/obj; find . | grep .o))
-
 ZETES_FEET_JAR = $(ZETES_FEET_PATH)/$(LIB)/java/zetesfeet.jar
 
 USER_MK = ZetesWings.mk
@@ -118,12 +114,12 @@ package: $(TARGET)/$(PACKAGE_NAME)
 
 include ../common-scripts/ideconf/ideconf.mk
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java $(SWT_CLASSES) $(ZETES_FEET_JAR)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_SOURCE_PATH)/%.java swt_all $(ZETES_FEET_JAR)
 	@echo [$(APPLICATION_NAME)] Compiling $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -encoding utf8 -sourcepath "$(JAVA_SOURCE_PATH)" -classpath "$(ZETES_FEET_JAR)$(CLASSPATH_DELIM)$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
 
-$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java $(SWT_CLASSES) $(ZETES_FEET_JAR)
+$(JAVA_CLASSPATH)/%.class: $(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)/%.java swt_all $(ZETES_FEET_JAR)
 	@echo [$(APPLICATION_NAME)] Compiling platform specific $<...
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javac" -encoding utf8 -sourcepath "$(JAVA_PLATFORM_SPECIFIC_SOURCE_PATH)" -classpath "$(ZETES_FEET_JAR)$(CLASSPATH_DELIM)$(JAVA_CLASSPATH)" -d "$(JAVA_CLASSPATH)" $<
@@ -138,12 +134,30 @@ $(OBJECTS_PATH)/%.o: $(SRC)/cpp/%.c $(CPP_HEADER_FILES)
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	gcc -std=c99 $(DEBUG_OPTIMIZE) $(PIC) -D_JNI_IMPLEMENTATION_ -c -Iinclude -I"$(SRC)/cpp" $(ZETES_FEET_INCLUDE) $(PLATFORM_GENERAL_INCLUDES) $< -o $@
 
-$(LIBRARY_PATH)/$(LIBRARY_NAME): $(C_OBJECTS) $(CPP_OBJECTS) $(SWT_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
+# SWT
+
+SWTPATH = $(CURDIR)/swt-static/$(PLATFORM_TAG)/target
+swt_all: $(SWTPATH)/libswt.a
+	@echo [$(APPLICATION_NAME)] Copying SWT classes...
+	if [ ! -d "$(JAVA_CLASSPATH)" ]; then mkdir -p "$(JAVA_CLASSPATH)"; fi
+	# Copying SWT classes
+	(cd swt-static/$(PLATFORM_TAG)/target/classes; cp -rf * $(CURDIR)/$(JAVA_CLASSPATH)/)
+
+$(SWTPATH)/libswt.a:
+	(cd $(CURDIR)/swt-static/$(PLATFORM_TAG); make)
+
+$(LIBRARY_PATH)/libswt.a: $(SWTPATH)/libswt.a
+	@echo [$(APPLICATION_NAME)] Copying $@...
+	cp -f $^ $@
+
+# Target
+	
+$(LIBRARY_PATH)/$(LIBRARY_NAME): $(C_OBJECTS) $(CPP_OBJECTS) $(ZETES_FEET_PATH)/$(LIB)/$(PLATFORM_TAG)/libzetesfeet.a
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(LIBRARY_PATH);
-	ar rs $@ $(CPP_OBJECTS) $(C_OBJECTS) $(SWT_OBJECTS)
+	ar rs $@ $(CPP_OBJECTS) $(C_OBJECTS)
 
-$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) $(SWT_CLASSES)
+$(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(JAVA_PLATFORM_SPECIFIC_CLASSES) swt_all
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(JAVA_LIBRARY_PATH)
 	# Making the java class library
@@ -155,12 +169,6 @@ $(JAVA_LIBRARY_PATH)/$(JAVA_LIBRARY_NAME): $(ZETES_FEET_JAR) $(JAVA_CLASSES) $(J
 	        "$(JAVA_HOME)/bin/jar" cf $(JAVA_LIBRARY_NAME) -C $(CURDIR)/$(JAVA_CLASSPATH) .; \
 	    ) \
 	)
-
-$(SWT_CLASSES) : $(JAVA_CLASSPATH)/%: swt-static/$(PLATFORM_TAG)/target/classes/%
-	@echo [$(APPLICATION_NAME)] Copying SWT class '$<'...
-	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	# Extracting swt
-	cp -rf '$<' '$@'
 
 $(TARGET)/$(PACKAGE_NAME): all
 	@echo [$(APPLICATION_NAME)] Making package file '$@'...
@@ -175,4 +183,4 @@ clean:
 	rm -rf $(TARGET)
 
 .PHONY: help all package clean
-.SILENT:
+#.SILENT:

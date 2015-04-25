@@ -13,9 +13,10 @@ RESOURCES = resources
 DEBUG_OPTIMIZE = -O0  -g
 
 ifeq ($(UNAME), Darwin)	# OS X
+  JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_ARCH = darwin x86_64
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin" $(CUSTOM_INCLUDES)
-  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa $(CUSTOM_LIBS)
+  PLATFORM_GENERAL_LINKER_OPTIONS = -framework Cocoa -framework WebKit -framework CoreServices -framework JavaScriptCore -framework Security -framework SecurityInterface $(CUSTOM_LIBS)
   PLATFORM_CONSOLE_OPTION = 
   SH_LIB_EXT=.so
   STRIP_OPTIONS=-S -x
@@ -161,7 +162,6 @@ $(BINARY_PATH)/$(APPLICATION_NAME).app: osx-bundle/Contents/Info.plist $(BINARY_
 	mkdir -p $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/Resources
 	cp -r osx-bundle/* $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app
 	cp $(BINARY_PATH)/$(BINARY_NAME) $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/MacOS
-	cp $(ZETES_JNI_LIBS_TARGET) $(BINARY_PATH)/bundle/$(APPLICATION_NAME).app/Contents/MacOS
 
 else ifeq ($(OS), Windows_NT)	# Windows 
 

@@ -145,11 +145,20 @@ public class LiteHTMLView extends Composite {
 			imgGc.dispose();
 			imgDt = img.getImageData();
 
-			for (int i = 0; i < te.x * te.y; i++) {
-				imgDt.alphaData[i] = imgDt.data[i * 4 + 1];
-				imgDt.data[i * 4 + 0] = (byte) gc.getForeground().getRed();
-				imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getGreen();
-				imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getBlue();
+			if (SWT.getPlatform().equals("cocoa")) {
+				for (int i = 0; i < te.x * te.y; i++) {
+					imgDt.alphaData[i] = imgDt.data[i * 4 + 1];
+					imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getRed();
+					imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getGreen();
+					imgDt.data[i * 4 + 3] = (byte) gc.getForeground().getBlue();
+				}
+			} else {
+				for (int i = 0; i < te.x * te.y; i++) {
+					imgDt.alphaData[i] = imgDt.data[i * 4 + 0];
+					imgDt.data[i * 4 + 0] = (byte) gc.getForeground().getRed();
+					imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getGreen();
+					imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getBlue();
+				}
 			}
 			return new Image(gc.getDevice(), imgDt);
 		}

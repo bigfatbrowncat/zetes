@@ -278,6 +278,17 @@ endif
 			   -lm -lz -o $@
 	strip -o $@$(EXE_EXT).tmp $(STRIP_OPTIONS) $@$(EXE_EXT) && mv $@$(EXE_EXT).tmp $@$(EXE_EXT) 
 
+	#g++ -mdll $(DEBUG_OPTIMIZE) -Llib/$(PLATFORM_TAG) $(CPP_OBJECTS) \
+	#           @$(OBJECTS_PATH)/libzetesfeet/liblistpath.txt \
+	#           @$(OBJECTS_PATH)/libzeteswings/liblistpath.txt \
+	#           @$(OBJECTS_PATH)/liblistpath.txt \
+	#           $(OBJECTS_PATH)/boot.jar.o \
+	#           $(OBJECTS_PATH)/entry.str.o \
+	#           $(OBJECTS_PATH)/app_id.str.o \
+	#		   $(PLATFORM_GENERAL_LINKER_OPTIONS) $(PLATFORM_CONSOLE_OPTION) \
+	#		   -lm -lz -o $@.dll
+	#strip -o $@.dll.tmp $(STRIP_OPTIONS) $@.dll && mv $@.dll.tmp $@.dll 
+
 $(JAVA_OBJECTS_PATH)/classpath.jar: $(ZETES_WINGS_PATH)/$(LIB)/java/$(JAVA_ZETES_WINGS_LIBRARY) $(ZETES_FEET_PATH)/$(LIB)/java/$(JAVA_ZETES_FEET_LIBRARY) $(CUSTOM_JARS)
 	@echo [$(APPLICATION_NAME)] Constructing $@...
 	mkdir -p $(JAVA_CLASSPATH_EXTERNAL);

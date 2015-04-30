@@ -13,7 +13,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
@@ -37,32 +36,6 @@ public class LiteHTMLView extends Composite {
 		private HashMap<Integer, Color> loadedColors = new HashMap<>();
 		private HashMap<String, ImageData> loadedImages = new HashMap<>();
 
-		private class TextCacheItemKey {
-			public final Font font;
-			public final Color color;
-			public final String string;
-			public TextCacheItemKey(Font font, Color color, String string) {
-				super();
-				this.font = font;
-				this.color = color;
-				this.string = string;
-			}
-			@Override
-			public int hashCode() {
-				return string.hashCode() + 1000 * color.hashCode() + 100000 * font.hashCode();
-			}
-			@Override
-			public boolean equals(Object other) {
-				if (other instanceof TextCacheItemKey) {
-					TextCacheItemKey o = ((TextCacheItemKey) other);
-					return o.font.equals(font) && o.string.equals(string) && o.color.equals(color);
-				} else {
-					return false;
-				}
-			}
-		}
-		private HashMap<TextCacheItemKey, Image> cachedTextImages = new HashMap<>();
-		
 		private ImageData getImage(String name) {
 			if (loadedImages.containsKey(name)) {
 				return loadedImages.get(name);
@@ -127,96 +100,34 @@ public class LiteHTMLView extends Composite {
 		protected Position getClientRect() {
 			return new Position(getClientArea());
 		}
-		
-		private Image bufferStringImage(GC gc, String string) {
-			Point te = gc.textExtent(string, SWT.TRANSPARENT);
-			
-			ImageData imgDt = new ImageData(te.x, te.y, 32, new PaletteData(0xff000000, 0x00ff0000, 0x0000ff00));
-			imgDt.setAlpha(0, 0, 0);
-			Image img = new Image(gc.getDevice(), imgDt);
-			
-			GC imgGc = new GC(img);
-			imgGc.setFont(gc.getFont());
-			imgGc.setBackground(new Color(gc.getDevice(), 0x00, 0x00, 0x00));
-			imgGc.setForeground(new Color(gc.getDevice(), 0xFF, 0xFF, 0xFF));
-			
-			imgGc.drawText(string, 0, 0, SWT.TRANSPARENT);
-			
-			imgGc.dispose();
-			imgDt = img.getImageData();
-
-			if (SWT.getPlatform().equals("cocoa")) {
-				for (int i = 0; i < te.x * te.y; i++) {
-					imgDt.alphaData[i] = imgDt.data[i * 4 + 1];
-					imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getRed();
-					imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getGreen();
-					imgDt.data[i * 4 + 3] = (byte) gc.getForeground().getBlue();
-				}
-			} else {
-				for (int i = 0; i < te.x * te.y; i++) {
-					imgDt.alphaData[i] = imgDt.data[i * 4 + 0];
-					imgDt.data[i * 4 + 0] = (byte) gc.getForeground().getRed();
-					imgDt.data[i * 4 + 1] = (byte) gc.getForeground().getGreen();
-					imgDt.data[i * 4 + 2] = (byte) gc.getForeground().getBlue();
-				}
-			}
-			return new Image(gc.getDevice(), imgDt);
-		}
-		
-		/*private void drawFast(ImageData target, ImageData source, int x, int y) {
-			int tc, sc, s0, sa, sr, sg, sb, t0, tr, tg, tb;
-			for (int i = 0; i < source.width; i++) {
-				for (int j = 0; j < source.height; j++) {
-					if (j + y < target.height && i + x < target.width) {
-						tc = ((j + y) * target.width + (i + x));
-						sc = ((j + 0) * source.width + (i + 0));
-						
-						sa = source.alphaData[sc] & 0xff;
-						
-						s0 = source.data[sc * 4 + 0] & 0xff;
-						sr = source.data[sc * 4 + 1] & 0xff;
-						sg = source.data[sc * 4 + 2] & 0xff;
-						sb = source.data[sc * 4 + 3] & 0xff;
-
-						t0 = target.data[tc * 4 + 0] & 0xff;
-						tr = target.data[tc * 4 + 1] & 0xff;
-						tg = target.data[tc * 4 + 2] & 0xff;
-						tb = target.data[tc * 4 + 3] & 0xff;
-						
-						
-						float a = ((float)sa) / 255;
-						target.data[tc * 4 + 0] = (byte) (t0 * (1 - a) + s0 * a);
-						target.data[tc * 4 + 1] = (byte) (tr * (1 - a) + sr * a);
-						target.data[tc * 4 + 2] = (byte) (tg * (1 - a) + sg * a);
-						target.data[tc * 4 + 3] = (byte) (tb * (1 - a) + sb * a);
-					}
-				}
-			}
-		}*/
-
-		
+				
 		@Override
 		protected void drawText(long hdc, String text, long hFont, WebColor color, Position pos) {
+
+			boolean notEmpty = false;
+			for (int i = 0; i < text.length(); i++) {
+				if (text.charAt(i) != ' ' && text.charAt(i) != '\t' && text.charAt(i) != '\n' && text.charAt(i) != '\r') {
+					notEmpty = true;
+					break;
+				}
+			}
 			
-			Font font = loadedFonts.get(hFont);
-
-			int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
-			Color swtColor = loadedColors.get(index);
-			if (swtColor == null) {
-				swtColor = new Color(getDisplay(), color.red & 0xFF, color.green & 0xFF, color.blue & 0xFF);
-				loadedColors.put(index, swtColor);
+			if (notEmpty) {
+				Font font = loadedFonts.get(hFont);
+	
+				int index = (color.red & 0xFF) << 16 + (color.green & 0xFF) << 8 + (color.blue & 0xFF); 
+				Color swtColor = loadedColors.get(index);
+				if (swtColor == null) {
+					swtColor = new Color(getDisplay(), color.red & 0xFF, color.green & 0xFF, color.blue & 0xFF);
+					loadedColors.put(index, swtColor);
+				}
+				
+				if (gc.getForeground() != swtColor) gc.setForeground(swtColor);
+				if (gc.getFont() != font) gc.setFont(font);
+	
+				gc.drawText(text, pos.x, pos.y, true);
 			}
-			//gc.setAlpha(color.alpha & 0xFF);
-
-			TextCacheItemKey cik = new TextCacheItemKey(font, swtColor, text);
-			if (!cachedTextImages.containsKey(cik)) {
-				gc.setForeground(swtColor);
-				gc.setFont(font);
-				cachedTextImages.put(cik, bufferStringImage(gc, text));
-			}
-			gc.drawImage(cachedTextImages.get(cik), pos.x, pos.y);
-			//drawFast(buffer, cachedTextImages.get(cik), pos.x, pos.y);
-
+			
 		}
 		
 		@Override

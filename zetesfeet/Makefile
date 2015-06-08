@@ -14,11 +14,7 @@ DEBUG_OPTIMIZE = -O0 -g
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME = $(shell /usr/libexec/java_home)
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
-else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
-  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
-  PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
-else ifeq ($(UNAME) $(ARCH), Linux armv7l)              # linux on Raspberry Pi
+else ifeq ($(UNAME), Linux)				# linux
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   PLATFORM_GENERAL_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"

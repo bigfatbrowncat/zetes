@@ -15,10 +15,15 @@ endif
 AVIAN_ARCH=$(ARCH)
 ifeq ($(AVIAN_ARCH), armv6l)   # Raspberry Pi
   AVIAN_ARCH=arm
+else ifeq ($(AVIAN_ARCH), armv7l)
+  AVIAN_ARCH=arm
+else ifeq ($(AVIAN_ARCH), i686)
+  AVIAN_ARCH=i386
+  ARCH=i386
 endif
 
 ifeq ($(UNAME), Darwin)	# OS X
-  JAVA_HOME=$(shell /usr/libexec/java_home)
+  JAVA_HOME?=$(shell /usr/libexec/java_home)
   PLATFORM=darwin
   PLATFORM_TAG = darwin-x86_64
   AVIAN_PLATFORM_TAG_PART = macosx-x86_64
@@ -27,31 +32,11 @@ ifeq ($(UNAME), Darwin)	# OS X
   SHLIB_EXT=.dylib
   EXE_EXT=
   PIC=
-else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
-  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
+else ifeq ($(UNAME), Linux)
+  JAVA_HOME?=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   PLATFORM=linux
-  PLATFORM_TAG = linux-x86_64
-  AVIAN_PLATFORM_TAG_PART = linux-x86_64
-  CLASSPATH_DELIM=:
-  JNILIB_EXT=.so
-  SHLIB_EXT=.so
-  EXE_EXT=
-  PIC=-fPIC
-else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
-  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
-  PLATFORM=linux
-  PLATFORM_TAG = linux-armv6l
-  AVIAN_PLATFORM_TAG_PART = linux-arm
-  CLASSPATH_DELIM=:
-  JNILIB_EXT=.so
-  SHLIB_EXT=.so
-  EXE_EXT=
-  PIC=-fPIC
-else ifeq ($(UNAME) $(ARCH), Linux armv7l)              # linux on ARM v7
-  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
-  PLATFORM=linux
-  PLATFORM_TAG = linux-armv7l
-  AVIAN_PLATFORM_TAG_PART = linux-arm
+  PLATFORM_TAG = linux-$(ARCH)
+  AVIAN_PLATFORM_TAG_PART = linux-$(AVIAN_ARCH)
   CLASSPATH_DELIM=:
   JNILIB_EXT=.so
   SHLIB_EXT=.so
